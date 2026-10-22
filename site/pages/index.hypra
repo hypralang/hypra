@@ -20,7 +20,7 @@ page(layout: Site, title: "Pages that compile", canonical: "https://hypralang.de
       }
       """
   }
-  props(sample: Sample, version: Text)
+  props(sample: Sample, version: Text, guides: List)
 
   section(class: "mx-auto grid max-w-6xl gap-12 px-6 pt-16 lg:grid-cols-[1fr_1.05fr] lg:items-start") {
     div(class: "lg:pt-6") {
@@ -62,7 +62,20 @@ page(layout: Site, title: "Pages that compile", canonical: "https://hypralang.de
     }
   }
 
-  Section(number: "04", title: "Install") {
+  Section(number: "04", title: "Guides") {
+    ul(class: "mt-6 grid gap-px border-y border-rule bg-rule sm:grid-cols-3") {
+      for guide in guides {
+        li(class: "bg-paper sm:px-5 sm:first:pl-0") {
+          a(guide.url, class: "block h-full py-5 pr-6 no-underline hover:underline sm:pr-0") {
+            h3(class: "text-lg leading-snug font-bold") "{guide.title}"
+            p(class: "mt-1.5 text-ink-2") "{guide.description}"
+          }
+        }
+      }
+    }
+  }
+
+  Section(number: "05", title: "Install") {
     div(id: "install", class: "mt-6 grid scroll-mt-24 gap-10 lg:grid-cols-3") {
       div {
         h3 "Command line"

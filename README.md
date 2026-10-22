@@ -14,6 +14,7 @@
 <p align="center">
   <a href="https://hypralang.dev">Website</a> ·
   <a href="https://hypralang.dev/docs/">Docs</a> ·
+  <a href="https://hypralang.dev/guides/">Guides</a> ·
   <a href="php/laravel">Laravel</a> ·
   <a href="editors/vscode">VS Code</a> ·
   <a href="https://github.com/hypralang/hypra/releases">Download</a>

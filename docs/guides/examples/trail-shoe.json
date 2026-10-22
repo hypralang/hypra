@@ -1,0 +1,10 @@
+{
+  "shoe": {
+    "id": 7,
+    "name": "Trail Runner GTX",
+    "summary": "A waterproof trail shoe with a grippy sole, for wet and muddy runs of any length.",
+    "photo": "/img/trail-runner-gtx.jpg",
+    "features": ["Waterproof membrane", "4 mm lugs for mud", "290 g in size 42"],
+    "price": "€149"
+  }
+}

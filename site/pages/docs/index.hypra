@@ -2,17 +2,21 @@ use "../layout.hypra"
 
 page(layout: Site, title: "{doc.title}", canonical: "https://hypralang.dev{doc.url}", description: "{doc.description}") {
   allow("SEC-002") "the docs are our own Markdown, turned into HTML when the site is built"
-  props(doc: Doc, docs: List)
+  props(doc: Doc, sections: List)
 
   div(class: "mx-auto grid max-w-6xl gap-10 px-6 pt-10 lg:grid-cols-[12rem_1fr] xl:grid-cols-[12rem_1fr_12rem]") {
-    nav(aria-label: "Docs", class: "text-[15px] lg:sticky lg:top-8 lg:self-start") {
-      ul(class: "grid gap-0.5") {
-        for page in docs {
-          li {
-            if page.current {
-              a(page.url, aria-current: "page", class: "block border-l-2 border-ink py-1 pl-3 font-bold no-underline") "{page.title}"
-            } else {
-              a(page.url, class: "block border-l-2 border-rule py-1 pl-3 text-ink-2 no-underline hover:border-ink-2 hover:text-ink") "{page.title}"
+    // on a phone the page comes first and the list of pages after it
+    nav(aria-label: "Docs", class: "order-last text-[15px] lg:order-none lg:sticky lg:top-8 lg:self-start") {
+      for section in sections {
+        p(class: "mt-6 mb-2 font-mono text-[13px] text-mute first:mt-0") "{section.title}"
+        ul(class: "grid gap-0.5") {
+          for page in section.pages {
+            li {
+              if page.current {
+                a(page.url, aria-current: "page", class: "block border-l-2 border-ink py-1 pl-3 font-bold no-underline") "{page.title}"
+              } else {
+                a(page.url, class: "block border-l-2 border-rule py-1 pl-3 text-ink-2 no-underline hover:border-ink-2 hover:text-ink") "{page.title}"
+              }
             }
           }
         }

@@ -1,0 +1,11 @@
+page(title: "{shoe.name}", description: "{shoe.summary}") {
+  props(shoe: Shoe)
+  h1 "{shoe.name}"
+  img(shoe.photo, alt: "{shoe.name}, side view")
+  p "{shoe.summary}"
+  ul {
+    for feature in shoe.features { li "{feature}" }
+  }
+  p { "From " b "{shoe.price}" ", free returns for 30 days." }
+  action("cart.add", id: shoe.id) "Add to cart"
+}

@@ -1,7 +1,7 @@
 // Builds hypralang.dev into dist/. The pages are Hypra; their content comes from the repository's Markdown docs and
 // from running the compiler on a sample, so the site always shows what the current version does.
 import { execFileSync, spawnSync } from "node:child_process";
-import { cpSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { cpSync, mkdirSync, mkdtempSync, readFileSync, renameSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -48,6 +48,31 @@ const docs = [
   },
 ];
 
+// the guides, in the order of the sidebar; each solves one problem, with and without Hypra
+const guides = [
+  {
+    section: "guides",
+    slug: "markdown-for-llms-in-laravel",
+    file: "docs/guides/markdown-for-llms-in-laravel.md",
+    nav: "Markdown for LLMs in Laravel",
+    description: "Answer AI agents in Markdown from the same URL as your HTML, with Laravel middleware or with Hypra.",
+  },
+  {
+    section: "guides",
+    slug: "accessibility-checks-at-compile-time",
+    file: "docs/guides/accessibility-checks-at-compile-time.md",
+    nav: "Accessibility checks at compile time",
+    description: "Catch missing alt text, unlabeled fields, empty buttons and skipped headings before a page ships.",
+  },
+  {
+    section: "guides",
+    slug: "webmcp-tools-for-your-website",
+    file: "docs/guides/webmcp-tools-for-your-website.md",
+    nav: "WebMCP tools for your website",
+    description: "Turn your forms and buttons into tools AI agents can call, with WebMCP attributes and JSON Schemas.",
+  },
+];
+
 execFileSync("cargo", ["build", "--release", "--quiet"], { cwd: repo, stdio: "inherit" });
 const hypra = join(repo, "target/release/hypra");
 const version = execFileSync(hypra, ["--version"], { encoding: "utf8" }).trim().replace("hypra ", "");
@@ -60,19 +85,20 @@ const highlighter = await createHighlighter({
   ],
 });
 const aliases = { console: "shellscript", sh: "shellscript", bash: "shellscript", text: "text", "": "text" };
-/** Highlighted code in a block that gets a copy button; `wrap` breaks long lines instead of scrolling. */
-const highlight = (code, lang, wrap = false) => {
+/** Highlighted code in a block that gets a copy button; `wrap` breaks long lines instead of scrolling, and `label`
+ * names the block, e.g. "Output" for what the compiler wrote. */
+const highlight = (code, lang, wrap = false, label = "") => {
   const name = aliases[lang] ?? lang;
   const html = highlighter.codeToHtml(code.replace(/\n$/, ""), {
     lang: highlighter.getLoadedLanguages().includes(name) ? name : "text",
     themes: { light: "github-light", dark: "github-dark" },
     defaultColor: "light",
   });
-  return `<div class="codeblock${wrap ? " wrap" : ""}">${html}</div>`;
+  return `<div class="codeblock${wrap ? " wrap" : ""}"${label ? ` data-label="${label}"` : ""}>${html}</div>`;
 };
 const escape = (text) => text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 /** The compiler's report, colored the way a terminal shows it. */
-function terminal(report) {
+function terminal(report, label = "") {
   const lines = escape(report).split("\n").map((line) => {
     if (/^error\[/.test(line)) return `<span class="e">${line}</span>`;
     if (/^warning\[/.test(line)) return `<span class="w">${line}</span>`;
@@ -80,7 +106,7 @@ function terminal(report) {
     if (/^\s*(--&gt;|\||\d+ \|)/.test(line)) return `<span class="m">${line}</span>`;
     return line;
   });
-  return `<div class="codeblock wrap terminal"><pre><code>${lines.join("\n")}</code></pre></div>`;
+  return `<div class="codeblock wrap terminal"${label ? ` data-label="${label}"` : ""}><pre><code>${lines.join("\n")}</code></pre></div>`;
 }
 
 /** Runs the compiler on a page with data and fails the build on any error or warning. */
@@ -144,8 +170,8 @@ const landing = {
 // --- the docs: Markdown from the repository
 
 const slug = (text) => text.toLowerCase().replace(/<[^>]+>|`/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
-const pageOf = (file) => docs.find((d) => d.file === file);
-const urlOf = (doc) => (doc.slug ? `/docs/${doc.slug}/` : "/docs/");
+const pageOf = (file) => [...docs, ...guides].find((d) => d.file === file);
+const urlOf = (doc) => `/${doc.section ?? "docs"}/${doc.slug ? `${doc.slug}/` : ""}`;
 
 /** Converts a doc to HTML: highlighted code, headings with ids, links to other docs within the site. */
 function render(doc, markdown) {
@@ -153,7 +179,10 @@ function render(doc, markdown) {
   const marked = new Marked({
     renderer: {
       code({ text, lang }) {
-        return highlight(text, (lang ?? "").split(/\s/)[0]);
+        // ```html output marks what the compiler writes; tests/guides.rs checks it is
+        const [language, kind] = (lang ?? "").split(/\s+/);
+        if (language === "console" && kind === "output") return terminal(text, "Output");
+        return highlight(text, language, true, kind === "output" ? "Output" : "");
       },
       heading({ tokens, depth, text }) {
         const id = slug(text);
@@ -181,22 +210,32 @@ function render(doc, markdown) {
 
 rmSync(dist, { recursive: true, force: true });
 cpSync(join(site, "public"), dist, { recursive: true });
-build(join(site, "pages/index.hypra"), landing, dist);
+build(
+  join(site, "pages/index.hypra"),
+  { ...landing, guides: guides.map((g) => ({ url: urlOf(g), title: g.nav, description: g.description })) },
+  dist,
+);
 
-const loaded = docs.map((doc) => {
+const load = (doc) => {
   const markdown = readFileSync(join(repo, doc.file), "utf8");
   const [, title] = markdown.match(/^# (.+)$/m);
   const rest = markdown.replace(/^# .+\n/m, "");
   return { ...doc, title, markdown, rest };
-});
-for (const doc of loaded) {
+};
+const loaded = docs.map(load);
+const loadedGuides = guides.map(load);
+for (const doc of [...loaded, ...loadedGuides]) {
   const { html, toc } = render(doc, doc.rest);
-  const out = join(dist, "docs", doc.slug);
+  const out = join(dist, doc.section ?? "docs", doc.slug);
+  const links = (list) => list.map((d) => ({ url: urlOf(d), title: d.nav, current: d === doc }));
   build(
     join(site, "pages/docs/index.hypra"),
     {
       doc: { title: doc.title, description: doc.description, url: urlOf(doc), html, toc, markdown: "index.md" },
-      docs: loaded.map((d) => ({ url: urlOf(d), title: d.nav, current: d === doc })),
+      sections: [
+        { title: "Docs", pages: links(loaded) },
+        { title: "Guides", pages: links(loadedGuides) },
+      ],
     },
     out,
   );
@@ -204,16 +243,29 @@ for (const doc of loaded) {
   writeFileSync(join(out, "index.md"), doc.markdown);
 }
 
+// --- the list of guides
+build(
+  join(site, "pages/guides.hypra"),
+  { guides: loadedGuides.map((g) => ({ url: urlOf(g), title: g.title, description: g.description })) },
+  join(dist, "guides"),
+);
+// the compiler names its outputs after the page; this one is the folder's index
+for (const ext of ["html", "md", "json", "webmcp.json"]) {
+  renameSync(join(dist, "guides", `guides.${ext}`), join(dist, "guides", `index.${ext}`));
+}
+
 // --- llms.txt: where agents find the docs as Markdown
 writeFileSync(
   join(dist, "llms.txt"),
   `# Hypra\n\n> Hypra is a strict markup language that compiles to HTML for people and to Markdown, JSON and WebMCP tools for AI agents.\n\n## Docs\n\n` +
     loaded.map((d) => `- [${d.title}](${origin}${urlOf(d)}index.md): ${d.description}`).join("\n") +
+    "\n\n## Guides\n\n" +
+    loadedGuides.map((d) => `- [${d.title}](${origin}${urlOf(d)}index.md): ${d.description}`).join("\n") +
     "\n",
 );
 
 // --- for search engines: every page, and where the list is
-const pages = [`${origin}/`, ...loaded.map((d) => `${origin}${urlOf(d)}`)];
+const pages = [`${origin}/`, ...loaded.map((d) => `${origin}${urlOf(d)}`), `${origin}/guides/`, ...loadedGuides.map((d) => `${origin}${urlOf(d)}`)];
 writeFileSync(
   join(dist, "sitemap.xml"),
   `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n` +

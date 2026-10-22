@@ -19,6 +19,7 @@ layout Site(lang: "en", title_suffix: " · Hypra", site_name: "Hypra", image: "h
       }
       nav(aria-label: "Main", class: "flex items-center gap-5 text-[15px] whitespace-nowrap sm:gap-6 [&_a]:no-underline [&_a:hover]:underline") {
         a("/docs/") "Docs"
+        a("/guides/") "Guides"
         // on a phone the docs sidebar links to these
         a("/docs/laravel/", class: "hidden sm:inline") "Laravel"
         a("/docs/vscode/", class: "hidden sm:inline") "VS Code"

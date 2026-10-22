@@ -1,0 +1,17 @@
+page(title: "Your cart", description: "The shoes in your cart, ready to check out, with free shipping on orders over €100.") {
+  props(cart: Cart)
+  h1 "Your cart"
+  for item in cart.items {
+    article {
+      h2 "{item.name}"
+      p "Size {item.size}"
+      action("cart.remove", id: item.id, confirm: "Remove {item.name}?") "Remove from cart"
+    }
+  }
+  form("/checkout", name: "checkout", description: "Pay for the cart and choose how it's delivered") {
+    field("delivery", type: Choice(standard: "Standard, 3–5 days", express: "Express, next day"), label: "Delivery")
+    field("email", type: Email, label: "Email for the receipt")
+    field("note", type: Text(max: 200), label: "Note for the courier", optional: true)
+    button "Pay now"
+  }
+}

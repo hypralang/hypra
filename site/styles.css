@@ -53,6 +53,11 @@
 .codeblock .copy {
   @apply absolute top-2.5 right-2.5 rounded border border-rule bg-paper px-2 py-0.5 font-sans text-[13px] text-ink-2 hover:border-ink hover:text-ink;
 }
+/* a block of compiler output says so in the top padding, opposite the copy button */
+.codeblock[data-label]::before {
+  content: attr(data-label);
+  @apply absolute top-3 left-4 z-10 font-mono text-[12px] tracking-wide text-mute uppercase;
+}
 .terminal .e { @apply font-bold text-fail; }
 .terminal .w { @apply font-bold text-warn; }
 .terminal .h { @apply text-pass; }

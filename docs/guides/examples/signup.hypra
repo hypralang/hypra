@@ -1,0 +1,10 @@
+page(title: "Sign up", description: "Create an account to save your favourite routes and get one weekly email with new trails.") {
+  h1 "Create an account"
+  img("/img/trail.jpg")
+  h3 "Why sign up?"
+  p { "Save routes and get new trails every week. " a("/about") "Click here" }
+  form("/signup", name: "signup") {
+    field("email", type: Email)
+    button
+  }
+}
