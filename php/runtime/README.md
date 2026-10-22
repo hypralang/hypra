@@ -28,7 +28,7 @@ $output->webmcp;    // tool definitions for AI agents
 | `formFields` | a closure returning hidden fields for POST forms to this site, e.g. `fn () => ['_token' => $token]` |
 | `alternateUrl` | where the page's Markdown is served; adds `<link rel="alternate" type="text/markdown">` |
 
-For Laravel, use [hypra/laravel](../laravel).
+For Laravel, use [hypra/laravel](https://hypralang.dev/docs/laravel/).
 
 ## License
 
