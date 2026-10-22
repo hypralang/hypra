@@ -12,9 +12,9 @@
 
    The `release` workflow checks that the versions match the tag, builds the compiler for Linux, macOS and
    Windows (x64 and ARM) and the VS Code extension, and publishes them as a GitHub release with `SHA256SUMS`.
-   `php artisan hypra:install` downloads from there.
-3. Publish the compiler to crates.io, so `cargo install hypra` works: `cargo publish`.
-4. Publish the PHP packages. Packagist needs each in its own repository, so `php/runtime` and `php/laravel` are
+   `php artisan hypra:install` downloads from there. Then the `registries` workflow publishes the compiler on
+   crates.io and the extension on Open VSX, with the `CARGO_REGISTRY_TOKEN` and `OVSX_PAT` secrets.
+3. Publish the PHP packages. Packagist needs each in its own repository, so `php/runtime` and `php/laravel` are
    split into `hypralang/hypra-runtime` and `hypralang/hypra-laravel` and tagged with the same version:
 
    ```console
@@ -24,8 +24,7 @@
    ```
 
    and the same for `php/laravel`. Packagist picks up new tags by itself once the repositories are registered.
-5. Publish the VS Code extension to the Visual Studio Marketplace, and to Open VSX, where Cursor and other editors
-   built on VS Code install extensions from: `cd editors/vscode && npx vsce publish && npx ovsx publish`.
+4. Publish the extension on the Visual Studio Marketplace: `cd editors/vscode && npx vsce publish`.
 
 ## The website
 

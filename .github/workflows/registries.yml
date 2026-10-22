@@ -1,0 +1,52 @@
+# Publishes a release to crates.io (`cargo install hypra`) and Open VSX (the extension for Cursor and other editors
+# built on VS Code). The release workflow runs it after each release; it can also be run by hand for a tag.
+name: registries
+
+on:
+  workflow_call:
+    inputs:
+      tag:
+        type: string
+        required: true
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "The release to publish, e.g. v0.1.0"
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  crates:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.tag }}
+      - uses: dtolnay/rust-toolchain@stable
+      - run: cargo publish --locked
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+
+  open-vsx:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+      - name: Download the extension from the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release download "${{ inputs.tag }}" -R "$GITHUB_REPOSITORY" -p '*.vsix'
+      - name: Publish
+        env:
+          OVSX_PAT: ${{ secrets.OVSX_PAT }}
+        run: |
+          # the namespace is created with the first release
+          if ! curl -sf https://open-vsx.org/api/hypralang > /dev/null; then
+            npx --yes ovsx@1.2.0 create-namespace hypralang
+          fi
+          npx --yes ovsx@1.2.0 publish *.vsix

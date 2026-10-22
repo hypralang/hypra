@@ -1,5 +1,5 @@
-# Builds the compiler for every platform when a version is tagged, and publishes it as a GitHub release with
-# SHA-256 checksums. `php artisan hypra:install` downloads from these releases.
+# Builds the compiler for every platform when a version is tagged, publishes it as a GitHub release with SHA-256
+# checksums, then on crates.io and Open VSX. `php artisan hypra:install` downloads from these releases.
 name: release
 
 on:
@@ -99,3 +99,10 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: gh release create "$GITHUB_REF_NAME" dist/* --title "$GITHUB_REF_NAME" --generate-notes
+
+  registries:
+    needs: publish
+    uses: ./.github/workflows/registries.yml
+    with:
+      tag: ${{ github.ref_name }}
+    secrets: inherit
