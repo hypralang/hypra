@@ -133,6 +133,7 @@ pub const RULES: &[(&str, &str)] = &[
     ("A11Y-010", "positive tabindex"),
     ("A11Y-011", "autoplaying video isn't muted"),
     ("A11Y-012", "ARIA name or state on a div or span without a role"),
+    ("A11Y-013", "links with the same text go to different places"),
     ("ALLOW-001", "allow has no reason"),
     ("ALLOW-002", "allow has no rule code"),
     ("ALLOW-003", "allow names an unknown rule"),

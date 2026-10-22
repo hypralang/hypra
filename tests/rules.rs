@@ -55,6 +55,7 @@ fn cases() -> Vec<Case> {
         case("A11Y-010", page("  div(tabindex: 1) \"x\"")),
         case("A11Y-011", page("  video(\"/v.mp4\", captions: \"/c.vtt\", autoplay: true)")),
         case("A11Y-012", page("  div(aria-label: \"Box\") \"x\"")),
+        case("A11Y-013", page("  props(posts: List)\n  for post in posts { a(post.url) \"Details\" }")),
         case("ALLOW-001", page("  allow(\"A11Y-001\")\n  img(\"/a.jpg\")")),
         case("ALLOW-002", page("  allow \"no rule\"\n  p \"x\"")),
         case("ALLOW-003", page("  allow(\"NOPE-001\") \"reason\"\n  p \"x\"")),

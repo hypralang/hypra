@@ -89,8 +89,8 @@ page(title: "About us", description: "Who we are: a small bakery that bakes brea
 
 | Attribute | Meaning |
 | --- | --- |
-| `title` | **required.** The `<title>`; keep it under 60 characters |
-| `description` | **required**, unless the layout sets one or `robots` has `noindex`. For search results and link previews; 50 to 160 characters |
+| `title` | **required.** The `<title>`; keep it under 60 characters wide |
+| `description` | **required**, unless the layout sets one or `robots` has `noindex`. For search results and link previews; 50 to 160 characters wide |
 | `layout` | a layout name, e.g. `layout: Shop` |
 | `canonical` | the page's full canonical URL, starting with `https://` |
 | `image` | the image for link previews |
@@ -353,7 +353,13 @@ stop the build, but fix it unless there's a reason (then use `allow`).
   right after an `h1` starts with an `h2`.
 - `alt` describes what the image shows ("Blue running shoe, side view"), never `"image"`, `"photo"` or a file name.
   Images without meaning get `decorative: true`.
-- Link text says where it goes ("Read the setup guide"), never just "click here", "here" or "read more".
+- Link text says where it goes ("Read the setup guide"), never just "click here", "here" or "read more". Links
+  with the same text go to the same place: in a loop, put what's different into the text ("Read more about
+  {post.title}") or into `aria-label`.
+- Titles and descriptions are measured by how wide they are, like in search results: Chinese, Japanese and Korean
+  characters count twice.
+- Vague link and alt texts ("click here", "image") are checked in the page's language (`lang`): English and German
+  so far. A page in another language isn't checked for them, and neither is one whose `lang` comes from data.
 - An `iframe` has a `title`. A video that autoplays is `muted: true`. `tabindex` is `0` or `-1`, never positive.
 - An `id` is used once per page, so a component with a fixed `id` is used once.
 - `raw` with data writes it unescaped; only use it for trusted HTML. `javascript:` URLs are errors.
@@ -403,6 +409,7 @@ write. Errors stop the build; warnings don't. `allow("CODE") "reason"` turns one
 | `A11Y-010` | positive tabindex (warning) |
 | `A11Y-011` | autoplaying video isn't muted (warning) |
 | `A11Y-012` | ARIA name or state on a div or span without a role (warning) |
+| `A11Y-013` | links with the same text go to different places (warning) |
 | `ALLOW-001` | allow has no reason |
 | `ALLOW-002` | allow has no rule code |
 | `ALLOW-003` | allow names an unknown rule (warning) |

@@ -123,7 +123,7 @@ What it checks, among others:
 | Check | Code |
 | --- | --- |
 | images need alt text, or `decorative: true`; alt text like "image" or "photo" is a warning | `A11Y-001`, `A11Y-008` |
-| links and buttons need text; link text says where it goes, not "click here" | `A11Y-002`, `A11Y-005`, `A11Y-007` |
+| links and buttons need text; link text says where it goes, not "click here", and means one place | `A11Y-002`, `A11Y-005`, `A11Y-007`, `A11Y-013` |
 | form fields need a label, and a form needs a button | `FORM-002`, `FORM-003` |
 | headings go down one level at a time, and a page has one `h1` | `A11Y-006`, `SEO-003` |
 | videos need captions; autoplaying videos are muted | `A11Y-003`, `A11Y-011` |
