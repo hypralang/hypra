@@ -21,14 +21,20 @@ jobs:
   crates:
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    # trusted publishing: crates.io trusts this workflow, so no long-lived token is stored
+    permissions:
+      contents: read
+      id-token: write
     steps:
       - uses: actions/checkout@v7
         with:
           ref: ${{ inputs.tag }}
       - uses: dtolnay/rust-toolchain@stable
+      - uses: rust-lang/crates-io-auth-action@v1.0.5
+        id: auth
       - run: cargo publish --locked
         env:
-          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+          CARGO_REGISTRY_TOKEN: ${{ steps.auth.outputs.token }}
 
   open-vsx:
     runs-on: ubuntu-latest

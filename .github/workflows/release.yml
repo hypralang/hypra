@@ -102,6 +102,9 @@ jobs:
 
   registries:
     needs: publish
+    permissions:
+      contents: read
+      id-token: write
     uses: ./.github/workflows/registries.yml
     with:
       tag: ${{ github.ref_name }}
