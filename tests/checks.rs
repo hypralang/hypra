@@ -416,6 +416,13 @@ fn links_with_the_same_text_go_to_the_same_place() {
     // unless the text or aria-label says which one
     assert_eq!(loop_with("a(post.url) \"Details about {post.title}\""), Vec::<String>::new());
     assert_eq!(loop_with("a(post.url, aria-label: \"Details about {post.title}\") \"Details\""), Vec::<String>::new());
+    // or the element around it does, as WCAG 2.4.4 allows: a card with a heading, a table row, a list item
+    assert_eq!(loop_with("article { h2 \"{post.title}\" a(post.url) \"Details\" }"), Vec::<String>::new());
+    assert_eq!(loop_with("tr { td \"{post.title}\" td { a(post.url) \"Details\" } }"), Vec::<String>::new());
+    assert_eq!(loop_with("li { \"{post.title} \" a(post.url) \"Details\" }"), Vec::<String>::new());
+    // an article without a heading doesn't say which one it is
+    assert_eq!(loop_with("article { a(post.url) \"Details\" }"), ["A11Y-013"]);
+    assert_eq!(codes(&run("  ul { li { a(\"/a\") \"Details\" } li { a(\"/b\") \"Details\" } }")), Vec::<&str>::new());
 }
 
 #[test]
