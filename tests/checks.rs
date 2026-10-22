@@ -129,7 +129,7 @@ fn raw_html_from_data_warns() {
 
 #[test]
 fn javascript_urls_are_errors() {
-    let result = run("  a(\"javascript:alert(1)\") \"Go\"\n  a(href: \" JavaScript:void(0)\") \"Go\"");
+    let result = run("  a(\"javascript:alert(1)\") \"Go\"\n  a(href: \" JavaScript:void(0)\") \"Run\"");
     assert_eq!(codes(&result), ["SEC-003", "SEC-003"]);
     assert!(result.output.is_none());
 }
@@ -355,4 +355,84 @@ fn data_in_text_is_located_past_escapes() {
     let at: Vec<(usize, usize)> = result.diagnostics.iter().map(|d| (d.pos.line, d.pos.col)).collect();
     assert_eq!(codes(&result), ["TYPE-002", "TYPE-002"]);
     assert_eq!(at, [(3, 10), (4, 5)]);
+}
+
+/// A page in a given language, with a body.
+fn in_language(lang: &str, body: &str) -> Compiled {
+    let src = format!(
+        "page(title: \"T\", description: \"{DESCRIPTION}\", lang: \"{lang}\") {{\n  h1 \"Main topic\"\n{body}\n}}\n"
+    );
+    compile(&src, &json!({}), "p")
+}
+
+#[test]
+fn vague_link_and_alt_texts_are_checked_in_the_page_language() {
+    let body = "  a(\"/a\") \"Hier klicken\"\n  a(\"/b\") \"click here\"\n  img(\"/a.jpg\", alt: \"Bild\")\n  img(\"/b.jpg\", alt: \"photo\")";
+    // German words on a German page, English words on an English one, also with a region
+    assert_eq!(codes(&in_language("de", body)), ["A11Y-007", "A11Y-008"]);
+    assert_eq!(codes(&in_language("de-AT", body)), ["A11Y-007", "A11Y-008"]);
+    assert_eq!(codes(&in_language("en", body)), ["A11Y-007", "A11Y-008"]);
+    let flagged = |lang| in_language(lang, body).diagnostics.iter().map(|d| d.pos.line).collect::<Vec<_>>();
+    assert_eq!(flagged("de"), [3, 5]);
+    assert_eq!(flagged("en"), [4, 6]);
+    // a language the checks don't know isn't checked against another language's words
+    assert_eq!(codes(&in_language("fr", body)), Vec::<&str>::new());
+    // nor is a page whose language comes from data
+    let src = format!(
+        "page(title: \"T\", description: \"{DESCRIPTION}\", lang: \"{{l}}\") {{\n  props(l: Text)\n  h1 \"x\"\n{body}\n}}\n"
+    );
+    assert_eq!(codes(&compile(&src, &json!({ "l": "de" }), "p")), Vec::<&str>::new());
+    // a file name is never alt text, in any language
+    assert_eq!(codes(&in_language("fr", "  img(\"/a.jpg\", alt: \"DSC_0042.jpg\")")), ["A11Y-008"]);
+}
+
+#[test]
+fn components_are_checked_in_the_language_of_the_page() {
+    let files = |path: &str| match path {
+        "p.hypra" => Ok(format!(
+            "use \"teaser.hypra\"\npage(title: \"T\", description: \"{DESCRIPTION}\", lang: \"de\") {{\n  h1 \"x\"\n  Teaser\n}}\n"
+        )),
+        "teaser.hypra" => Ok("component Teaser { a(\"/news\") \"Weiterlesen\" }\n".to_string()),
+        _ => Err("not found".to_string()),
+    };
+    let result = hypra::compile_with("p.hypra", &json!({}), &files);
+    assert_eq!(codes(&result), ["A11Y-007"]);
+}
+
+#[test]
+fn links_with_the_same_text_go_to_the_same_place() {
+    // two fixed links: the same text must mean the same target
+    assert_eq!(codes(&run("  a(\"/a\") \"Details\"\n  a(\"/b\") \"Details\"")), ["A11Y-013"]);
+    assert_eq!(codes(&run("  a(\"/a\") \"Details\"\n  a(\"/a\") \"Details\"")), Vec::<&str>::new());
+    // in a loop, a fixed text with a target from data goes somewhere else every time
+    let data = json!({ "posts": [{ "url": "/1", "title": "One" }] });
+    let loop_with = |link: &str| {
+        codes(&run_with(&format!("  props(posts: List)\n  for post in posts {{ {link} }}"), "", data.clone()))
+            .into_iter()
+            .map(String::from)
+            .collect::<Vec<_>>()
+    };
+    assert_eq!(loop_with("a(post.url) \"Details\""), ["A11Y-013"]);
+    // unless the text or aria-label says which one
+    assert_eq!(loop_with("a(post.url) \"Details about {post.title}\""), Vec::<String>::new());
+    assert_eq!(loop_with("a(post.url, aria-label: \"Details about {post.title}\") \"Details\""), Vec::<String>::new());
+}
+
+#[test]
+fn length_is_measured_by_width() {
+    use hypra::rules::width;
+    assert_eq!(width("Running shoes"), 13);
+    assert_eq!(width("東京の天気"), 10);
+    assert_eq!(width("한국어"), 6);
+    assert_eq!(width("e\u{301}"), 1);
+    // 40 Japanese characters are 80 wide: a fine description, not a short one
+    let description = "東京の今日と明日の天気予報。気温、降水確率、風の強さを一時間ごとに確認できます。";
+    let src = format!(
+        "page(title: \"東京の天気\", description: \"{description}\", lang: \"ja\") {{\n  h1 \"東京の天気\"\n}}\n"
+    );
+    assert_eq!(codes(&compile(&src, &json!({}), "p")), Vec::<&str>::new());
+    // and 31 of them make a title wider than search results show
+    let title = "東京".repeat(15) + "都";
+    let src = format!("page(title: \"{title}\", description: \"{DESCRIPTION}\", lang: \"ja\") {{\n  h1 \"x\"\n}}\n");
+    assert_eq!(codes(&compile(&src, &json!({}), "p")), ["SEO-002"]);
 }

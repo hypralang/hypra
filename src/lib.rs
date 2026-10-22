@@ -17,6 +17,7 @@ pub mod nav;
 pub mod parser;
 pub mod php;
 pub mod rules;
+pub mod words;
 
 use diag::Diagnostic;
 use parser::{Item, Value};
@@ -113,8 +114,10 @@ fn frontend(entry: &str, load: &dyn Fn(&str) -> Result<String, String>, build: b
 
     let (defs, defs_diagnostics) = defs::collect(&modules);
     diagnostics.extend(defs_diagnostics);
+    // components in imported files are checked in the language of the page that uses them
+    let lang = check::page_language(&modules[0], &defs);
     for (i, items) in modules.iter().enumerate() {
-        diagnostics.extend(check::check(items, &defs, i == 0));
+        diagnostics.extend(check::check(items, &defs, i == 0, lang.as_deref()));
     }
     if diagnostics.iter().any(Diagnostic::is_error) {
         return failed(diagnostics, sources);

@@ -14,11 +14,27 @@ use crate::parser::{
     Arg, Braces, Def, Element, Item, Piece, Value, ValueKind, any_element, elements_named, is_name, pieces, reads_data,
 };
 use crate::rules;
+use crate::words::{self, Words};
 
-/// Checks one file. Only the entry file (`is_entry`) has a page; imported files hold definitions.
-pub fn check<'a>(items: &'a [Item], defs: &'a Defs<'a>, is_entry: bool) -> Vec<Diagnostic> {
+/// The language a page is written in: its `lang`, its layout's, or English, Hypra's default. `None` when it comes
+/// from data, or for a file without a page, so checks that depend on the language don't guess.
+pub fn page_language(items: &[Item], defs: &Defs) -> Option<String> {
+    let page = *elements_named([items], "page").first()?;
+    let chain = layout_chain(defs, page.arg("layout"));
+    match page.arg("lang").or_else(|| chain_setting(&chain, "lang")) {
+        None => Some("en".to_string()),
+        Some(v) => static_text(v).map(String::from),
+    }
+}
+
+/// Checks one file. Only the entry file (`is_entry`) has a page; imported files hold definitions. `lang` is the
+/// page's language, for the checks that depend on it.
+pub fn check<'a>(items: &'a [Item], defs: &'a Defs<'a>, is_entry: bool, lang: Option<&str>) -> Vec<Diagnostic> {
     let mut c = Checker {
         defs,
+        words: lang.and_then(words::for_language),
+        loops: 0,
+        links: vec![],
         diags: vec![],
         allowed: vec![],
         in_template: false,
@@ -52,6 +68,12 @@ pub fn check<'a>(items: &'a [Item], defs: &'a Defs<'a>, is_entry: bool) -> Vec<D
 
 struct Checker<'a> {
     defs: &'a Defs<'a>,
+    /// Words that say nothing in the page's language, if the checks know that language.
+    words: Option<&'static Words>,
+    /// How many `for` loops the current item is in.
+    loops: usize,
+    /// Links with fixed text and a fixed target seen so far, for links with the same text going elsewhere.
+    links: Vec<(String, String)>,
     diags: Vec<Diagnostic>,
     /// Rule codes switched off by `allow` for the item currently being checked.
     allowed: Vec<String>,
@@ -175,7 +197,9 @@ impl<'a> Checker<'a> {
                 let was = std::mem::replace(&mut self.in_control, true);
                 let was_form = self.enter_control();
                 self.names.push(f.var.clone());
+                self.loops += 1;
                 self.items(&f.body, parent);
+                self.loops -= 1;
                 self.names.pop();
                 self.in_control = was;
                 self.form = was_form;
@@ -920,11 +944,11 @@ impl<'a> Checker<'a> {
         };
         let Some(text) = static_text(alt) else { return };
         let text = text.trim().to_lowercase();
-        const GENERIC: &[&str] = &["image", "img", "photo", "picture", "pic", "graphic", "bild", "foto"];
+        let generic = self.words.is_some_and(|w| w.generic_alt.contains(&text.as_str()));
         const FILES: &[&str] = &[".jpg", ".jpeg", ".png", ".gif", ".webp", ".avif", ".svg"];
         let help = if text.is_empty() {
             "for an image without meaning, use decorative: true instead of an empty alt"
-        } else if GENERIC.contains(&text.as_str()) {
+        } else if generic {
             "say what the image shows, e.g. alt: \"Blue running shoe, side view\""
         } else if FILES.iter().any(|ext| text.ends_with(ext)) || text.starts_with("img_") || text.starts_with("dsc") {
             "alt is a file name; say what the image shows instead"
@@ -936,24 +960,44 @@ impl<'a> Checker<'a> {
         );
     }
 
+    /// Link text that says where the link goes, in the page's language, and that means one place.
     fn link_text(&mut self, e: &Element) {
         // an aria-label names the link instead of its text
-        if e.arg("aria-label").is_some() || e.arg("aria-labelledby").is_some() {
-            return;
-        }
-        let v = match (&e.value, e.children.as_slice()) {
-            (Some(v), _) | (None, [Item::Text(v)]) => v,
+        let (v, label) = match (e.arg("aria-label"), &e.value, e.children.as_slice()) {
+            (Some(v), ..) => (v, true),
+            _ if e.arg("aria-labelledby").is_some() => return,
+            (None, Some(v), _) | (None, None, [Item::Text(v)]) => (v, false),
             _ => return,
         };
         let Some(text) = static_text(v) else { return };
-        const VAGUE: &[&str] =
-            &["click here", "here", "click", "read more", "more", "learn more", "link", "this link", "this"];
         let text = text.trim().trim_end_matches(['.', '!', '…', ':']).to_lowercase();
-        if VAGUE.contains(&text.as_str()) {
-            self.report(
+        if !label && self.words.is_some_and(|w| w.vague_links.contains(&text.as_str())) {
+            return self.report(
                 Diagnostic::warning("A11Y-007", format!("link text `{text}` doesn't say where it goes"), v.pos, v.len)
                     .help("describe the target, e.g. a(\"/guide\") \"Read the setup guide\""),
             );
+        }
+        // people using screen readers often go through a list of a page's links, where only the text tells them
+        // apart; this needs no knowledge of the language
+        let Some(href) = e.main_or("href") else { return };
+        let message = format!("links with the text `{text}` go to different places");
+        match static_text(href) {
+            None if self.loops > 0 => {
+                self.report(Diagnostic::warning("A11Y-013", message, v.pos, v.len).help(
+                    "put what's different into the text, e.g. \"Read more about {post.title}\", or set aria-label",
+                ))
+            }
+            None => {}
+            Some(target) => {
+                let elsewhere = self.links.iter().any(|(t, h)| *t == text && h != target);
+                if elsewhere {
+                    self.report(
+                        Diagnostic::warning("A11Y-013", message, v.pos, v.len)
+                            .help("give each link text that says where it goes, or set aria-label"),
+                    );
+                }
+                self.links.push((text, target.to_string()));
+            }
         }
     }
 
