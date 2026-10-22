@@ -354,8 +354,9 @@ stop the build, but fix it unless there's a reason (then use `allow`).
 - `alt` describes what the image shows ("Blue running shoe, side view"), never `"image"`, `"photo"` or a file name.
   Images without meaning get `decorative: true`.
 - Link text says where it goes ("Read the setup guide"), never just "click here", "here" or "read more". Links
-  with the same text go to the same place: in a loop, put what's different into the text ("Read more about
-  {post.title}") or into `aria-label`.
+  with the same text go to the same place, unless what's around them tells them apart: a list item, a table row
+  or cell, or an `article` or `section` with its own heading. Otherwise put what's different into the text
+  ("Read more about {post.title}") or into `aria-label`.
 - Titles and descriptions are measured by how wide they are, like in search results: Chinese, Japanese and Korean
   characters count twice.
 - Vague link and alt texts ("click here", "image") are checked in the page's language (`lang`): English and German

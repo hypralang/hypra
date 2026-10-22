@@ -35,6 +35,7 @@ pub fn check<'a>(items: &'a [Item], defs: &'a Defs<'a>, is_entry: bool, lang: Op
         words: lang.and_then(words::for_language),
         loops: 0,
         links: vec![],
+        link_context: 0,
         diags: vec![],
         allowed: vec![],
         in_template: false,
@@ -74,6 +75,8 @@ struct Checker<'a> {
     loops: usize,
     /// Links with fixed text and a fixed target seen so far, for links with the same text going elsewhere.
     links: Vec<(String, String)>,
+    /// How many elements around the current item tell its links apart, like a list item or a card with a heading.
+    link_context: usize,
     diags: Vec<Diagnostic>,
     /// Rule codes switched off by `allow` for the item currently being checked.
     allowed: Vec<String>,
@@ -313,7 +316,10 @@ impl<'a> Checker<'a> {
         let was_foreign = std::mem::replace(&mut self.in_foreign, html::is_foreign(&e.name));
         let was_html_template = self.in_html_template;
         self.in_html_template |= e.name == "template";
+        let context = gives_link_context(e);
+        self.link_context += usize::from(context);
         self.items(&e.children, &e.name);
+        self.link_context -= usize::from(context);
         self.in_control = was_control;
         self.form = was_form;
         self.in_foreign = was_foreign;
@@ -978,15 +984,18 @@ impl<'a> Checker<'a> {
             );
         }
         // people using screen readers often go through a list of a page's links, where only the text tells them
-        // apart; this needs no knowledge of the language
+        // apart; this needs no knowledge of the language. A list item, table row or card around a link is enough,
+        // as WCAG 2.4.4 allows: "Edit" in a user's table row says which user.
+        if self.link_context > 0 {
+            return;
+        }
         let Some(href) = e.main_or("href") else { return };
         let message = format!("links with the text `{text}` go to different places");
         match static_text(href) {
-            None if self.loops > 0 => {
-                self.report(Diagnostic::warning("A11Y-013", message, v.pos, v.len).help(
-                    "put what's different into the text, e.g. \"Read more about {post.title}\", or set aria-label",
-                ))
-            }
+            None if self.loops > 0 => self.report(Diagnostic::warning("A11Y-013", message, v.pos, v.len).help(
+                "put what's different into the text, e.g. \"Read more about {post.title}\", set aria-label, or \
+                     put each link in a list item or a card with a heading",
+            )),
             None => {}
             Some(target) => {
                 let elsewhere = self.links.iter().any(|(t, h)| *t == text && h != target);
@@ -1328,6 +1337,16 @@ fn contains_submit(items: &[Item], defs: &Defs, depth: usize) -> bool {
 
 fn contains_element(items: &[Item], name: &str) -> bool {
     any_element(items, &|e| e.name == name)
+}
+
+/// Elements that tell the links in them apart: a list item, a table row or cell, a description, or an article or
+/// section with its own heading.
+fn gives_link_context(e: &Element) -> bool {
+    match e.name.as_str() {
+        "li" | "tr" | "td" | "th" | "dd" => true,
+        "article" | "section" => any_element(&e.children, &|c| is_heading(&c.name)),
+        _ => false,
+    }
 }
 
 fn capitalize(name: &str) -> String {
