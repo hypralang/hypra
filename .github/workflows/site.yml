@@ -17,6 +17,8 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    outputs:
+      urls: ${{ steps.urls.outputs.list }}
     steps:
       - uses: actions/checkout@v7
       - uses: dtolnay/rust-toolchain@stable
@@ -27,6 +29,8 @@ jobs:
         working-directory: site
       - run: npm run build
         working-directory: site
+      - id: urls
+        run: echo "list=$(grep -o '<loc>[^<]*' site/dist/sitemap.xml | cut -c6- | jq -R . | jq -cs .)" >> "$GITHUB_OUTPUT"
       - uses: actions/upload-pages-artifact@v5
         with:
           path: site/dist
@@ -44,3 +48,12 @@ jobs:
     steps:
       - id: deployment
         uses: actions/deploy-pages@v5
+      # tells Bing and the other IndexNow search engines that the pages changed; the key file is in site/public
+      - name: IndexNow
+        continue-on-error: true
+        env:
+          URLS: ${{ needs.build.outputs.urls }}
+        run: |
+          body=$(jq -cn --argjson urls "$URLS" '{host: "hypralang.dev", key: "be4b3ce8cebe8200a3f195a2ac94008e", urlList: $urls}')
+          curl -sS --fail-with-body -X POST https://api.indexnow.org/indexnow -H 'Content-Type: application/json; charset=utf-8' -d "$body" -w '%{http_code}\n'
+
