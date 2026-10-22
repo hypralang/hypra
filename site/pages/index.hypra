@@ -1,0 +1,91 @@
+use "layout.hypra"
+use "parts.hypra"
+
+page(layout: Site, title: "Pages that compile", canonical: "https://hypralang.dev/", description: "Hypra is a markup language with a compiler: one file becomes accessible HTML, Markdown for AI agents and typed tools.") {
+  allow("SEC-002") "the code on this page is our own, highlighted when the site is built"
+
+  head {
+    script(type: "application/ld+json") """
+      {
+        "@context": "https://schema.org",
+        "@type": "SoftwareSourceCode",
+        "name": "Hypra",
+        "description": "A strict markup language whose compiler turns one file into accessible HTML, Markdown for AI agents and typed tools.",
+        "url": "https://hypralang.dev/",
+        "codeRepository": "https://github.com/hypralang/hypra",
+        "programmingLanguage": "Rust",
+        "runtimePlatform": ["Linux", "macOS", "Windows", "PHP", "Laravel"],
+        "license": ["https://opensource.org/license/mit", "https://www.apache.org/licenses/LICENSE-2.0"],
+        "keywords": "markup language, HTML compiler, accessibility, SEO, Laravel, Markdown for LLMs, WebMCP"
+      }
+      """
+  }
+  props(sample: Sample, version: Text)
+
+  section(class: "mx-auto grid max-w-6xl gap-12 px-6 pt-16 lg:grid-cols-[1fr_1.05fr] lg:items-start") {
+    div(class: "lg:pt-6") {
+      h1(class: "text-[3.4rem] leading-[1.02] font-extrabold tracking-[-0.03em] sm:text-[4.2rem]") "Pages that compile."
+      p(class: "mt-6 max-w-xl text-[1.2rem] text-ink-2") "Hypra is a markup language with a compiler. One file becomes accessible HTML for browsers, Markdown for AI agents and typed tools for anything that acts on your site. A page with a mistake doesn't build, so nobody sees it."
+      div(class: "mt-8 flex flex-wrap items-center gap-3 text-[15px]") {
+        a("#install", class: "rounded-md bg-ink px-5 py-2.5 font-bold text-paper no-underline hover:bg-ink-2") "Install"
+        a("/docs/", class: "rounded-md border border-ink px-5 py-2.5 font-bold no-underline hover:bg-ink hover:text-paper") "Read the reference"
+      }
+      p(class: "mt-6 font-mono text-[14px] text-mute") "v{version} · Rust · MIT or Apache-2.0"
+    }
+    Code(label: "product.hypra", note: "the source") { raw "{sample.source}" }
+  }
+
+  Section(number: "01", title: "One file, every output") {
+    p(class: "mt-3 max-w-2xl text-ink-2") "What the compiler made from the file above and one product from the database. Nothing is written twice, and every output is checked."
+    div(class: "mt-8 grid gap-6 lg:grid-cols-3") {
+      Code(label: "HTML", note: "for browsers") { raw "{sample.html}" }
+      Code(label: "Markdown", note: "for AI agents") { raw "{sample.markdown}" }
+      Code(label: "Tools", note: "for agents that act") { raw "{sample.tools}" }
+    }
+  }
+
+  Section(number: "02", title: "Mistakes stop at the compiler") {
+    div(class: "mt-6 grid gap-10 lg:grid-cols-[1fr_1.3fr]") {
+      p(class: "text-ink-2") "A missing description, an image without alt text, a typo in an element: Hypra says where, why and how to fix it, in words a person and an AI that writes the page both understand."
+      Code(label: "hypra check broken.hypra", note: "3 errors") { raw "{sample.errors}" }
+    }
+  }
+
+  Section(number: "03", title: "What you get") {
+    dl(class: "mt-6 grid gap-x-12 sm:grid-cols-2") {
+      Point(term: "Accessible by default", text: "Alt text, labels, heading order, link text and captions are checked, not hoped for.")
+      Point(term: "SEO without plugins", text: "Title, description, canonical, Open Graph and Twitter tags come from the page's settings.")
+      Point(term: "Safe with any data", text: "Data is always text: no cross-site scripting, no fake Markdown for agents, no CSRF token sent to another site.")
+      Point(term: "Works with your stack", text: "Tailwind, Alpine.js, htmx and web components work as they are.")
+      Point(term: "Ready for Laravel", text: ".hypra files are views, and one URL answers in HTML, Markdown or JSON.")
+      Point(term: "One small binary", text: "Under a megabyte, written in Rust. Pages compile in milliseconds.")
+    }
+  }
+
+  Section(number: "04", title: "Install") {
+    div(id: "install", class: "mt-6 grid scroll-mt-24 gap-10 lg:grid-cols-3") {
+      div {
+        h3 "Command line"
+        p(class: "mt-1 mb-3 text-ink-2") { "With Rust, or " a("https://github.com/hypralang/hypra/releases") "download a build" " for Linux, macOS or Windows." }
+        raw "{sample.install_cli}"
+      }
+      div {
+        h3 "Laravel"
+        p(class: "mt-1 mb-3 text-ink-2") { "Downloads the compiler for you, no Rust needed. " a("/docs/laravel/") "Laravel docs" }
+        raw "{sample.install_laravel}"
+      }
+      div {
+        h3 "VS Code and Cursor"
+        p(class: "mt-1 mb-3 text-ink-2") { "Errors as you type, go to definition, rename, hover help. " a("/docs/vscode/") "Extension docs" }
+        raw "{sample.install_vscode}"
+      }
+    }
+  }
+}
+
+component Point(term: Text, text: Text) {
+  div(class: "border-b border-rule py-5") {
+    dt(class: "font-bold") "{term}"
+    dd(class: "mt-1 text-ink-2") "{text}"
+  }
+}

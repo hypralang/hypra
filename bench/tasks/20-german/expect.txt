@@ -1,0 +1,4 @@
+<html lang="de">
+<h1>Über uns</h1>
+<bakery-map
+lat="52.52"

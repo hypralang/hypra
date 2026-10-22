@@ -1,0 +1,1 @@
+A contact page with a form that posts to `/contact`. Fields: name (1 to 80 characters), email, subject (one of: order, catering, other), message (up to 1000 characters) and a required checkbox to accept the privacy policy. Add a submit button.

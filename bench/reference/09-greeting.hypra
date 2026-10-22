@@ -1,0 +1,12 @@
+page(title: "Dashboard", description: "Your Crumb & Co account at a glance: orders, settings and saved breads.") {
+  props(user: User)
+  h1 "Dashboard"
+  header {
+    if user.loggedIn {
+      p "Welcome back, {user.name}"
+      a("/logout") "Log out"
+    } else {
+      a("/login") "Log in"
+    }
+  }
+}

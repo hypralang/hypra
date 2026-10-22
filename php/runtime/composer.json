@@ -1,0 +1,28 @@
+{
+    "name": "hypra/runtime",
+    "description": "Runtime for PHP pages compiled by the Hypra compiler",
+    "keywords": [
+        "templates",
+        "html",
+        "markdown",
+        "accessibility",
+        "seo"
+    ],
+    "type": "library",
+    "license": "MIT OR Apache-2.0",
+    "homepage": "https://hypralang.dev",
+    "support": {
+        "issues": "https://github.com/hypralang/hypra/issues",
+        "source": "https://github.com/hypralang/hypra",
+        "docs": "https://hypralang.dev/docs/php/",
+        "security": "https://github.com/hypralang/hypra/security/policy"
+    },
+    "require": {
+        "php": ">=8.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "Hypra\\Runtime\\": "src/"
+        }
+    }
+}

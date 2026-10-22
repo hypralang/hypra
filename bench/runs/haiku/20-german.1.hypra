@@ -1,0 +1,6 @@
+// A German page with a map web component
+page(title: "Über uns", description: "Über unsere Bäckerei in Berlin: Wir backen jede Nacht Brot von Hand, mit Sauerteig und regionalen Zutaten.", lang: "de") {
+  h1 "Über uns"
+  p "Wir backen jede Nacht Brot von Hand, mit viel Zeit, Sorgfalt und Zutaten aus der Region."
+  bakery-map(lat: 52.52, lng: 13.40)
+}

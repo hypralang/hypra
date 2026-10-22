@@ -1,0 +1,3 @@
+<code>Ctrl+S</code>
+<b>save</b>||<strong>save</strong>
+<a href="/guide">the guide</a>

@@ -1,0 +1,14 @@
+page(title: "Our breads", description: "All breads we bake each night, with prices and a page for every loaf.") {
+  props(products: List)
+  h1 "Our breads"
+  div(class: "grid grid-cols-3 gap-4") {
+    for product in products {
+      article(class: "rounded-lg shadow p-4") {
+        img(product.image, alt: "A loaf of {product.name}")
+        h2 "{product.name}"
+        p "{product.price} €"
+        a(product.url) "View {product.name}"
+      }
+    }
+  }
+}

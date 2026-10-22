@@ -1,0 +1,13 @@
+page(title: "Dashboard", description: "The dashboard header: greets you by name when you are logged in, or offers a link to log in.") {
+  props(user: User)
+
+  header {
+    h1 "Dashboard"
+    if user.loggedIn {
+      p "Hello, {user.name}!"
+      a("/logout") "Log out of your account"
+    } else {
+      a("/login") "Log in to your account"
+    }
+  }
+}

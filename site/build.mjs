@@ -1,0 +1,232 @@
+// Builds hypralang.dev into dist/. The pages are Hypra; their content comes from the repository's Markdown docs and
+// from running the compiler on a sample, so the site always shows what the current version does.
+import { execFileSync, spawnSync } from "node:child_process";
+import { cpSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { dirname, join, relative, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
+import { Marked } from "marked";
+import { createHighlighter } from "shiki";
+
+const site = dirname(fileURLToPath(import.meta.url));
+const repo = resolve(site, "..");
+const dist = join(site, "dist");
+const origin = "https://hypralang.dev";
+const github = "https://github.com/hypralang/hypra";
+
+// the docs, in the order of the sidebar; the slug is the folder under /docs/
+const docs = [
+  {
+    slug: "",
+    file: "docs/spec.md",
+    nav: "Language",
+    description: "The complete Hypra reference: elements, data, components, layouts, forms, actions and every check.",
+  },
+  {
+    slug: "laravel",
+    file: "php/laravel/README.md",
+    nav: "Laravel",
+    description: "Use .hypra files as Laravel views: install the compiler, render pages, answer agents in Markdown and JSON.",
+  },
+  {
+    slug: "php",
+    file: "php/runtime/README.md",
+    nav: "PHP runtime",
+    description: "Render compiled Hypra pages from any PHP app with the small hypra/runtime package.",
+  },
+  {
+    slug: "vscode",
+    file: "editors/vscode/README.md",
+    nav: "VS Code",
+    description: "Hypra in VS Code and Cursor: errors as you type, go to definition, references, rename, hover help and formatting.",
+  },
+  {
+    slug: "security",
+    file: "SECURITY.md",
+    nav: "Security",
+    description: "How Hypra keeps data from changing what a page does, what it checks, and how to report a problem.",
+  },
+];
+
+execFileSync("cargo", ["build", "--release", "--quiet"], { cwd: repo, stdio: "inherit" });
+const hypra = join(repo, "target/release/hypra");
+const version = execFileSync(hypra, ["--version"], { encoding: "utf8" }).trim().replace("hypra ", "");
+
+const highlighter = await createHighlighter({
+  themes: ["github-light", "github-dark"],
+  langs: [
+    "html", "markdown", "json", "shellscript", "php", "javascript", "css", "yaml",
+    { ...JSON.parse(readFileSync(join(repo, "editors/vscode/syntaxes/hypra.tmLanguage.json"), "utf8")), name: "hypra" },
+  ],
+});
+const aliases = { console: "shellscript", sh: "shellscript", bash: "shellscript", text: "text", "": "text" };
+/** Highlighted code in a block that gets a copy button; `wrap` breaks long lines instead of scrolling. */
+const highlight = (code, lang, wrap = false) => {
+  const name = aliases[lang] ?? lang;
+  const html = highlighter.codeToHtml(code.replace(/\n$/, ""), {
+    lang: highlighter.getLoadedLanguages().includes(name) ? name : "text",
+    themes: { light: "github-light", dark: "github-dark" },
+    defaultColor: "light",
+  });
+  return `<div class="codeblock${wrap ? " wrap" : ""}">${html}</div>`;
+};
+const escape = (text) => text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+/** The compiler's report, colored the way a terminal shows it. */
+function terminal(report) {
+  const lines = escape(report).split("\n").map((line) => {
+    if (/^error\[/.test(line)) return `<span class="e">${line}</span>`;
+    if (/^warning\[/.test(line)) return `<span class="w">${line}</span>`;
+    if (/^\s*= help/.test(line)) return `<span class="h">${line}</span>`;
+    if (/^\s*(--&gt;|\||\d+ \|)/.test(line)) return `<span class="m">${line}</span>`;
+    return line;
+  });
+  return `<div class="codeblock wrap terminal"><pre><code>${lines.join("\n")}</code></pre></div>`;
+}
+
+/** Runs the compiler on a page with data and fails the build on any error or warning. */
+function build(page, data, out) {
+  const dataFile = join(mkdtempSync(join(tmpdir(), "hypra-site-")), "data.json");
+  writeFileSync(dataFile, JSON.stringify(data));
+  const result = spawnSync(hypra, ["build", page, "--data", dataFile, "--out", out], { encoding: "utf8" });
+  if (result.status !== 0 || !result.stderr.includes("0 errors, 0 warnings")) {
+    throw new Error(`${relative(site, page)} didn't build cleanly:\n${result.stderr}`);
+  }
+}
+
+// --- the landing page: a sample page, compiled for real
+
+const sample = {
+  source: `page(title: "Runner X", description: "A light running shoe for long distances, with free returns.") {
+  props(product: Product)
+  h1 "{product.name}"
+  img(product.photo, alt: "{product.name}, side view")
+  p "{product.summary}"
+  action("cart.add", id: product.id) "Add to cart"
+}
+`,
+  data: { product: { id: 42, name: "Runner X", photo: "/img/runner-x.jpg", summary: "220 g, made for long distances." } },
+  broken: `page(title: "Shoes") {
+  h1 "Shoes"
+  img("/shoe.jpg")
+  buton "Buy"
+}
+`,
+};
+const work = mkdtempSync(join(tmpdir(), "hypra-sample-"));
+writeFileSync(join(work, "product.hypra"), sample.source);
+writeFileSync(join(work, "broken.hypra"), sample.broken);
+build(join(work, "product.hypra"), sample.data, join(work, "out"));
+const read = (file) => readFileSync(join(work, "out", file), "utf8");
+const body = read("product.html").split("<body>\n")[1].split("</body>")[0].replace(/^ {2}/gm, "");
+const check = spawnSync(hypra, ["check", "broken.hypra"], { cwd: work, encoding: "utf8" });
+
+const shell = (lines) => highlight(lines.join("\n"), "shellscript", true);
+const landing = {
+  version,
+  sample: {
+    source: highlight(sample.source, "hypra", true),
+    html: highlight(body, "html", true),
+    markdown: highlight(read("product.md"), "markdown", true),
+    tools: highlight(JSON.stringify(JSON.parse(read("product.webmcp.json")), null, 2), "json", true),
+    errors: terminal(check.stderr.trim()),
+    install_cli: shell(["cargo install hypra"]),
+    install_laravel: shell(["composer require hypra/laravel", "php artisan hypra:install"]),
+    install_vscode: shell([
+      "# Cursor, VSCodium and other editors that install from Open VSX",
+      "cursor --install-extension hypralang.hypra",
+      "# VS Code: the extension from the release",
+      `curl -LO ${github}/releases/download/v${version}/hypra-${version}.vsix`,
+      `code --install-extension hypra-${version}.vsix`,
+    ]),
+  },
+};
+
+// --- the docs: Markdown from the repository
+
+const slug = (text) => text.toLowerCase().replace(/<[^>]+>|`/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+const pageOf = (file) => docs.find((d) => d.file === file);
+const urlOf = (doc) => (doc.slug ? `/docs/${doc.slug}/` : "/docs/");
+
+/** Converts a doc to HTML: highlighted code, headings with ids, links to other docs within the site. */
+function render(doc, markdown) {
+  const toc = [];
+  const marked = new Marked({
+    renderer: {
+      code({ text, lang }) {
+        return highlight(text, (lang ?? "").split(/\s/)[0]);
+      },
+      heading({ tokens, depth, text }) {
+        const id = slug(text);
+        if (depth === 2) toc.push({ id, text: text.replace(/`/g, "") });
+        return `<h${depth} id="${id}">${this.parser.parseInline(tokens)}</h${depth}>\n`;
+      },
+      link({ href, tokens }) {
+        const label = this.parser.parseInline(tokens);
+        if (/^([a-z]+:|#)/.test(href)) return `<a href="${href}">${label}</a>`;
+        const [path, hash = ""] = href.split("#");
+        const target = relative(repo, resolve(repo, dirname(doc.file), path));
+        // a link to a folder means its README
+        const other = pageOf(target) ?? pageOf(join(target, "README.md"));
+        const url = other ? urlOf(other) : `${github}/${target.includes(".") ? "blob" : "tree"}/main/${target}`;
+        return `<a href="${url}${hash ? `#${hash}` : ""}">${label}</a>`;
+      },
+    },
+  });
+  // every rule code's row gets an id, so editors can link an error to where it's explained: /docs/#a11y-001
+  const html = marked
+    .parse(markdown)
+    .replace(/<tr>\n<td><code>([A-Z0-9]+-\d{3})<\/code><\/td>/g, (row, code) => row.replace("<tr>", `<tr id="${code.toLowerCase()}">`));
+  return { html, toc };
+}
+
+rmSync(dist, { recursive: true, force: true });
+cpSync(join(site, "public"), dist, { recursive: true });
+build(join(site, "pages/index.hypra"), landing, dist);
+
+const loaded = docs.map((doc) => {
+  const markdown = readFileSync(join(repo, doc.file), "utf8");
+  const [, title] = markdown.match(/^# (.+)$/m);
+  const rest = markdown.replace(/^# .+\n/m, "");
+  return { ...doc, title, markdown, rest };
+});
+for (const doc of loaded) {
+  const { html, toc } = render(doc, doc.rest);
+  const out = join(dist, "docs", doc.slug);
+  build(
+    join(site, "pages/docs/index.hypra"),
+    {
+      doc: { title: doc.title, description: doc.description, url: urlOf(doc), html, toc, markdown: "index.md" },
+      docs: loaded.map((d) => ({ url: urlOf(d), title: d.nav, current: d === doc })),
+    },
+    out,
+  );
+  // agents get the docs as they were written
+  writeFileSync(join(out, "index.md"), doc.markdown);
+}
+
+// --- llms.txt: where agents find the docs as Markdown
+writeFileSync(
+  join(dist, "llms.txt"),
+  `# Hypra\n\n> Hypra is a strict markup language that compiles to HTML for people and to Markdown, JSON and WebMCP tools for AI agents.\n\n## Docs\n\n` +
+    loaded.map((d) => `- [${d.title}](${origin}${urlOf(d)}index.md): ${d.description}`).join("\n") +
+    "\n",
+);
+
+// --- for search engines: every page, and where the list is
+const pages = [`${origin}/`, ...loaded.map((d) => `${origin}${urlOf(d)}`)];
+writeFileSync(
+  join(dist, "sitemap.xml"),
+  `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n` +
+    pages.map((url) => `  <url><loc>${url}</loc></url>`).join("\n") +
+    "\n</urlset>\n",
+);
+writeFileSync(join(dist, "robots.txt"), `User-agent: *\nAllow: /\n\nSitemap: ${origin}/sitemap.xml\n`);
+
+// --- the stylesheet, from the classes in the Hypra pages
+execFileSync(join(site, "node_modules/.bin/tailwindcss"), ["-i", join(site, "styles.css"), "-o", join(dist, "site.css"), "--minify"], {
+  cwd: site,
+  stdio: ["ignore", "ignore", "inherit"],
+});
+
+mkdirSync(dist, { recursive: true });
+console.log(`built hypralang.dev ${version} into ${relative(process.cwd(), dist) || "."}`);

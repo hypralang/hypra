@@ -1,0 +1,3 @@
+content="noindex"
+href="https://crumb.test/checkout"
+<h1>Checkout</h1>

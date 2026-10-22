@@ -1,0 +1,4 @@
+page(title: "Help", description: "How to use the recipe editor: saving, shortcuts and where to find the guide.") {
+  h1 "Help"
+  p { "Press " code "Ctrl+S" " to " b "save" ", or read " a("/guide") "the guide" " for more." }
+}

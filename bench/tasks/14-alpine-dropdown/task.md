@@ -1,0 +1,1 @@
+A page with an Alpine.js dropdown: a div with `x-data` holding `{ open: false }`, a button "Menu" that toggles `open` on click (Alpine's `@click`), and a list of two links that is only visible when open (Alpine's `x-show`). Load Alpine from `https://cdn.jsdelivr.net/npm/alpinejs@3.14.1/dist/cdn.min.js` with `defer`.

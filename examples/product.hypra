@@ -1,0 +1,41 @@
+// A product page: the first test case for the Hypra compiler.
+// hypra build examples/product.hypra --data examples/product.json
+use "layouts/shop.hypra"
+use "components/review-card.hypra"
+
+page(
+  layout: Shop,
+  title: "{product.name} – Running Shoes",
+  description: "{product.name}: a lightweight {product.weight} g running shoe for long distances.",
+  image: product.photo,
+  canonical: "https://shop.test/shoes/{product.id}",
+) {
+  props(product: Product)
+
+  article(class: "product") {
+    img(product.photo, alt: "{product.name}, side view", width: 600, height: 400, priority: true)
+    h1 "{product.name}"
+    p "{product.summary}"
+    ul {
+      for feature in product.features { li "{feature}" }
+    }
+    action("cart.add", id: product.id) "Add to cart"
+
+    details {
+      summary "Shipping"
+      p "Ships in 2 days. Free returns."
+    }
+  }
+
+  section {
+    h2 "Reviews"
+    for review in product.reviews { ReviewCard(review: review) }
+
+    form("/reviews", name: "review", description: "Leave a star rating and review") {
+      field("stars", type: Int(1..5), label: "Rating")
+      field("email", type: Email, label: "Your email")
+      field("body", type: Text(max: 2000), label: "Review", optional: true)
+      button "Send review"
+    }
+  }
+}

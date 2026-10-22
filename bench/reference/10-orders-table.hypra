@@ -1,0 +1,12 @@
+page(title: "Orders", description: "Every order you placed at Crumb & Co, with its date and total.") {
+  props(orders: List)
+  h1 "Orders"
+  table {
+    thead { tr { th "Order"  th "Date"  th "Total" } }
+    tbody {
+      for order in orders {
+        tr { td "{order.number}"  td "{order.date}"  td "{order.total}" }
+      }
+    }
+  }
+}

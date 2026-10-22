@@ -1,0 +1,1 @@
+Define a component `Feature` with a `title` (text) and an optional `highlight` flag that defaults to false. It renders an article with the title as an h2, a "Popular" badge only when highlighted, and the content it's called with. Use it three times on a page, once with highlight on.

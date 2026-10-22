@@ -1,0 +1,4 @@
+hx-get="/news?page=2"
+hx-target="#news"
+hx-swap="beforeend"
+id="news"

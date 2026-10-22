@@ -1,0 +1,17 @@
+page(title: "Shop", description: "Our breads, each baked by hand at night: browse the full range and open a product to see more about it.") {
+  head {
+    script("https://cdn.tailwindcss.com")
+  }
+  props(products: List)
+  h1 "Shop"
+  div(class: "grid grid-cols-3 gap-4") {
+    for product in products {
+      article(class: "rounded-lg shadow p-4") {
+        img(product.image, alt: "{product.name} bread")
+        h2 "{product.name}"
+        p "Price: {product.price}"
+        a(product.url) "View {product.name}"
+      }
+    }
+  }
+}

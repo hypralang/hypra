@@ -1,0 +1,15 @@
+# Weekly pull requests that keep the dependencies current; CI checks each one.
+version: 2
+updates:
+  - package-ecosystem: cargo
+    directory: /
+    schedule: { interval: weekly }
+  - package-ecosystem: composer
+    directories: [/php/runtime, /php/laravel]
+    schedule: { interval: weekly }
+  - package-ecosystem: npm
+    directories: [/editors/vscode, /site]
+    schedule: { interval: weekly }
+  - package-ecosystem: github-actions
+    directory: /
+    schedule: { interval: weekly }

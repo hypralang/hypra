@@ -1,0 +1,15 @@
+// Feature card component, used three times on one page.
+component Feature(title: Text, highlight: Bool = false) {
+  article(class: "feature") {
+    h2 "{title}"
+    if highlight { span(class: "badge") "Popular" }
+    slot
+  }
+}
+
+page(title: "Feature highlights", description: "Three features of our bakery shop, with one highlighted as popular this season.") {
+  h1 "Features"
+  Feature(title: "Sourdough", highlight: true) { p "Baked fresh every night." }
+  Feature(title: "Rye") { p "A dark, dense bread." }
+  Feature(title: "Bagels") { p "Boiled, then baked until golden." }
+}

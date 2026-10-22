@@ -1,0 +1,8 @@
+page(title: "{post.title}", description: "{post.summary}") {
+  props(post: Post)
+  article {
+    h1 "{post.title}"
+    p "By {post.author} on {post.date}"
+    for paragraph in post.paragraphs { p "{paragraph}" }
+  }
+}

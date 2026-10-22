@@ -1,0 +1,14 @@
+page(title: "Photo gallery", description: "A photo gallery from the bakery, with pictures of the morning bake and fresh loaves.") {
+  props(photos: List)
+
+  h1 "Gallery"
+  img("/img/divider.svg", decorative: true)
+  div(class: "gallery") {
+    for photo in photos {
+      figure {
+        img(photo.src, alt: "{photo.caption}")
+        figcaption "{photo.caption}"
+      }
+    }
+  }
+}

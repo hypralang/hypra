@@ -1,0 +1,5 @@
+page(title: "Checkout", description: "Checkout for your order. Search engines are asked not to index this page.", canonical: "https://crumb.test/checkout", robots: "noindex") {
+  h1 "Checkout"
+
+  p "Review your order and enter your payment details to complete the purchase."
+}

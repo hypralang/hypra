@@ -1,0 +1,14 @@
+{
+  "product": {
+    "id": 42,
+    "name": "Runner X",
+    "weight": 220,
+    "photo": "/img/runner-x.jpg",
+    "summary": "A lightweight running shoe for long distances.",
+    "features": ["Breathable mesh", "Recycled sole", "220 g per shoe"],
+    "reviews": [
+      { "author": "Ana", "body": "Great for long runs." },
+      { "author": "Tom", "body": "Light & comfortable <3" }
+    ]
+  }
+}

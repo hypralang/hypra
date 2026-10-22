@@ -1,0 +1,15 @@
+page(title: "Account menu demo", description: "A menu button that opens and closes a short list of account links, built with Alpine.js.") {
+  head {
+    script("https://cdn.jsdelivr.net/npm/alpinejs@3.14.1/dist/cdn.min.js", defer: true)
+  }
+
+  h1 "Account"
+
+  div(x-data: "{ open: false }") {
+    button("@click": "open = !open") "Menu"
+    ul(x-show: "open") {
+      li { a("/profile") "Your profile" }
+      li { a("/settings") "Settings" }
+    }
+  }
+}

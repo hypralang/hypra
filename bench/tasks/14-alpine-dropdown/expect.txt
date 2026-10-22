@@ -1,0 +1,4 @@
+x-data="{ open: false }"
+@click="open = !open"
+x-show="open"
+defer

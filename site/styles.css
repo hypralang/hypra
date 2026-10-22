@@ -1,0 +1,78 @@
+@import "tailwindcss";
+/* class names come from the Hypra pages */
+@source "./pages";
+
+@theme {
+  /* Atkinson Hyperlegible: drawn by the Braille Institute to be easy to read, for a language about accessible pages */
+  --font-sans: "Atkinson Hyperlegible Next", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "Atkinson Hyperlegible Mono", ui-monospace, monospace;
+  --color-paper: #fcfcfa;
+  --color-ink: #121212;
+  --color-ink-2: #474747;
+  --color-mute: #767676;
+  --color-rule: #e3e3dd;
+  --color-code: #f4f4ef;
+  /* the compiler's colors: what passes and what fails */
+  --color-pass: #0d7a4a;
+  --color-fail: #c42a1c;
+  --color-warn: #9a6a00;
+}
+
+/* dark mode follows the system setting */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-paper: #121312;
+    --color-ink: #ecece8;
+    --color-ink-2: #b9b9b3;
+    --color-mute: #8d8d87;
+    --color-rule: #2c2d2a;
+    --color-code: #1b1c1a;
+    --color-pass: #3fcf8e;
+    --color-fail: #ff6b5c;
+    --color-warn: #e3b341;
+    color-scheme: dark;
+  }
+  .shiki, .shiki span { color: var(--shiki-dark) !important; }
+}
+
+@layer base {
+  html { @apply bg-paper text-ink antialiased scroll-pt-20; font-size: 17px; }
+  body { @apply font-sans leading-relaxed; }
+  ::selection { @apply bg-ink text-paper; }
+  a { @apply underline decoration-ink/25 underline-offset-[3px] hover:decoration-ink; }
+  :focus-visible { @apply outline-2 outline-offset-2 outline-pass; }
+  button, [role="button"] { @apply cursor-pointer; }
+  h1, h2, h3 { @apply font-bold tracking-[-0.015em] text-ink; }
+}
+
+/* code: light, bordered blocks; highlighted when the site is built, with a copy button from site.js */
+.codeblock { @apply relative; }
+/* the copy button sits in the top padding, so it never covers a line of code */
+.codeblock pre { @apply overflow-x-auto rounded-md border border-rule bg-code px-4 pt-10 pb-4 font-mono text-[14px] leading-relaxed; background-color: var(--color-code) !important; }
+.codeblock.wrap pre { @apply break-words whitespace-pre-wrap; }
+.codeblock .copy {
+  @apply absolute top-2.5 right-2.5 rounded border border-rule bg-paper px-2 py-0.5 font-sans text-[13px] text-ink-2 hover:border-ink hover:text-ink;
+}
+.terminal .e { @apply font-bold text-fail; }
+.terminal .w { @apply font-bold text-warn; }
+.terminal .h { @apply text-pass; }
+.terminal .m { @apply text-mute; }
+
+/* the docs, written in Markdown */
+.prose { @apply max-w-none text-ink-2; }
+.prose h2 { @apply mt-14 mb-3 scroll-mt-20 border-t border-rule pt-8 text-[1.75rem] leading-tight; }
+.prose h3 { @apply mt-9 mb-2 scroll-mt-20 text-lg; }
+.prose tr[id] { @apply scroll-mt-24; }
+.prose tr:target { @apply bg-code; }
+.prose p, .prose ul, .prose ol, .prose table, .prose blockquote, .prose .codeblock { @apply mt-4; }
+.prose ul { @apply list-disc pl-6; }
+.prose ol { @apply list-decimal pl-6; }
+.prose li { @apply mt-1; }
+.prose li::marker { @apply text-mute; }
+.prose a { @apply text-ink; }
+.prose strong { @apply font-bold text-ink; }
+.prose :not(pre) > code { @apply rounded bg-code px-1 py-px font-mono text-[0.88em] text-ink; }
+.prose table { @apply block w-full overflow-x-auto text-[15px]; }
+.prose th { @apply border-b-2 border-ink px-3 py-2 text-left font-bold text-ink; }
+.prose td { @apply border-b border-rule px-3 py-2 align-top; }
+.prose blockquote { @apply border-l-4 border-rule pl-4; }

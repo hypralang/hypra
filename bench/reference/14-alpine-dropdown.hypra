@@ -1,0 +1,13 @@
+page(title: "Menu demo", description: "A small demo of a dropdown menu built with Alpine.js for the bakery site.") {
+  head {
+    script("https://cdn.jsdelivr.net/npm/alpinejs@3.14.1/dist/cdn.min.js", defer: true)
+  }
+  h1 "Menu demo"
+  div(x-data: "{ open: false }") {
+    button("@click": "open = !open") "Menu"
+    ul(x-show: "open") {
+      li { a("/bread") "Bread" }
+      li { a("/cakes") "Cakes" }
+    }
+  }
+}

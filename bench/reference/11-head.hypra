@@ -1,0 +1,9 @@
+page(title: "Welcome", description: "Welcome to Crumb & Co, a small bakery baking fresh bread every night.") {
+  head {
+    link(rel: "stylesheet", href: "/css/app.css")
+    link(rel: "icon", href: "/favicon.svg")
+    script("/js/app.js", type: "module")
+    meta(name: "theme-color", content: "#c2410c")
+  }
+  h1 "Welcome"
+}

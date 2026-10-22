@@ -1,0 +1,1 @@
+A photo gallery. Data: `photos`, a list with `src` and `caption`. Show each photo with its caption as alt text, inside a figure with a figcaption. Add one purely decorative divider image `/img/divider.svg` between the heading and the gallery.

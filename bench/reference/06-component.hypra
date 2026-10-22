@@ -1,0 +1,14 @@
+component Feature(title: Text, highlight: Bool = false) {
+  article {
+    h2 "{title}"
+    if highlight { span(class: "badge") "Popular" }
+    slot
+  }
+}
+
+page(title: "Features", description: "What makes Crumb & Co special: night baking, sourdough and local delivery.") {
+  h1 "Features"
+  Feature(title: "Night baking") { p "Bread is fresh by sunrise." }
+  Feature(title: "Sourdough", highlight: true) { p "Our starter is 12 years old." }
+  Feature(title: "Delivery") { p "Within 10 km." }
+}

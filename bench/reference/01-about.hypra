@@ -1,0 +1,10 @@
+page(title: "About Crumb & Co", description: "Crumb & Co is a small bakery that shapes every loaf by hand before sunrise.") {
+  h1 "About Crumb & Co"
+  p "We are a small neighbourhood bakery."
+  p "Every loaf is shaped by hand before sunrise."
+  ul {
+    li "Fresh"
+    li "Local"
+    li "Organic"
+  }
+}

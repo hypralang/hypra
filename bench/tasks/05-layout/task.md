@@ -1,0 +1,1 @@
+Define a layout called Site in the same file: language English, title suffix " | Crumb", a header with a navigation (labelled "Main") linking to / and /menu, a main area where pages go, and a footer with a copyright line. Then write a page that uses this layout and shows a heading "Our menu" and one paragraph.

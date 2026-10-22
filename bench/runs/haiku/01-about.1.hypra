@@ -1,0 +1,11 @@
+page(title: "About us", description: "Who we are: Crumb & Co, a small bakery that bakes bread by hand every night with local, organic flour.") {
+  h1 "About us"
+  p "Crumb & Co is a small bakery. We bake our bread by hand, every night, in one oven."
+  p "We buy our flour from farms close to the bakery, and we use organic ingredients wherever we can."
+  h2 "Our values"
+  ul {
+    li "Fresh"
+    li "Local"
+    li "Organic"
+  }
+}

@@ -1,0 +1,5 @@
+page(title: "Crumb & Co", description: "Crumb & Co bakes bread the slow way: by hand, at night, with local flour.") {
+  h1 "Bread."
+  allow("SEO-003") "the hero design splits the headline into two h1"
+  h1 "Done right."
+}

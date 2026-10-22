@@ -1,0 +1,376 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "Hypra",
+  "scopeName": "source.hypra",
+  "fileTypes": [
+    "hypra"
+  ],
+  "patterns": [
+    {
+      "include": "#statement"
+    }
+  ],
+  "injections": {
+    "L:meta.embedded.block.json": {
+      "patterns": [
+        {
+          "include": "#data"
+        }
+      ]
+    }
+  },
+  "repository": {
+    "statement": {
+      "patterns": [
+        {
+          "include": "#comment"
+        },
+        {
+          "include": "#embedded"
+        },
+        {
+          "include": "#triple-string"
+        },
+        {
+          "include": "#key"
+        },
+        {
+          "include": "#string"
+        },
+        {
+          "include": "#definition"
+        },
+        {
+          "include": "#for"
+        },
+        {
+          "include": "#if"
+        },
+        {
+          "include": "#keyword"
+        },
+        {
+          "include": "#element"
+        },
+        {
+          "include": "#value"
+        },
+        {
+          "include": "#punctuation"
+        }
+      ]
+    },
+    "comment": {
+      "name": "comment.line.double-slash.hypra",
+      "match": "//.*$"
+    },
+    "definition": {
+      "comment": "component Card(...) and layout Shop(...)",
+      "match": "\\b(component|layout)\\s+([A-Za-z_][A-Za-z0-9_]*)",
+      "captures": {
+        "1": {
+          "name": "storage.type.hypra"
+        },
+        "2": {
+          "name": "entity.name.type.hypra"
+        }
+      }
+    },
+    "for": {
+      "match": "\\b(for)\\s+([a-z_][A-Za-z0-9_]*)\\s+(in)\\b(?:\\s+([a-z_][A-Za-z0-9_]*(?:\\.[A-Za-z0-9_]+)*))?",
+      "captures": {
+        "1": {
+          "name": "keyword.control.loop.hypra"
+        },
+        "2": {
+          "name": "variable.other.hypra"
+        },
+        "3": {
+          "name": "keyword.control.loop.hypra"
+        },
+        "4": {
+          "name": "variable.other.hypra"
+        }
+      }
+    },
+    "if": {
+      "match": "\\b(if|else)\\b(?:\\s+(not)\\b)?(?:\\s+(?!if\\b)([a-z_][A-Za-z0-9_]*(?:\\.[A-Za-z0-9_]+)*))?",
+      "captures": {
+        "1": {
+          "name": "keyword.control.conditional.hypra"
+        },
+        "2": {
+          "name": "keyword.operator.logical.hypra"
+        },
+        "3": {
+          "name": "variable.other.hypra"
+        }
+      }
+    },
+    "keyword": {
+      "name": "keyword.control.import.hypra",
+      "match": "\\buse\\b(?=\\s*\")"
+    },
+    "key": {
+      "patterns": [
+        {
+          "comment": "a quoted attribute name: \"@click\": ...",
+          "match": "(\"[^\"\\n]*\")\\s*(:)(?!:)",
+          "captures": {
+            "1": {
+              "name": "entity.other.attribute-name.hypra"
+            },
+            "2": {
+              "name": "punctuation.separator.key-value.hypra"
+            }
+          }
+        },
+        {
+          "match": "\\b([A-Za-z_][A-Za-z0-9_\\-]*)\\s*(:)(?!:)",
+          "captures": {
+            "1": {
+              "name": "entity.other.attribute-name.hypra"
+            },
+            "2": {
+              "name": "punctuation.separator.key-value.hypra"
+            }
+          }
+        }
+      ]
+    },
+    "element": {
+      "patterns": [
+        {
+          "comment": "Hypra's own elements",
+          "match": "\\b(page|props|head|body|slot|raw|allow|action|field)\\b(?=\\s*[({\"]|\\s*$|\\s*//)",
+          "name": "keyword.other.element.hypra"
+        },
+        {
+          "comment": "a component call, a layout or a type",
+          "match": "\\b[A-Z][A-Za-z0-9_]*\\b",
+          "name": "entity.name.type.hypra"
+        },
+        {
+          "comment": "an element: a name followed by its arguments, text or children",
+          "match": "\\b[a-z][a-z0-9]*(?:-[a-z0-9]+)*\\b(?=\\s*[({\"]|\\s*$|\\s*//)",
+          "name": "entity.name.tag.hypra"
+        }
+      ]
+    },
+    "value": {
+      "patterns": [
+        {
+          "name": "constant.language.boolean.hypra",
+          "match": "\\b(true|false)\\b"
+        },
+        {
+          "name": "constant.numeric.hypra",
+          "match": "-?\\b\\d+(?:\\.\\d+)?\\b"
+        },
+        {
+          "name": "keyword.operator.hypra",
+          "match": "==|!=|\\.\\.|="
+        },
+        {
+          "name": "variable.other.hypra",
+          "match": "\\b[a-z_][A-Za-z0-9_]*(?:\\.[A-Za-z0-9_]+)*\\b"
+        }
+      ]
+    },
+    "punctuation": {
+      "patterns": [
+        {
+          "name": "punctuation.section.block.hypra",
+          "match": "[{}]"
+        },
+        {
+          "name": "punctuation.section.parens.hypra",
+          "match": "[()]"
+        },
+        {
+          "name": "punctuation.section.brackets.hypra",
+          "match": "[\\[\\]]"
+        },
+        {
+          "name": "punctuation.separator.comma.hypra",
+          "match": ","
+        }
+      ]
+    },
+    "string": {
+      "name": "string.quoted.double.hypra",
+      "begin": "\"",
+      "end": "\"",
+      "beginCaptures": {
+        "0": {
+          "name": "punctuation.definition.string.begin.hypra"
+        }
+      },
+      "endCaptures": {
+        "0": {
+          "name": "punctuation.definition.string.end.hypra"
+        }
+      },
+      "patterns": [
+        {
+          "name": "constant.character.escape.hypra",
+          "match": "\\\\[\"\\\\nt]"
+        },
+        {
+          "name": "invalid.illegal.escape.hypra",
+          "match": "\\\\."
+        },
+        {
+          "include": "#interpolation"
+        }
+      ]
+    },
+    "triple-string": {
+      "name": "string.quoted.triple.hypra",
+      "begin": "\"\"\"",
+      "end": "^\\s*\"\"\"",
+      "beginCaptures": {
+        "0": {
+          "name": "punctuation.definition.string.begin.hypra"
+        }
+      },
+      "endCaptures": {
+        "0": {
+          "name": "punctuation.definition.string.end.hypra"
+        }
+      },
+      "patterns": [
+        {
+          "include": "#interpolation"
+        }
+      ]
+    },
+    "interpolation": {
+      "patterns": [
+        {
+          "name": "constant.character.escape.hypra",
+          "match": "\\{\\{|\\}\\}"
+        },
+        {
+          "include": "#data"
+        }
+      ]
+    },
+    "embedded": {
+      "patterns": [
+        {
+          "comment": "a JSON script over several lines: {name} in it reads data",
+          "begin": "\\b(script)\\b(\\([^\\n]*json[^\\n]*\\))\\s*(\"\"\")\\s*$",
+          "end": "^\\s*(\"\"\")",
+          "beginCaptures": {
+            "1": {
+              "name": "entity.name.tag.hypra"
+            },
+            "2": {
+              "patterns": [
+                {
+                  "include": "#statement"
+                }
+              ]
+            },
+            "3": {
+              "name": "punctuation.definition.string.begin.hypra"
+            }
+          },
+          "endCaptures": {
+            "1": {
+              "name": "punctuation.definition.string.end.hypra"
+            }
+          },
+          "contentName": "meta.embedded.block.json",
+          "patterns": [
+            {
+              "include": "#data"
+            },
+            {
+              "include": "source.json"
+            }
+          ]
+        },
+        {
+          "comment": "JavaScript over several lines, written as it is",
+          "begin": "\\b(script)\\b(\\([^\\n]*\\))?\\s*(\"\"\")\\s*$",
+          "end": "^\\s*(\"\"\")",
+          "beginCaptures": {
+            "1": {
+              "name": "entity.name.tag.hypra"
+            },
+            "2": {
+              "patterns": [
+                {
+                  "include": "#statement"
+                }
+              ]
+            },
+            "3": {
+              "name": "punctuation.definition.string.begin.hypra"
+            }
+          },
+          "endCaptures": {
+            "1": {
+              "name": "punctuation.definition.string.end.hypra"
+            }
+          },
+          "contentName": "meta.embedded.block.javascript",
+          "patterns": [
+            {
+              "include": "source.js"
+            }
+          ]
+        },
+        {
+          "comment": "CSS over several lines, written as it is",
+          "begin": "\\b(style)\\b(\\([^\\n]*\\))?\\s*(\"\"\")\\s*$",
+          "end": "^\\s*(\"\"\")",
+          "beginCaptures": {
+            "1": {
+              "name": "entity.name.tag.hypra"
+            },
+            "2": {
+              "patterns": [
+                {
+                  "include": "#statement"
+                }
+              ]
+            },
+            "3": {
+              "name": "punctuation.definition.string.begin.hypra"
+            }
+          },
+          "endCaptures": {
+            "1": {
+              "name": "punctuation.definition.string.end.hypra"
+            }
+          },
+          "contentName": "meta.embedded.block.css",
+          "patterns": [
+            {
+              "include": "source.css"
+            }
+          ]
+        }
+      ]
+    },
+    "data": {
+      "comment": "{user.name} reads data",
+      "match": "(\\{)([a-z_][A-Za-z0-9_]*(?:\\.[A-Za-z0-9_]+)*)(\\})",
+      "name": "meta.interpolation.hypra",
+      "captures": {
+        "1": {
+          "name": "punctuation.section.interpolation.begin.hypra"
+        },
+        "2": {
+          "name": "variable.other.hypra"
+        },
+        "3": {
+          "name": "punctuation.section.interpolation.end.hypra"
+        }
+      }
+    }
+  }
+}

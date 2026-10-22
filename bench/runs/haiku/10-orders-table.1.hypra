@@ -1,0 +1,23 @@
+page(title: "Orders", description: "A table of your recent orders, with the order number, date and total for each.") {
+  props(orders: List)
+
+  h1 "Orders"
+  table {
+    thead {
+      tr {
+        th(scope: "col") "Order"
+        th(scope: "col") "Date"
+        th(scope: "col") "Total"
+      }
+    }
+    tbody {
+      for order in orders {
+        tr {
+          td "{order.number}"
+          td "{order.date}"
+          td "{order.total}"
+        }
+      }
+    }
+  }
+}

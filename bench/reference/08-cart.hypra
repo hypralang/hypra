@@ -1,0 +1,13 @@
+page(title: "Your cart", description: "Review the breads in your cart, remove what you don't need and check out.", robots: "noindex") {
+  props(cart: Cart)
+  h1 "Your cart"
+  ul {
+    for item in cart.items {
+      li {
+        p "{item.quantity} × {item.name}"
+        action("cart.remove", id: item.id, confirm: "Remove {item.name}?") "Remove"
+      }
+    }
+  }
+  action("cart.checkout") "Check out"
+}

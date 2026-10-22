@@ -1,0 +1,7 @@
+page(title: "News", description: "News from Crumb & Co: new breads, opening hours and events at the bakery.") {
+  h1 "News"
+  div(id: "news") {
+    article { h2 "New rye bread" p "Available from Monday." }
+  }
+  button(hx-get: "/news?page=2", hx-target: "#news", hx-swap: "beforeend") "Load more"
+}

@@ -1,0 +1,90 @@
+{
+  "name": "hypra",
+  "displayName": "Hypra",
+  "description": "Highlighting, errors as you type, Go to Definition, references, rename, hover help and formatting for Hypra, the markup language for people and AI agents.",
+  "version": "0.1.0",
+  "publisher": "hypralang",
+  "homepage": "https://hypralang.dev/docs/vscode/",
+  "bugs": {
+    "url": "https://github.com/hypralang/hypra/issues"
+  },
+  "icon": "icon.png",
+  "galleryBanner": {
+    "color": "#121212",
+    "theme": "dark"
+  },
+  "license": "(MIT OR Apache-2.0)",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hypralang/hypra"
+  },
+  "engines": {
+    "vscode": "^1.91.0"
+  },
+  "categories": [
+    "Programming Languages",
+    "Formatters",
+    "Linters"
+  ],
+  "keywords": [
+    "hypra",
+    "html",
+    "markup",
+    "template",
+    "accessibility",
+    "seo"
+  ],
+  "main": "./dist/extension.js",
+  "activationEvents": [],
+  "contributes": {
+    "languages": [
+      {
+        "id": "hypra",
+        "aliases": [
+          "Hypra",
+          "hypra"
+        ],
+        "extensions": [
+          ".hypra"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "hypra",
+        "scopeName": "source.hypra",
+        "path": "./syntaxes/hypra.tmLanguage.json",
+        "embeddedLanguages": {
+          "meta.embedded.block.javascript": "javascript",
+          "meta.embedded.block.css": "css",
+          "meta.embedded.block.json": "json"
+        }
+      }
+    ],
+    "configuration": {
+      "title": "Hypra",
+      "properties": {
+        "hypra.path": {
+          "type": "string",
+          "default": "hypra",
+          "description": "The hypra compiler: a command on your PATH or a full path to it."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "test": "node test/grammar.test.mjs",
+    "bundle": "esbuild extension.js --bundle --platform=node --external:vscode --minify --outfile=dist/extension.js",
+    "package": "npm run bundle && cat ../../LICENSE-MIT ../../LICENSE-APACHE > LICENSE && vsce package"
+  },
+  "dependencies": {
+    "vscode-languageclient": "10.1.2"
+  },
+  "devDependencies": {
+    "@vscode/vsce": "4.0.0",
+    "esbuild": "0.28.2",
+    "vscode-oniguruma": "2.0.1",
+    "vscode-textmate": "9.3.2"
+  }
+}

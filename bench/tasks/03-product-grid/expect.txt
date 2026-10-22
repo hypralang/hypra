@@ -1,0 +1,5 @@
+grid grid-cols-3 gap-4
+rounded-lg shadow p-4
+src="/img/sourdough.jpg"
+href="/p/rye"
+Sourdough

@@ -1,0 +1,17 @@
+name: Idea
+description: Something Hypra should check, output or support
+labels: [idea]
+body:
+  - type: textarea
+    id: idea
+    attributes:
+      label: What you want to write
+      description: A page as you'd like to write it, and the HTML you'd expect.
+      render: hypra
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: Why
+      description: What it's for, and what you do today instead.

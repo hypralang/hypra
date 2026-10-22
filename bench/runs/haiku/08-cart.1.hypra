@@ -1,0 +1,14 @@
+page(title: "Shopping cart", description: "Review the items in your shopping cart, remove any you no longer want, and check out.") {
+  props(cart: Cart)
+
+  h1 "Your cart"
+  ul {
+    for item in cart.items {
+      li {
+        "{item.name}, quantity {item.quantity} "
+        action("cart.remove", id: item.id, confirm: "Remove this item?") "Remove"
+      }
+    }
+  }
+  action("cart.checkout") "Check out"
+}

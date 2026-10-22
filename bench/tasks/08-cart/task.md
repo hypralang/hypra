@@ -1,0 +1,1 @@
+A shopping cart page. Data: `cart` with `items` (each with `id`, `name`, `quantity`). List the items; each has a "Remove" action named `cart.remove` with the item id that asks for confirmation first. Below the list add an action `cart.checkout` labelled "Check out".

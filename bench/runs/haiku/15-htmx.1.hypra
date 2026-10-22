@@ -1,0 +1,12 @@
+page(title: "Latest news", description: "The latest news from our team, with a button that loads more articles on demand.") {
+  h1 "Latest news"
+
+  div(id: "news") {
+    article {
+      h2 "Placeholder headline"
+      p "The first news article appears here."
+    }
+  }
+
+  button(hx-get: "/news?page=2", hx-target: "#news", hx-swap: "beforeend") "Load more"
+}

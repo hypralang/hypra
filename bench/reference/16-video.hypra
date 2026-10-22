@@ -1,0 +1,5 @@
+page(title: "Baking class", description: "Watch our sourdough baking class and learn to bake a loaf in 20 minutes.") {
+  h1 "Baking class"
+  p "Learn to bake sourdough in 20 minutes."
+  video("/media/class.mp4", captions: "/media/class.vtt")
+}

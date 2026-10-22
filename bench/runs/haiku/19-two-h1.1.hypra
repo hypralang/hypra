@@ -1,0 +1,7 @@
+// A landing page whose design splits the headline into two h1 headings
+page(title: "Bread, done right", description: "Bread made by hand every night with slow fermentation and local flour, delivered fresh each morning.") {
+  h1 "Bread."
+  allow("SEO-003") "the design splits the headline into two h1 headings on purpose"
+  h1 "Done right."
+  p "Every loaf is shaped by hand and baked slowly, so it stays fresh for days."
+}

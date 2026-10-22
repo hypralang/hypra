@@ -1,0 +1,101 @@
+# Builds the compiler for every platform when a version is tagged, and publishes it as a GitHub release with
+# SHA-256 checksums. `php artisan hypra:install` downloads from these releases.
+name: release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    # one machine per system builds all of its targets. macOS is cross-compiled on Linux with cargo-zigbuild:
+    # hosted macOS runners are often unavailable, and the compiler is plain Rust
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - { name: linux-x64, os: ubuntu-latest, targets: x86_64-unknown-linux-musl }
+          - { name: linux-arm64, os: ubuntu-24.04-arm, targets: aarch64-unknown-linux-musl }
+          - { name: macos, os: ubuntu-latest, targets: "aarch64-apple-darwin,x86_64-apple-darwin", zig: true }
+          - { name: windows, os: windows-latest, targets: "x86_64-pc-windows-msvc,aarch64-pc-windows-msvc" }
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.targets }}
+      - if: contains(matrix.targets, 'musl')
+        run: sudo apt-get update && sudo apt-get install -y musl-tools
+      - if: matrix.zig
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.13"
+      - if: matrix.zig
+        run: |
+          pip install ziglang==0.13.0
+          cargo install cargo-zigbuild@0.24.0 --locked
+      - name: Check the tag matches the version
+        shell: bash
+        run: |
+          version=$(grep -m1 '^version' Cargo.toml | cut -d '"' -f2)
+          test "v$version" = "$GITHUB_REF_NAME" || { echo "tag $GITHUB_REF_NAME but Cargo.toml says $version"; exit 1; }
+          extension=$(grep -m1 '"version"' editors/vscode/package.json | cut -d '"' -f4)
+          test "$extension" = "$version" || { echo "the VS Code extension says $extension"; exit 1; }
+      - name: Build and package
+        shell: bash
+        run: |
+          IFS=, read -ra targets <<< "${{ matrix.targets }}"
+          for target in "${targets[@]}"; do
+            build=build; [[ "${{ matrix.zig }}" == true ]] && build=zigbuild
+            cargo $build --release --locked --target "$target"
+            name="hypra-${GITHUB_REF_NAME#v}-$target"
+            mkdir "$name"
+            exe=hypra; [[ "$target" == *windows* ]] && exe=hypra.exe
+            cp "target/$target/release/$exe" README.md LICENSE-MIT LICENSE-APACHE "$name/"
+            tar -czf "$name.tar.gz" "$name"
+          done
+      - uses: actions/upload-artifact@v7
+        with:
+          name: ${{ matrix.name }}
+          path: hypra-*.tar.gz
+
+  vscode:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: editors/vscode
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+      - run: npm ci
+      - run: npm test
+      - run: npm run package
+      - uses: actions/upload-artifact@v7
+        with:
+          name: vscode
+          path: editors/vscode/*.vsix
+
+  publish:
+    needs: [build, vscode]
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v8
+        with:
+          path: dist
+          merge-multiple: true
+      - name: Checksums
+        working-directory: dist
+        run: sha256sum hypra-* > SHA256SUMS && cat SHA256SUMS
+      - name: Publish the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$GITHUB_REF_NAME" dist/* --title "$GITHUB_REF_NAME" --generate-notes

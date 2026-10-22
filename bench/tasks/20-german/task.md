@@ -1,0 +1,1 @@
+A page in German (language `de`): title "Über uns", a description, the heading "Über uns" and a paragraph. Also include a web component `bakery-map` with the attributes `lat` (52.52) and `lng` (13.40).

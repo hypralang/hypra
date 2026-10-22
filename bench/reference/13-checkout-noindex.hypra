@@ -1,0 +1,4 @@
+page(title: "Checkout", description: "Check your order, choose a delivery time and pay for your breads.", robots: "noindex", canonical: "https://crumb.test/checkout") {
+  h1 "Checkout"
+  p "Check your order and pay."
+}

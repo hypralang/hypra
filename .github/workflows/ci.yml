@@ -1,0 +1,56 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  compiler:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+      - run: cargo fmt --check
+      - run: cargo clippy --all-targets -- -D warnings
+      - run: php --version
+      # the W3C validator checks the HTML of the differential test's random pages; npm has pinned versions
+      - run: npm install --no-save vnu-jar@26.10.12
+      - run: cargo test
+        env:
+          VNU_JAR: node_modules/vnu-jar/build/dist/vnu.jar
+      - run: cargo run -q -- build examples/product.hypra --data examples/product.json
+      - run: cargo run -q -- fmt --check $(git ls-files '*.hypra' ':!bench/runs')
+
+  laravel:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.4"
+          tools: composer
+      - run: cargo build
+      - run: composer install --no-interaction --no-progress
+        working-directory: php/laravel
+      - run: vendor/bin/phpunit
+        working-directory: php/laravel
+
+  vscode:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: editors/vscode
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+      - run: npm ci
+      - run: npm test

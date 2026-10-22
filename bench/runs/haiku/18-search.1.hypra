@@ -1,0 +1,8 @@
+// A search page: a GET form that sends the query to /search
+page(title: "Search", description: "Search our site for pages, products and articles by typing a word or phrase.") {
+  h1 "Search"
+  form("/search", name: "search", method: "get", description: "Search the site") {
+    field("q", type: String(1..100), label: "Search text")
+    button "Search"
+  }
+}

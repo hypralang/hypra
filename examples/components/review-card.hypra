@@ -1,0 +1,6 @@
+component ReviewCard(review: Review) {
+  article {
+    h3 "{review.author}"
+    p "{review.body}"
+  }
+}

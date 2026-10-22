@@ -1,0 +1,3 @@
+<video
+src="/media/class.mp4"
+src="/media/class.vtt"

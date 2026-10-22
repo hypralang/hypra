@@ -1,0 +1,12 @@
+// An FAQ page: each question is an expandable details element
+page(title: "Frequently asked questions", description: "Answers to the most common questions about delivery and our menu options.") {
+  props(faqs: List)
+
+  h1 "Frequently asked questions"
+  for faq in faqs {
+    details {
+      summary "{faq.question}"
+      p "{faq.answer}"
+    }
+  }
+}

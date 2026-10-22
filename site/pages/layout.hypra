@@ -1,0 +1,42 @@
+// The frame of every page on hypralang.dev.
+use "parts.hypra"
+
+layout Site(lang: "en", title_suffix: " · Hypra", site_name: "Hypra", image: "https://hypralang.dev/social.png") {
+  head {
+    link(rel: "icon", href: "/favicon.svg", type: "image/svg+xml")
+    link(rel: "preconnect", href: "https://fonts.googleapis.com")
+    link(rel: "preconnect", href: "https://fonts.gstatic.com", crossorigin: true)
+    link(rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;700;800&family=Atkinson+Hyperlegible+Mono:wght@400;600&display=swap")
+    link(rel: "stylesheet", href: "/site.css")
+    script("/site.js", defer: true)
+  }
+
+  header(class: "border-b border-rule") {
+    div(class: "mx-auto flex h-16 max-w-6xl items-center justify-between gap-6 px-6") {
+      a("/", class: "flex items-center gap-2.5 no-underline", aria-label: "Hypra home") {
+        Mark(class: "size-7")
+        span(class: "text-[1.35rem] font-extrabold tracking-[-0.02em]") "hypra"
+      }
+      nav(aria-label: "Main", class: "flex items-center gap-5 text-[15px] whitespace-nowrap sm:gap-6 [&_a]:no-underline [&_a:hover]:underline") {
+        a("/docs/") "Docs"
+        // on a phone the docs sidebar links to these
+        a("/docs/laravel/", class: "hidden sm:inline") "Laravel"
+        a("/docs/vscode/", class: "hidden sm:inline") "VS Code"
+        a("https://github.com/hypralang/hypra") "GitHub"
+      }
+    }
+  }
+
+  main { slot }
+
+  footer(class: "mt-28 border-t border-rule") {
+    div(class: "mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-6 py-8 text-[14px] text-mute") {
+      p "Hypra is free software, MIT or Apache-2.0. This site is written in Hypra."
+      p(class: "flex gap-5") {
+        a("/llms.txt") "llms.txt"
+        a("/docs/security/") "Security"
+        a("https://github.com/hypralang/hypra") "Source"
+      }
+    }
+  }
+}

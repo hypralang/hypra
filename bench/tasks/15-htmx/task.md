@@ -1,0 +1,1 @@
+A news page with an htmx "Load more" button that sends a GET request to `/news?page=2` (`hx-get`), puts the result into the element with id `news` (`hx-target`) and appends it (`hx-swap` set to `beforeend`). Include the news container with one placeholder article.

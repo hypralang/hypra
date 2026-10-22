@@ -1,0 +1,11 @@
+page(title: "Gallery", description: "Photos from the Crumb & Co bakery: early mornings, ovens and fresh loaves.") {
+  props(photos: List)
+  h1 "Gallery"
+  img("/img/divider.svg", decorative: true)
+  for photo in photos {
+    figure {
+      img(photo.src, alt: "{photo.caption}")
+      figcaption "{photo.caption}"
+    }
+  }
+}

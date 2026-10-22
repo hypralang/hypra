@@ -1,0 +1,12 @@
+{
+  "photos": [
+    {
+      "src": "/img/a.jpg",
+      "caption": "Morning bake"
+    },
+    {
+      "src": "/img/b.jpg",
+      "caption": "Fresh loaves"
+    }
+  ]
+}

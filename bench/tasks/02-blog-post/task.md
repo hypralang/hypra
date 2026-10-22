@@ -1,0 +1,1 @@
+A blog post page. Data: `post` with `title`, `author`, `date`, `summary` and `paragraphs` (a list of strings). Show the title as the main heading, a line with the author and date, and every paragraph. Use the post title as the page title and the summary as the description.

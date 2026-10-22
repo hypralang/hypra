@@ -1,0 +1,69 @@
+{
+    "name": "hypra/laravel",
+    "description": "Hypra views for Laravel: .hypra pages rendered as HTML, Markdown or JSON",
+    "keywords": [
+        "laravel",
+        "views",
+        "templates",
+        "html",
+        "markdown",
+        "accessibility",
+        "seo",
+        "ai"
+    ],
+    "type": "library",
+    "license": "MIT OR Apache-2.0",
+    "homepage": "https://hypralang.dev",
+    "support": {
+        "issues": "https://github.com/hypralang/hypra/issues",
+        "source": "https://github.com/hypralang/hypra",
+        "docs": "https://hypralang.dev/docs/laravel/",
+        "security": "https://github.com/hypralang/hypra/security/policy"
+    },
+    "require": {
+        "php": ">=8.2",
+        "hypra/runtime": "^0.1",
+        "guzzlehttp/guzzle": "^7.8 || ^8.0",
+        "illuminate/console": "^11.0 || ^12.0 || ^13.0",
+        "illuminate/http": "^11.0 || ^12.0 || ^13.0",
+        "illuminate/routing": "^11.0 || ^12.0 || ^13.0",
+        "illuminate/support": "^11.0 || ^12.0 || ^13.0",
+        "illuminate/view": "^11.0 || ^12.0 || ^13.0",
+        "symfony/process": "^7.0 || ^8.0"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^9.0 || ^10.0 || ^11.0",
+        "phpunit/phpunit": "^11.0 || ^12.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Hypra\\Laravel\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Hypra\\Laravel\\Tests\\": "tests/"
+        }
+    },
+    "repositories": [
+        {
+            "type": "path",
+            "url": "../runtime",
+            "options": {
+                "versions": {
+                    "hypra/runtime": "0.1.0"
+                }
+            }
+        }
+    ],
+    "scripts": {
+        "test": "phpunit"
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Hypra\\Laravel\\HypraServiceProvider"
+            ]
+        }
+    }
+}

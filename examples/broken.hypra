@@ -1,0 +1,16 @@
+// Intentionally broken, to show the compiler's errors:
+// hypra check examples/broken.hypra
+page(title: "Shop") {
+  main {
+    img("/img/shoe.jpg")
+    h1 "Shoes"
+    h1 "More shoes"
+    buton "Buy"
+
+    form("/signup", name: "signup") {
+      field("email", type: Email)
+      field("age", type: Integr(18..), label: "Age")
+      button "Sign up"
+    }
+  }
+}

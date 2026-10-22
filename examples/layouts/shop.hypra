@@ -1,0 +1,17 @@
+// The frame around every shop page: navigation, footer and site-wide settings.
+layout Shop(lang: "en", title_suffix: " | Shop", site_name: "Shop") {
+  head {
+    link(rel: "stylesheet", href: "/app.css")
+  }
+
+  header {
+    nav(aria-label: "Main") {
+      a("/") "Home"
+      a("/shoes") "Shoes"
+    }
+  }
+
+  main { slot }
+
+  footer { p "© 2026 Shop" }
+}

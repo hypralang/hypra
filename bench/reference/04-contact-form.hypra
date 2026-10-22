@@ -1,0 +1,11 @@
+page(title: "Contact us", description: "Questions, orders or catering requests: send Crumb & Co a message here.") {
+  h1 "Contact us"
+  form("/contact", name: "contact", description: "Send us a message") {
+    field("name", type: String(1..80), label: "Name")
+    field("email", type: Email, label: "Email")
+    field("subject", type: Choice("order", "catering", "other"), label: "Subject")
+    field("message", type: Text(max: 1000), label: "Message")
+    field("privacy", type: Accept, label: "I accept the privacy policy")
+    button "Send"
+  }
+}

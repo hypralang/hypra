@@ -1,0 +1,5 @@
+page(title: "Help: editor shortcuts", description: "Help for the editor: how to save your work with a keyboard shortcut, and where to find the full guide.") {
+  h1 "Help"
+
+  p { "Press " code "Ctrl+S" " to " b "save" ", or read " a("/guide") "the guide" " for more." }
+}

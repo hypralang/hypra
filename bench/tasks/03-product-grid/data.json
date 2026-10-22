@@ -1,0 +1,16 @@
+{
+  "products": [
+    {
+      "name": "Sourdough",
+      "price": "6.50",
+      "image": "/img/sourdough.jpg",
+      "url": "/p/sourdough"
+    },
+    {
+      "name": "Rye",
+      "price": "5.00",
+      "image": "/img/rye.jpg",
+      "url": "/p/rye"
+    }
+  ]
+}

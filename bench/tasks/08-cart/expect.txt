@@ -1,0 +1,4 @@
+action="/_a/cart.remove"
+name="id" value="2"
+onsubmit="return confirm(
+action="/_a/cart.checkout"

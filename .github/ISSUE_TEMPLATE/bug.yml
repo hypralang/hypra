@@ -1,0 +1,26 @@
+name: Bug
+description: The compiler, a package or the extension does something wrong
+labels: [bug]
+body:
+  - type: textarea
+    id: page
+    attributes:
+      label: Page and data
+      description: The smallest `.hypra` page, and data if it needs any, that shows the problem.
+      render: hypra
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What happened, and what you expected
+      description: Paste the compiler's output or the HTML it wrote.
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: The output of `hypra --version`, plus the package or extension version if one is involved.
+    validations:
+      required: true

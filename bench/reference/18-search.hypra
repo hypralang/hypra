@@ -1,0 +1,7 @@
+page(title: "Search", description: "Search all Crumb & Co recipes by name, ingredient or type of bread.") {
+  h1 "Search"
+  form("/search", name: "search", description: "Search recipes", method: "get") {
+    field("q", type: String(..100), label: "Search for")
+    button "Search"
+  }
+}

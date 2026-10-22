@@ -1,0 +1,15 @@
+layout Site(lang: "en", title_suffix: " | Crumb") {
+  header {
+    nav(aria-label: "Main") {
+      a("/") "Home"
+      a("/menu") "Menu"
+    }
+  }
+  main { slot }
+  footer { p "© 2026 Crumb & Co" }
+}
+
+page(layout: Site, title: "Menu", description: "What Crumb & Co bakes this week: bread, buns and pastries, fresh every morning.") {
+  h1 "Our menu"
+  p "Bread, buns and pastries, fresh every morning."
+}

@@ -1,0 +1,6 @@
+// A page presenting a baking class video with captions
+page(title: "Baking Class Video", description: "Watch our bread baking class video: shaping, proofing and baking a loaf by hand.") {
+  video("/media/class.mp4", captions: "/media/class.vtt", controls: true)
+  h1 "Baking class"
+  p "In this class you learn to shape, proof and bake bread by hand, step by step, with a baker at your side."
+}

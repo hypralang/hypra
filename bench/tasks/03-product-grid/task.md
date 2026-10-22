@@ -1,0 +1,1 @@
+A shop page listing products. Data: `products`, a list of objects with `name`, `price`, `image` and `url`. Show each product as a card with its image (with meaningful alt text), name, price and a link to its page. Style the cards with Tailwind classes, e.g. `grid grid-cols-3 gap-4` on the container and `rounded-lg shadow p-4` on each card.

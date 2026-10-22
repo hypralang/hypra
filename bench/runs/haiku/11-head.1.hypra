@@ -1,0 +1,10 @@
+page(title: "Welcome", description: "Welcome to our site, where you can find everything we offer and start exploring today.") {
+  head {
+    link(rel: "stylesheet", href: "/css/app.css")
+    script("/js/app.js", type: "module")
+    link(rel: "icon", href: "/favicon.svg")
+    meta(name: "theme-color", content: "#c2410c")
+  }
+
+  h1 "Welcome"
+}

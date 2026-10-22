@@ -1,0 +1,23 @@
+[package]
+name = "hypra"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.88"
+description = "A strict markup language that compiles to HTML, Markdown, JSON and WebMCP tools"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/hypralang/hypra"
+homepage = "https://hypralang.dev"
+readme = "README.md"
+keywords = ["html", "markup", "compiler", "accessibility", "seo"]
+categories = ["compilers", "template-engine", "web-programming"]
+# the crate is the compiler; the spec is compiled in for hover help
+include = ["/src", "/tests", "/examples", "/docs/spec.md", "/README.md", "/SECURITY.md", "/LICENSE-*"]
+
+[dependencies]
+serde_json = { version = "1.0.154", features = ["preserve_order"] }
+
+# small, fast downloads for the prebuilt binaries
+[profile.release]
+lto = true
+codegen-units = 1
+strip = true
