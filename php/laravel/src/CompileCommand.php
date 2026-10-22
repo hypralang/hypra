@@ -36,11 +36,12 @@ final class CompileCommand extends Command
             }
         }
         if ($failed > 0) {
-            $this->components->error("{$failed} of " . ($compiled + $failed) . ' Hypra pages don\'t compile.');
+            $verb = $failed === 1 ? "doesn't" : "don't";
+            $this->components->error("{$failed} of " . ($compiled + $failed) . " Hypra pages {$verb} compile.");
 
             return self::FAILURE;
         }
-        $this->components->info("Compiled {$compiled} Hypra pages.");
+        $this->components->info('Compiled ' . ($compiled === 1 ? '1 Hypra page.' : "{$compiled} Hypra pages."));
 
         return self::SUCCESS;
     }

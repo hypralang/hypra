@@ -111,9 +111,9 @@ final class DistributionTest extends TestCase
 
     public function test_compile_compiles_every_page_and_skips_components(): void
     {
-        $this->artisan('hypra:compile')->expectsOutputToContain('Compiled 1 Hypra pages')->assertSuccessful();
+        $this->artisan('hypra:compile')->expectsOutputToContain('Compiled 1 Hypra page.')->assertSuccessful();
 
         file_put_contents("{$this->work}/views/broken.hypra", "page(title: \"Broken\") {\n  h1 \"x\"\n}\n");
-        $this->artisan('hypra:compile')->expectsOutputToContain('1 of 2 Hypra pages don\'t compile')->assertFailed();
+        $this->artisan('hypra:compile')->expectsOutputToContain('1 of 2 Hypra pages doesn\'t compile')->assertFailed();
     }
 }
