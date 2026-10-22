@@ -49,7 +49,8 @@
 .codeblock { @apply relative; }
 /* the copy button sits in the top padding, so it never covers a line of code */
 .codeblock pre { @apply overflow-x-auto rounded-md border border-rule bg-code px-4 pt-10 pb-4 font-mono text-[14px] leading-relaxed; background-color: var(--color-code) !important; }
-.codeblock.wrap pre { @apply break-words whitespace-pre-wrap; }
+/* long words like URLs break too, so a block is never wider than the screen */
+.codeblock.wrap pre { @apply whitespace-pre-wrap; overflow-wrap: anywhere; }
 .codeblock .copy {
   @apply absolute top-2.5 right-2.5 rounded border border-rule bg-paper px-2 py-0.5 font-sans text-[13px] text-ink-2 hover:border-ink hover:text-ink;
 }
@@ -76,7 +77,7 @@
 .prose li::marker { @apply text-mute; }
 .prose a { @apply text-ink; }
 .prose strong { @apply font-bold text-ink; }
-.prose :not(pre) > code { @apply rounded bg-code px-1 py-px font-mono text-[0.88em] text-ink; }
+.prose :not(pre) > code { @apply rounded bg-code px-1 py-px font-mono text-[0.88em] text-ink; overflow-wrap: anywhere; }
 .prose table { @apply block w-full overflow-x-auto text-[15px]; }
 .prose th { @apply border-b-2 border-ink px-3 py-2 text-left font-bold text-ink; }
 .prose td { @apply border-b border-rule px-3 py-2 align-top; }

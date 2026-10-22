@@ -97,7 +97,8 @@ const highlight = (code, lang, wrap = false, label = "") => {
   return `<div class="codeblock${wrap ? " wrap" : ""}"${label ? ` data-label="${label}"` : ""}>${html}</div>`;
 };
 const escape = (text) => text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-/** The compiler's report, colored the way a terminal shows it. */
+/** The compiler's report, colored the way a terminal shows it. Its lines don't wrap, so the `^^^` under a line keep
+ * pointing at the right place; on a narrow screen the block scrolls instead. */
 function terminal(report, label = "") {
   const lines = escape(report).split("\n").map((line) => {
     if (/^error\[/.test(line)) return `<span class="e">${line}</span>`;
@@ -106,7 +107,7 @@ function terminal(report, label = "") {
     if (/^\s*(--&gt;|\||\d+ \|)/.test(line)) return `<span class="m">${line}</span>`;
     return line;
   });
-  return `<div class="codeblock wrap terminal"${label ? ` data-label="${label}"` : ""}><pre><code>${lines.join("\n")}</code></pre></div>`;
+  return `<div class="codeblock terminal"${label ? ` data-label="${label}"` : ""}><pre><code>${lines.join("\n")}</code></pre></div>`;
 }
 
 /** Runs the compiler on a page with data and fails the build on any error or warning. */
