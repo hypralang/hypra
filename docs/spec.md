@@ -359,8 +359,9 @@ stop the build, but fix it unless there's a reason (then use `allow`).
   ("Read more about {post.title}") or into `aria-label`.
 - Titles and descriptions are measured by how wide they are, like in search results: Chinese, Japanese and Korean
   characters count twice.
-- Vague link and alt texts ("click here", "image") are checked in the page's language (`lang`): English and German
-  so far. A page in another language isn't checked for them, and neither is one whose `lang` comes from data.
+- Vague link and alt texts ("click here", "image") are checked in the page's language (`lang`): English, German,
+  French, Spanish, Portuguese, Italian and Dutch so far. A page in another language isn't checked for them, and
+  neither is one whose `lang` comes from data.
 - An `iframe` has a `title`. A video that autoplays is `muted: true`. `tabindex` is `0` or `-1`, never positive.
 - An `id` is used once per page, so a component with a fixed `id` is used once.
 - `raw` with data writes it unescaped; only use it for trusted HTML. `javascript:` URLs are errors.

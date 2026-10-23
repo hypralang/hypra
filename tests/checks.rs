@@ -376,14 +376,30 @@ fn vague_link_and_alt_texts_are_checked_in_the_page_language() {
     assert_eq!(flagged("de"), [3, 5]);
     assert_eq!(flagged("en"), [4, 6]);
     // a language the checks don't know isn't checked against another language's words
-    assert_eq!(codes(&in_language("fr", body)), Vec::<&str>::new());
+    assert_eq!(codes(&in_language("ja", body)), Vec::<&str>::new());
     // nor is a page whose language comes from data
     let src = format!(
         "page(title: \"T\", description: \"{DESCRIPTION}\", lang: \"{{l}}\") {{\n  props(l: Text)\n  h1 \"x\"\n{body}\n}}\n"
     );
     assert_eq!(codes(&compile(&src, &json!({ "l": "de" }), "p")), Vec::<&str>::new());
     // a file name is never alt text, in any language
-    assert_eq!(codes(&in_language("fr", "  img(\"/a.jpg\", alt: \"DSC_0042.jpg\")")), ["A11Y-008"]);
+    assert_eq!(codes(&in_language("ja", "  img(\"/a.jpg\", alt: \"DSC_0042.jpg\")")), ["A11Y-008"]);
+}
+
+#[test]
+fn every_known_language_has_its_own_words() {
+    for (lang, link, alt) in [
+        ("fr", "Cliquez ici", "Photo"),
+        ("es", "Leer más", "Imagen"),
+        ("pt-BR", "Saiba mais", "Imagem"),
+        ("it", "Clicca qui", "Immagine"),
+        ("nl", "Lees meer", "Afbeelding"),
+    ] {
+        let body = format!("  a(\"/a\") \"{link}\"\n  img(\"/a.jpg\", alt: \"{alt}\")");
+        assert_eq!(codes(&in_language(lang, &body)), ["A11Y-007", "A11Y-008"], "{lang}");
+        // and only its own: English words on these pages are left alone
+        assert_eq!(codes(&in_language(lang, "  a(\"/a\") \"click here\"")), Vec::<&str>::new(), "{lang}");
+    }
 }
 
 #[test]
