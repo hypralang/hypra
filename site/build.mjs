@@ -1,7 +1,7 @@
 // Builds hypralang.dev into dist/. The pages are Hypra; their content comes from the repository's Markdown docs and
 // from running the compiler on a sample, so the site always shows what the current version does.
 import { execFileSync, spawnSync } from "node:child_process";
-import { cpSync, mkdirSync, mkdtempSync, readFileSync, renameSync, rmSync, writeFileSync } from "node:fs";
+import { cpSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, renameSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -72,6 +72,30 @@ const guides = [
     description: "Turn your forms and buttons into tools AI agents can call, with WebMCP attributes and JSON Schemas.",
   },
 ];
+
+// the rules: a page for every code the compiler reports, from docs/rules, grouped by the code's prefix
+const groups = {
+  A11Y: "Accessibility",
+  SEO: "Search engines",
+  SEC: "Security",
+  FORM: "Forms",
+  ATTR: "Attributes",
+  SEM: "Structure",
+  TYPE: "Data",
+  COMP: "Components",
+  LAYOUT: "Layouts",
+  IMPORT: "Imports",
+  ALLOW: "allow",
+  LEX: "Syntax",
+  PARSE: "Syntax",
+};
+const rules = readdirSync(join(repo, "docs/rules"))
+  .filter((name) => name.endsWith(".md"))
+  .sort()
+  .map((name) => {
+    const code = name.replace(/\.md$/, "");
+    return { section: "rules", slug: code.toLowerCase(), file: `docs/rules/${name}`, nav: code, code, group: groups[code.split("-")[0]] };
+  });
 
 execFileSync("cargo", ["build", "--release", "--quiet"], { cwd: repo, stdio: "inherit" });
 const hypra = join(repo, "target/release/hypra");
@@ -171,18 +195,35 @@ const landing = {
 // --- the docs: Markdown from the repository
 
 const slug = (text) => text.toLowerCase().replace(/<[^>]+>|`/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
-const pageOf = (file) => [...docs, ...guides].find((d) => d.file === file);
+const pageOf = (file) => [...docs, ...guides, ...rules].find((d) => d.file === file);
 const urlOf = (doc) => `/${doc.section ?? "docs"}/${doc.slug ? `${doc.slug}/` : ""}`;
+
+/** Where a link in a doc goes on the site: another doc, or the file on GitHub. With `absolute`, links within the
+ * site get the origin too, for Markdown read outside of it. */
+function linkOf(doc, href, absolute = false) {
+  if (/^([a-z]+:|#)/.test(href)) return href;
+  const [path, hash = ""] = href.split("#");
+  const target = relative(repo, resolve(repo, dirname(doc.file), path));
+  // a link to a folder means its README
+  const other = pageOf(target) ?? pageOf(join(target, "README.md"));
+  const url = other ? `${absolute ? origin : ""}${urlOf(other)}` : `${github}/${target.includes(".") ? "blob" : "tree"}/main/${target}`;
+  return `${url}${hash ? `#${hash}` : ""}`;
+}
 
 /** Converts a doc to HTML: highlighted code, headings with ids, links to other docs within the site. */
 function render(doc, markdown) {
   const toc = [];
+  const failures = doc.code ? ruleChecks(doc) : [];
   const marked = new Marked({
     renderer: {
       code({ text, lang }) {
         // ```html output marks what the compiler writes; tests/guides.rs checks it is
-        const [language, kind] = (lang ?? "").split(/\s+/);
+        const [language, kind, ...rest] = (lang ?? "").split(/\s+/);
         if (language === "console" && kind === "output") return terminal(text, "Output");
+        // a rule's examples: what `hypra check` says follows each one that fails
+        if (kind === "fails") return highlight(text, language, true) + terminal(failures.shift(), "hypra check");
+        if (kind === "file") return highlight(text, language, true, rest.join(" "));
+        if (kind === "data") return highlight(text, language, true, "Data");
         return highlight(text, language, true, kind === "output" ? "Output" : "");
       },
       heading({ tokens, depth, text }) {
@@ -191,22 +232,46 @@ function render(doc, markdown) {
         return `<h${depth} id="${id}">${this.parser.parseInline(tokens)}</h${depth}>\n`;
       },
       link({ href, tokens }) {
-        const label = this.parser.parseInline(tokens);
-        if (/^([a-z]+:|#)/.test(href)) return `<a href="${href}">${label}</a>`;
-        const [path, hash = ""] = href.split("#");
-        const target = relative(repo, resolve(repo, dirname(doc.file), path));
-        // a link to a folder means its README
-        const other = pageOf(target) ?? pageOf(join(target, "README.md"));
-        const url = other ? urlOf(other) : `${github}/${target.includes(".") ? "blob" : "tree"}/main/${target}`;
-        return `<a href="${url}${hash ? `#${hash}` : ""}">${label}</a>`;
+        return `<a href="${linkOf(doc, href)}">${this.parser.parseInline(tokens)}</a>`;
       },
     },
   });
   // every rule code's row gets an id, so editors can link an error to where it's explained: /docs/#a11y-001
   const html = marked
     .parse(markdown)
-    .replace(/<tr>\n<td><code>([A-Z0-9]+-\d{3})<\/code><\/td>/g, (row, code) => row.replace("<tr>", `<tr id="${code.toLowerCase()}">`));
+    .replace(/<tr>\n<td>(?:<a [^>]+>)?<code>([A-Z0-9]+-\d{3})<\/code>/g, (row, code) => row.replace("<tr>", `<tr id="${code.toLowerCase()}">`));
   return { html, toc };
+}
+
+/** What `hypra check` says about each failing example of a rule, in order. The examples import the rule's other
+ * files and are checked with the data before them; tests/rule_docs.rs checks that they fail as they should. */
+function ruleChecks(doc) {
+  const dir = mkdtempSync(join(tmpdir(), "hypra-rule-"));
+  const blocks = new Marked().lexer(doc.markdown).filter((token) => token.type === "code");
+  for (const { lang, text } of blocks) {
+    const [, kind, path] = lang.split(/\s+/);
+    if (kind !== "file") continue;
+    mkdirSync(dirname(join(dir, path)), { recursive: true });
+    writeFileSync(join(dir, path), `${text}\n`);
+  }
+  let data = [];
+  const reports = [];
+  for (const { lang, text } of blocks) {
+    const [language, kind] = lang.split(/\s+/);
+    if (language === "json" && kind === "data") {
+      writeFileSync(join(dir, "data.json"), text);
+      data = ["--data", "data.json"];
+    }
+    if (kind !== "fails") continue;
+    writeFileSync(join(dir, "page.hypra"), `${text}\n`);
+    const result = spawnSync(hypra, ["check", "page.hypra", ...data], { cwd: dir, encoding: "utf8" });
+    if (result.stdout || !result.stderr.includes(`[${doc.code}]`)) {
+      throw new Error(`${doc.file}: an example doesn't fail with ${doc.code}:\n${result.stdout}${result.stderr}`);
+    }
+    reports.push(result.stderr.trim());
+  }
+  rmSync(dir, { recursive: true, force: true });
+  return reports;
 }
 
 rmSync(dist, { recursive: true, force: true });
@@ -225,18 +290,24 @@ const load = (doc) => {
 };
 const loaded = docs.map(load);
 const loadedGuides = guides.map(load);
-for (const doc of [...loaded, ...loadedGuides]) {
+const loadedRules = rules.map(load).map((rule) => {
+  const what = rule.title.replace(/^[^:]+: /, "");
+  return { ...rule, what, description: `Hypra rule ${rule.code}, ${what}: why it's checked, a page that breaks it and the fix.` };
+});
+const allRules = { url: "/rules/", title: "All rules", current: false };
+for (const doc of [...loaded, ...loadedGuides, ...loadedRules]) {
   const { html, toc } = render(doc, doc.rest);
   const out = join(dist, doc.section ?? "docs", doc.slug);
   const links = (list) => list.map((d) => ({ url: urlOf(d), title: d.nav, current: d === doc }));
+  // a rule's page lists the other rules of its group; the docs and guides link to all of them
+  const rulesSection = doc.code
+    ? { title: `${doc.group} rules`, pages: [allRules, ...links(loadedRules.filter((r) => r.group === doc.group))] }
+    : { title: "Rules", pages: [allRules] };
   build(
     join(site, "pages/docs/index.hypra"),
     {
       doc: { title: doc.title, description: doc.description, url: urlOf(doc), html, toc, markdown: "index.md" },
-      sections: [
-        { title: "Docs", pages: links(loaded) },
-        { title: "Guides", pages: links(loadedGuides) },
-      ],
+      sections: [{ title: "Docs", pages: links(loaded) }, { title: "Guides", pages: links(loadedGuides) }, rulesSection],
     },
     out,
   );
@@ -250,9 +321,24 @@ build(
   { guides: loadedGuides.map((g) => ({ url: urlOf(g), title: g.title, description: g.description })) },
   join(dist, "guides"),
 );
-// the compiler names its outputs after the page; this one is the folder's index
-for (const ext of ["html", "md", "json", "webmcp.json"]) {
-  renameSync(join(dist, "guides", `guides.${ext}`), join(dist, "guides", `index.${ext}`));
+
+// --- the list of rules, by group
+build(
+  join(site, "pages/rules.hypra"),
+  {
+    groups: [...new Set(Object.values(groups))].map((title) => ({
+      title,
+      rules: loadedRules.filter((r) => r.group === title).map((r) => ({ url: urlOf(r), code: r.code, what: r.what })),
+    })),
+  },
+  join(dist, "rules"),
+);
+
+// the compiler names its outputs after the page; these are their folders' index
+for (const page of ["guides", "rules"]) {
+  for (const ext of ["html", "md", "json", "webmcp.json"]) {
+    renameSync(join(dist, page, `${page}.${ext}`), join(dist, page, `index.${ext}`));
+  }
 }
 
 // --- llms.txt: where agents find the docs as Markdown
@@ -262,11 +348,20 @@ writeFileSync(
     loaded.map((d) => `- [${d.title}](${origin}${urlOf(d)}index.md): ${d.description}`).join("\n") +
     "\n\n## Guides\n\n" +
     loadedGuides.map((d) => `- [${d.title}](${origin}${urlOf(d)}index.md): ${d.description}`).join("\n") +
+    "\n\n## Rules\n\nEvery message from the compiler has a code, and every code a page: why it's checked, a page that breaks it and the fix.\n\n" +
+    loadedRules.map((d) => `- [${d.title}](${origin}${urlOf(d)}index.md)`).join("\n") +
     "\n",
 );
 
 // --- for search engines: every page, and where the list is
-const pages = [`${origin}/`, ...loaded.map((d) => `${origin}${urlOf(d)}`), `${origin}/guides/`, ...loadedGuides.map((d) => `${origin}${urlOf(d)}`)];
+const pages = [
+  `${origin}/`,
+  ...loaded.map((d) => `${origin}${urlOf(d)}`),
+  `${origin}/guides/`,
+  ...loadedGuides.map((d) => `${origin}${urlOf(d)}`),
+  `${origin}/rules/`,
+  ...loadedRules.map((d) => `${origin}${urlOf(d)}`),
+];
 writeFileSync(
   join(dist, "sitemap.xml"),
   `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n` +

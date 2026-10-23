@@ -394,94 +394,94 @@ two spaces between items on one line stay as written. Run `hypra fmt --check` in
 
 ## Errors
 
-Every message has a code, a position and a fix (`help`). Read the help line; it usually says exactly what to
-write. Errors stop the build; warnings don't. `allow("CODE") "reason"` turns one off for the next element.
+Every message has a code, a position, a fix (`help`) and a link to its rule's page (`docs`), which explains the
+rule with a page that breaks it and the fixed page. Read the help line; it usually says exactly what to write. Errors stop the build; warnings don't. `allow("CODE") "reason"` turns one off for the next element.
 
 | Code | Meaning |
 | --- | --- |
-| `A11Y-001` | image has no alt text |
-| `A11Y-002` | link has no text |
-| `A11Y-003` | video has no captions |
-| `A11Y-004` | action has no label |
-| `A11Y-005` | button has no text |
-| `A11Y-006` | heading level skipped (warning) |
-| `A11Y-007` | link text doesn't say where it goes (warning) |
-| `A11Y-008` | alt text doesn't describe the image (warning) |
-| `A11Y-009` | iframe has no title (warning) |
-| `A11Y-010` | positive tabindex (warning) |
-| `A11Y-011` | autoplaying video isn't muted (warning) |
-| `A11Y-012` | ARIA name or state on a div or span without a role (warning) |
-| `A11Y-013` | links with the same text go to different places (warning) |
-| `ALLOW-001` | allow has no reason |
-| `ALLOW-002` | allow has no rule code |
-| `ALLOW-003` | allow names an unknown rule (warning) |
-| `ATTR-001` | unknown attribute (a warning on HTML elements, unless it's a near miss of a Hypra setting) |
-| `ATTR-002` | raw has no HTML |
-| `ATTR-003` | wrong kind of value |
-| `ATTR-004` | unnamed argument where a name is needed |
-| `ATTR-005` | attribute set twice |
-| `ATTR-006` | text on an element that takes none |
-| `ATTR-007` | default outside a component parameter |
-| `ATTR-008` | invalid attribute name |
-| `COMP-001` | unknown component |
-| `COMP-002` | missing component argument |
-| `COMP-003` | unknown component argument |
-| `COMP-004` | component defined twice |
-| `COMP-005` | component name isn't capitalized |
-| `COMP-006` | unnamed component argument |
-| `COMP-007` | component calls itself |
-| `COMP-008` | malformed component parameter |
-| `COMP-009` | page expands to too many elements |
-| `COMP-010` | content given to a component without a `slot` |
-| `FORM-001` | field has no name or type |
-| `FORM-002` | field has no label |
-| `FORM-003` | form has no button (warning) |
-| `FORM-004` | form with fields has no name (warning) |
-| `FORM-005` | field outside a form, or inside for or if in it |
-| `FORM-006` | unknown form method |
-| `IMPORT-001` | imported file can't be read |
-| `LAYOUT-001` | unknown layout |
-| `LAYOUT-002` | layout has no slot |
-| `LAYOUT-003` | layout defined twice |
-| `LAYOUT-004` | layout name isn't capitalized |
-| `LAYOUT-005` | layout inside itself |
-| `LEX-001` | unexpected character |
-| `LEX-002` | unterminated string |
-| `LEX-003` | unknown escape in a string |
-| `PARSE-001` | syntax error |
-| `PARSE-002` | nested too deeply |
-| `SEC-001` | inline event handler (warning) |
-| `SEC-002` | raw HTML from data (warning) |
-| `SEC-003` | URL that runs code |
-| `SEC-004` | data inside an attribute that runs or loads code (warning) |
-| `SEC-005` | data name in a script or style, which is written as-is (warning) |
-| `SEC-006` | `formaction` or `base` that could send forms to another site |
-| `SEC-007` | data in the `values` of an SVG animation that sets a link |
-| `SEM-001` | unknown element |
-| `SEM-002` | file has no page |
-| `SEM-003` | element in the wrong place |
-| `SEM-004` | image or video has no source |
-| `SEM-005` | action has no name |
-| `SEM-006` | slot outside a component or layout |
-| `SEM-007` | imported file contains a page |
-| `SEM-008` | void element has children |
-| `SEM-009` | html, body or title written by hand |
-| `SEM-010` | head in the wrong place |
-| `SEM-011` | element doesn't belong in head |
-| `SEM-012` | id used more than once (warning) |
-| `SEM-013` | lang isn't a language code (warning) |
-| `SEM-014` | invalid action name |
-| `SEO-001` | page has no title or description |
-| `SEO-002` | title too long (warning) |
-| `SEO-003` | more than one h1 |
-| `SEO-004` | page has no h1 (warning) |
-| `SEO-005` | canonical URL isn't absolute (warning) |
-| `SEO-006` | description too short or too long (warning) |
-| `TYPE-001` | prop missing from the data |
-| `TYPE-002` | unknown name or field |
-| `TYPE-003` | value isn't a list |
-| `TYPE-004` | unknown field type |
-| `TYPE-005` | wrong argument or default for a field type |
+| [`A11Y-001`](rules/A11Y-001.md) | image has no alt text |
+| [`A11Y-002`](rules/A11Y-002.md) | link has no text |
+| [`A11Y-003`](rules/A11Y-003.md) | video has no captions |
+| [`A11Y-004`](rules/A11Y-004.md) | action has no label |
+| [`A11Y-005`](rules/A11Y-005.md) | button has no text |
+| [`A11Y-006`](rules/A11Y-006.md) | heading level skipped (warning) |
+| [`A11Y-007`](rules/A11Y-007.md) | link text doesn't say where it goes (warning) |
+| [`A11Y-008`](rules/A11Y-008.md) | alt text doesn't describe the image (warning) |
+| [`A11Y-009`](rules/A11Y-009.md) | iframe has no title (warning) |
+| [`A11Y-010`](rules/A11Y-010.md) | positive tabindex (warning) |
+| [`A11Y-011`](rules/A11Y-011.md) | autoplaying video isn't muted (warning) |
+| [`A11Y-012`](rules/A11Y-012.md) | ARIA name or state on a div or span without a role (warning) |
+| [`A11Y-013`](rules/A11Y-013.md) | links with the same text go to different places (warning) |
+| [`ALLOW-001`](rules/ALLOW-001.md) | allow has no reason |
+| [`ALLOW-002`](rules/ALLOW-002.md) | allow has no rule code |
+| [`ALLOW-003`](rules/ALLOW-003.md) | allow names an unknown rule (warning) |
+| [`ATTR-001`](rules/ATTR-001.md) | unknown attribute (a warning on HTML elements, unless it's a near miss of a Hypra setting) |
+| [`ATTR-002`](rules/ATTR-002.md) | raw has no HTML |
+| [`ATTR-003`](rules/ATTR-003.md) | wrong kind of value |
+| [`ATTR-004`](rules/ATTR-004.md) | unnamed argument where a name is needed |
+| [`ATTR-005`](rules/ATTR-005.md) | attribute set twice |
+| [`ATTR-006`](rules/ATTR-006.md) | text on an element that takes none |
+| [`ATTR-007`](rules/ATTR-007.md) | default outside a component parameter |
+| [`ATTR-008`](rules/ATTR-008.md) | invalid attribute name |
+| [`COMP-001`](rules/COMP-001.md) | unknown component |
+| [`COMP-002`](rules/COMP-002.md) | missing component argument |
+| [`COMP-003`](rules/COMP-003.md) | unknown component argument |
+| [`COMP-004`](rules/COMP-004.md) | component defined twice |
+| [`COMP-005`](rules/COMP-005.md) | component name isn't capitalized |
+| [`COMP-006`](rules/COMP-006.md) | unnamed component argument |
+| [`COMP-007`](rules/COMP-007.md) | component calls itself |
+| [`COMP-008`](rules/COMP-008.md) | malformed component parameter |
+| [`COMP-009`](rules/COMP-009.md) | page expands to too many elements |
+| [`COMP-010`](rules/COMP-010.md) | content given to a component without a `slot` |
+| [`FORM-001`](rules/FORM-001.md) | field has no name or type |
+| [`FORM-002`](rules/FORM-002.md) | field has no label |
+| [`FORM-003`](rules/FORM-003.md) | form has no button (warning) |
+| [`FORM-004`](rules/FORM-004.md) | form with fields has no name (warning) |
+| [`FORM-005`](rules/FORM-005.md) | field outside a form, or inside for or if in it |
+| [`FORM-006`](rules/FORM-006.md) | unknown form method |
+| [`IMPORT-001`](rules/IMPORT-001.md) | imported file can't be read |
+| [`LAYOUT-001`](rules/LAYOUT-001.md) | unknown layout |
+| [`LAYOUT-002`](rules/LAYOUT-002.md) | layout has no slot |
+| [`LAYOUT-003`](rules/LAYOUT-003.md) | layout defined twice |
+| [`LAYOUT-004`](rules/LAYOUT-004.md) | layout name isn't capitalized |
+| [`LAYOUT-005`](rules/LAYOUT-005.md) | layout inside itself |
+| [`LEX-001`](rules/LEX-001.md) | unexpected character |
+| [`LEX-002`](rules/LEX-002.md) | unterminated string |
+| [`LEX-003`](rules/LEX-003.md) | unknown escape in a string |
+| [`PARSE-001`](rules/PARSE-001.md) | syntax error |
+| [`PARSE-002`](rules/PARSE-002.md) | nested too deeply |
+| [`SEC-001`](rules/SEC-001.md) | inline event handler (warning) |
+| [`SEC-002`](rules/SEC-002.md) | raw HTML from data (warning) |
+| [`SEC-003`](rules/SEC-003.md) | URL that runs code |
+| [`SEC-004`](rules/SEC-004.md) | data inside an attribute that runs or loads code (warning) |
+| [`SEC-005`](rules/SEC-005.md) | data name in a script or style, which is written as-is (warning) |
+| [`SEC-006`](rules/SEC-006.md) | `formaction` or `base` that could send forms to another site |
+| [`SEC-007`](rules/SEC-007.md) | data in the `values` of an SVG animation that sets a link |
+| [`SEM-001`](rules/SEM-001.md) | unknown element |
+| [`SEM-002`](rules/SEM-002.md) | file has no page |
+| [`SEM-003`](rules/SEM-003.md) | element in the wrong place |
+| [`SEM-004`](rules/SEM-004.md) | image or video has no source |
+| [`SEM-005`](rules/SEM-005.md) | action has no name |
+| [`SEM-006`](rules/SEM-006.md) | slot outside a component or layout |
+| [`SEM-007`](rules/SEM-007.md) | imported file contains a page |
+| [`SEM-008`](rules/SEM-008.md) | void element has children |
+| [`SEM-009`](rules/SEM-009.md) | html, body or title written by hand |
+| [`SEM-010`](rules/SEM-010.md) | head in the wrong place |
+| [`SEM-011`](rules/SEM-011.md) | element doesn't belong in head |
+| [`SEM-012`](rules/SEM-012.md) | id used more than once (warning) |
+| [`SEM-013`](rules/SEM-013.md) | lang isn't a language code (warning) |
+| [`SEM-014`](rules/SEM-014.md) | invalid action name |
+| [`SEO-001`](rules/SEO-001.md) | page has no title or description |
+| [`SEO-002`](rules/SEO-002.md) | title too long (warning) |
+| [`SEO-003`](rules/SEO-003.md) | more than one h1 |
+| [`SEO-004`](rules/SEO-004.md) | page has no h1 (warning) |
+| [`SEO-005`](rules/SEO-005.md) | canonical URL isn't absolute (warning) |
+| [`SEO-006`](rules/SEO-006.md) | description too short or too long (warning) |
+| [`TYPE-001`](rules/TYPE-001.md) | prop missing from the data |
+| [`TYPE-002`](rules/TYPE-002.md) | unknown name or field |
+| [`TYPE-003`](rules/TYPE-003.md) | value isn't a list |
+| [`TYPE-004`](rules/TYPE-004.md) | unknown field type |
+| [`TYPE-005`](rules/TYPE-005.md) | wrong argument or default for a field type |
 
 ## Common mistakes
 

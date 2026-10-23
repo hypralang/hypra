@@ -141,7 +141,7 @@ fn checks_as_you_type() {
     assert_eq!(found.len(), 1, "{found:?}");
     assert_eq!(found[0]["code"], "A11Y-001");
     assert_eq!(found[0]["range"]["start"], json!({ "line": 4, "character": 6 }));
-    assert_eq!(found[0]["codeDescription"]["href"], "https://hypralang.dev/docs/#a11y-001");
+    assert_eq!(found[0]["codeDescription"]["href"], "https://hypralang.dev/rules/a11y-001/");
 
     // and goes away when it's fixed
     change(&mut editor, &page, PAGE);

@@ -56,6 +56,7 @@ impl Diagnostic {
             if let Some(help) = &self.help {
                 out.push_str(&format!("  = help: {help}\n"));
             }
+            out.push_str(&format!("  = docs: {}\n", crate::help::rule_url(&self.code)));
             return out;
         }
         let line_no = self.pos.line.to_string();
@@ -75,6 +76,7 @@ impl Diagnostic {
         if let Some(help) = &self.help {
             out.push_str(&format!("{pad} = help: {help}\n"));
         }
+        out.push_str(&format!("{pad} = docs: {}\n", crate::help::rule_url(&self.code)));
         out
     }
 
@@ -88,6 +90,7 @@ impl Diagnostic {
             "col": self.pos.col,
             "len": self.len,
             "help": self.help,
+            "docs": crate::help::rule_url(&self.code),
         })
     }
 }

@@ -1,0 +1,26 @@
+use "layout.hypra"
+
+page(layout: Site, title: "Rules", canonical: "https://hypralang.dev/rules/", description: "Every check the Hypra compiler runs, from accessibility to security: why it matters, a page that breaks it and the fix.") {
+  props(groups: List)
+
+  div(class: "mx-auto max-w-6xl px-6 pt-14") {
+    h1(class: "text-[2.6rem] leading-tight font-extrabold tracking-[-0.025em]") "Rules"
+    p(class: "mt-3 max-w-2xl text-lg text-ink-2") "Every message from the compiler has a code, and every code has a page: why it's checked, a page that breaks the rule, what the compiler says about it, and the fix."
+    for group in groups {
+      section(class: "mt-12") {
+        h2(class: "text-xl font-bold") "{group.title}"
+        ul(class: "mt-4 grid gap-px border-y border-rule bg-rule sm:grid-cols-2") {
+          for rule in group.rules {
+            // a last rule alone in its row takes the whole row
+            li(class: "bg-paper sm:last:odd:col-span-2") {
+              a(rule.url, class: "flex h-full items-baseline gap-4 px-4 py-3 no-underline hover:bg-code") {
+                code(class: "w-24 shrink-0 font-mono text-[14px] text-mute") "{rule.code}"
+                span "{rule.what}"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

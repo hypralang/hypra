@@ -127,6 +127,7 @@ error[A11Y-001]: image has no alt text
 5 |     img("/img/shoe.jpg")
   |         ^^^^^^^^^^^^^^^
   = help: add alt: "..." or decorative: true
+  = docs: https://hypralang.dev/rules/a11y-001/
 
 error[SEM-001]: unknown element `buton`
  --> examples/broken.hypra:8:5
@@ -134,11 +135,13 @@ error[SEM-001]: unknown element `buton`
 8 |     buton "Buy"
   |     ^^^^^
   = help: did you mean `button`?
+  = docs: https://hypralang.dev/rules/sem-001/
 …
 6 errors, 0 warnings
 ```
 
-Add `--format json` to get the same list as JSON. Checks on text that comes from data, like a description from
+Every code has [a page](https://hypralang.dev/rules/) with an example that breaks the rule and the fix. Add
+`--format json` to get the same list as JSON. Checks on text that comes from data, like a description from
 a database, run when a page is built with that data.
 
 ## Works with everything
