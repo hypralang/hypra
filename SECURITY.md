@@ -19,9 +19,9 @@ unsafe code on purpose, for example with `raw`; the compiler reports those place
 
 ## How data is written
 
-Every place data can end up has its own rule. They're the same in the static build (`interp.rs`) and the PHP
-runtime (`php/runtime`), and `tests/differential.rs` renders hundreds of random pages with tricky data in both to
-make sure (set `HYPRA_FUZZ_CASES` for more).
+Every place data can end up has its own rule. They're the same in the static build (`interp.rs`), the PHP
+runtime (`php/runtime`) and the JavaScript runtime (`js/runtime.js`), and `tests/differential.rs` renders hundreds
+of random pages with tricky data in all three to make sure (set `HYPRA_FUZZ_CASES` for more).
 
 | Where the data goes | What happens |
 | --- | --- |
@@ -43,8 +43,8 @@ What's checked when a page is compiled:
 - Inline event handlers like `onclick` are warnings (`SEC-001`).
 - Quoted attribute names must be valid names (`ATTR-008`), so a name can't smuggle in another attribute.
 - Action names only use letters, digits, dots, dashes and underscores (`SEM-014`), because they become URLs.
-- Names that end up in generated PHP (form, field and action names, paths) are fixed text, never data, and every
-  string in generated PHP is written as an escaped PHP literal.
+- Names that end up in generated PHP or JavaScript (form, field and action names, paths) are fixed text, never
+  data, and every string in generated code is written as an escaped literal of that language.
 
 ## Forms and Laravel
 
@@ -52,7 +52,7 @@ What's checked when a page is compiled:
   allowlist: a URL counts as this site only if it has no scheme and doesn't start with `//`, read the way browsers
   read it (tabs and newlines removed, leading spaces and control characters skipped, `\` treated as `/`). So
   `https://…`, `//…`, `/\evil.example` and `ht<tab>tps://…` never receive them, also when the URL comes from data.
-  The Rust and PHP versions are tested against the same list of tricky URLs.
+  The Rust, PHP and JavaScript versions are tested against the same list of tricky URLs.
 - A button's `formaction` must be a fixed path on this site, and `base(href: …)` must be fixed text (`SEC-006`):
   both could otherwise redirect a form, hidden fields included.
 - Quoted attribute names are lowercased like HTML does, so `"HREF"` or `"ONCLICK"` get the same checks as `href`
@@ -62,6 +62,14 @@ What's checked when a page is compiled:
 - In strict mode (the default when `APP_DEBUG` is on), data that doesn't match the page throws a `DataError`
   naming the `.hypra` line. Turn `APP_DEBUG` off in production, as with any Laravel error.
 - The compiler runs as a separate process with the view's path as an argument, never through a shell.
+
+## Editors
+
+- The VS Code extension runs the compiler for errors, formatting and the preview, and that can be a compiler the
+  project installed (`node_modules/hypra`, `storage/hypra`). So it does this only in folders VS Code trusts; in
+  others it only highlights.
+- The preview shows the page with its scripts, like a browser would. The extension doesn't listen to the preview,
+  so a script there can't do anything in VS Code.
 
 ## Limits
 

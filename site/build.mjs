@@ -44,7 +44,7 @@ const docs = [
     slug: "vscode",
     file: "editors/vscode/README.md",
     nav: "VS Code",
-    description: "Hypra in VS Code and Cursor: errors as you type, go to definition, references, rename, hover help and formatting.",
+    description: "Hypra in VS Code and Cursor: a preview of the page and its Markdown, errors as you type, go to definition, rename and formatting.",
   },
   {
     slug: "agents",

@@ -8,8 +8,8 @@
 2. Tag it and push the tag:
 
    ```console
-   $ git tag v0.2.0
-   $ git push origin v0.2.0
+   $ git tag v0.4.0
+   $ git push origin v0.4.0
    ```
 
    The `release` workflow checks that the versions match the tag, builds the compiler for Linux, macOS and
@@ -23,7 +23,7 @@
    ```console
    $ git subtree split --prefix php/runtime -b split-runtime
    $ git push git@github.com:hypralang/hypra-runtime.git split-runtime:main
-   $ git push git@github.com:hypralang/hypra-runtime.git split-runtime:refs/tags/v0.2.0
+   $ git push git@github.com:hypralang/hypra-runtime.git split-runtime:refs/tags/v0.4.0
    ```
 
    and the same for `php/laravel`. Packagist picks up new tags by itself once the repositories are registered.

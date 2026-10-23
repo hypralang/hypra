@@ -50,7 +50,7 @@ page(title: "{product.name} – Running Shoes", description: "{product.name}: a 
 | **PHP 8.2+** | pages compiled to PHP render at request time with [`hypra/runtime`](php/runtime) |
 | **Laravel 11, 12, 13** | `.hypra` views, Markdown and JSON for agents on the same URL, CSRF, actions, `hypra:install`, `hypra:compile` |
 | **CSS and JavaScript** | anything: Tailwind, Alpine.js, htmx, web components, React or Vue islands |
-| **Editors** | VS Code and Cursor: highlighting, errors as you type, go to definition, references, rename, hover, formatting; other editors through `hypra lsp` |
+| **Editors** | VS Code and Cursor: a preview of the page, its Markdown and JSON, errors as you type, go to definition, references, rename, hover, formatting; other editors through `hypra lsp` |
 | **Compiler** | prebuilt for Linux, macOS and Windows on x64 and ARM: `npm install hypra`, `cargo install hypra` or a download |
 
 Other server languages, like Python, Go or Ruby, can use the static build or call `hypra build`.
@@ -351,9 +351,10 @@ A path can be a folder: `hypra check views` and `hypra fmt views` take every `.h
 `views`, so `views/shop/cart.hypra` becomes `dist/shop/cart.mjs`. Files with only components and layouts aren't
 built on their own; the pages that use them are.
 
-For VS Code and Cursor, [editors/vscode](editors/vscode) adds highlighting, errors as you type, Go to
-Definition, Find All References, Rename, hover help and Format Document. They come from `hypra lsp`, a language server, so other editors get
-them too: point the editor's LSP support at `hypra lsp` for `.hypra` files. In Neovim:
+For VS Code and Cursor, [editors/vscode](editors/vscode) adds highlighting, a preview next to the editor
+(Ctrl+K V), errors as you type, Go to Definition, Find All References, Rename, hover help and Format Document.
+All but the highlighting and the preview come from `hypra lsp`, a language server, so other editors get them too:
+point the editor's LSP support at `hypra lsp` for `.hypra` files. In Neovim:
 
 ```lua
 vim.filetype.add({ extension = { hypra = "hypra" } })
