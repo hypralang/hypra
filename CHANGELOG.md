@@ -5,6 +5,8 @@ fixes and adds checks.
 
 ## Unreleased
 
+- [Hypra with AI coding agents](https://hypralang.dev/docs/agents/): what to tell Claude Code, Codex, Cursor and
+  Copilot so they write Hypra, and [llms-full.txt](https://hypralang.dev/llms-full.txt) with all the docs in one file
 - Every rule has a page on [hypralang.dev/rules](https://hypralang.dev/rules/), with an example that breaks it and
   the fix, and every message links to it: `= docs:` in the terminal, `docs` in `--format json`, and the code in
   the editor
