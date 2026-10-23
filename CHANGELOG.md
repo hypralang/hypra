@@ -3,7 +3,7 @@
 Hypra is pre-1.0: a minor version (0.2, 0.3) may change the language or its output, a patch version (0.1.1) only
 fixes and adds checks.
 
-## Unreleased
+## 0.3.1
 
 - `hypra fmt` takes folders too, like `check` and `build`
 - A build given a folder of only components and layouts passes over it instead of stopping:
