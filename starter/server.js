@@ -6,7 +6,7 @@ import index from "./dist/index.mjs";
 import show from "./dist/coffee/show.mjs";
 import { coffees } from "./data.js";
 
-const types = { ".css": "text/css", ".svg": "image/svg+xml" };
+const types = { ".css": "text/css", ".svg": "image/svg+xml", ".jpg": "image/jpeg" };
 
 function send(res, output, accept) {
   const { contentType, body } = output.negotiate(accept);

@@ -2,6 +2,8 @@
 export const coffees = [
   {
     slug: "yirgacheffe",
+    photo: "/photos/yirgacheffe.jpg",
+    photo_alt: "Pour-over coffee being brewed with a copper kettle",
     name: "Yirgacheffe",
     origin: "Gedeo, Ethiopia",
     notes: "jasmine, bergamot, peach",
@@ -15,6 +17,8 @@ export const coffees = [
   },
   {
     slug: "huila",
+    photo: "/photos/huila.jpg",
+    photo_alt: "A cappuccino with latte art, held in one hand",
     name: "Huila",
     origin: "Pitalito, Colombia",
     notes: "red apple, caramel, cocoa",
@@ -28,6 +32,8 @@ export const coffees = [
   },
   {
     slug: "huehuetenango",
+    photo: "/photos/huehuetenango.jpg",
+    photo_alt: "Roasted coffee beans, close up",
     name: "Huehuetenango",
     origin: "La Libertad, Guatemala",
     notes: "dark chocolate, plum, brown sugar",

@@ -214,9 +214,14 @@ p {
   padding: 64px 0 24px;
 }
 
+.hero-art {
+  border-radius: var(--radius);
+  box-shadow: 0 30px 60px -30px rgb(43 29 20 / 0.5);
+}
+
 .hero-grid {
   display: grid;
-  grid-template-columns: 1.1fr 0.9fr;
+  grid-template-columns: 1fr 1fr;
   align-items: center;
   gap: 48px;
 }
@@ -251,6 +256,8 @@ p {
 .card img {
   border-radius: 10px;
   margin-bottom: 16px;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
 }
 
 .card-link {
@@ -313,7 +320,7 @@ textarea {
 
 .product {
   display: grid;
-  grid-template-columns: 0.9fr 1.1fr;
+  grid-template-columns: 1fr 1fr;
   gap: 56px;
   align-items: start;
   padding-top: 56px;
@@ -402,13 +409,8 @@ textarea {
     grid-template-columns: 1fr;
   }
 
-  .hero-art {
-    max-width: 320px;
-  }
-
   .product-art {
     position: static;
-    max-width: 360px;
   }
 
   .site-header nav {

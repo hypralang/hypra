@@ -12,7 +12,7 @@ page(layout: Site, title: "Small-batch coffee, roasted weekly", description: "Si
         p(class: "lede") "Three single-origin coffees, roasted light enough to taste the farm and shipped within days of roasting."
         a("#coffees", class: "button") "See this week's coffees"
       }
-      img("/bags/hero.svg", decorative: true, width: 480, height: 480, class: "hero-art")
+      img("/photos/hero.jpg", alt: "Kettles and a glass pour-over brewer on a coffee bar", width: 1000, height: 750, class: "hero-art")
     }
   }
 

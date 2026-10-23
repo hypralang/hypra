@@ -24,6 +24,7 @@ $ curl -H "Accept: text/markdown" localhost:3000/coffee/huila
 | `layouts/site.hypra` | header, footer, the stylesheet and the site's name |
 | `components/coffee-card.hypra` | a coffee in the grid on the home page |
 | `public/styles.css` | the whole look: Hypra writes no CSS |
+| `public/photos/` | the photos |
 | `data.js` | the coffees; in a real app they come from a database |
 | `server.js` | renders pages with `render()` and answers with `negotiate()` |
 
@@ -43,3 +44,11 @@ Change the colours and fonts at the top of `public/styles.css`, the name in `lay
 the compiler says what's wrong, on which line, and how to fix it.
 
 The language is at [hypralang.dev/docs](https://hypralang.dev/docs/).
+
+## Photos
+
+The photos are in the public domain or under [CC0](https://creativecommons.org/publicdomain/zero/1.0/), from
+Wikimedia Commons: [hero](https://commons.wikimedia.org/wiki/File:Drip_brewing_(Unsplash).jpg) by Thomas
+Martinsen, [Yirgacheffe](https://commons.wikimedia.org/wiki/File:Manual_drip_(pour-over)_coffee.jpg) and
+[Huila](https://commons.wikimedia.org/wiki/File:Latte_art_4.jpg) by Kim Sanso, and
+[Huehuetenango](https://commons.wikimedia.org/wiki/File:Roasted_coffee_beans.jpg) by MarkSweep.

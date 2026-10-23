@@ -4,7 +4,7 @@ page(layout: Site, title: "{coffee.name}, {coffee.origin}", description: "{coffe
   props(coffee: Coffee)
 
   div(class: "wrap product", style: "--accent: {coffee.color}") {
-    img("/bags/{coffee.slug}.svg", alt: "Bag of {coffee.name} coffee", width: 480, height: 600, class: "product-art")
+    img(coffee.photo, alt: coffee.photo_alt, width: 1000, height: 750, class: "product-art")
     div(class: "stack") {
       p(class: "eyebrow") "{coffee.origin}"
       h1 "{coffee.name}"
