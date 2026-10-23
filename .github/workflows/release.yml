@@ -111,3 +111,14 @@ jobs:
     with:
       tag: ${{ github.ref_name }}
     secrets: inherit
+
+  npm:
+    needs: publish
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+    steps:
+      - name: Start the npm workflow
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run npm.yml -R "$GITHUB_REPOSITORY" --ref main -f tag="$GITHUB_REF_NAME"

@@ -1,0 +1,50 @@
+# Publishes a release on npm (`npm install hypra`): the compiler for every system and the runtime for JavaScript
+# pages. The release workflow starts it after each release; it can also be run by hand for a tag. It's a workflow
+# of its own because npm refuses a publish from a workflow that another one calls. npm trusts this file, so no
+# token is stored.
+name: npm
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "The release to publish, e.g. v0.2.0"
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  npm:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.tag }}
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          registry-url: https://registry.npmjs.org
+      - name: Put the release's compilers into the package
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tag="${{ inputs.tag }}"
+          gh release download "$tag" -R "$GITHUB_REPOSITORY" -p 'hypra-*.tar.gz' -D release
+          for archive in release/*.tar.gz; do
+            name=$(basename "$archive" .tar.gz)
+            target=${name#hypra-${tag#v}-}
+            exe=hypra; [[ "$target" == *windows* ]] && exe=hypra.exe
+            tar -xzf "$archive" -C release
+            mkdir -p "js/bin/$target"
+            cp "release/$name/$exe" "js/bin/$target/"
+          done
+          # one for each system bin/hypra.js knows
+          test "$(find js/bin -mindepth 1 -maxdepth 1 -type d | wc -l)" = 6 || { ls -R js/bin; exit 1; }
+      # trusted publishing needs npm 11.5.1 or later
+      - run: npx --yes npm@11.5.1 publish --access public
+        working-directory: js
