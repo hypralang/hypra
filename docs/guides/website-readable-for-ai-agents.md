@@ -27,7 +27,8 @@ crawler sees:
 $ curl -s https://example.com/articles/sourdough | grep "Why your sourdough"
 ```
 
-If the text isn't in what `curl` returns, most AI crawlers don't see it either.
+If the text isn't in what `curl` returns, most AI crawlers don't see it either. Keep the rest of the basics too:
+a sitemap listed in `robots.txt`, stable URLs, and no login or paywall in front of what you want read.
 
 ## 2. Say what each page is
 
@@ -36,6 +37,11 @@ The same things that help search engines and screen readers help language models
 `alt` text that describes images, links whose text says where they go, and real elements, like `button` for
 buttons and `nav` for navigation, instead of styled `div`s. A model reading the page has no styles to go by;
 the structure is all it gets.
+
+Write each section so it stands on its own. AI answers often quote one passage, not the whole page, so put the
+answer before the explanation and state the facts plainly, like prices, dates, opening hours and versions. A
+"last updated" date on pages that change, and questions people really ask answered in their own words, help too.
+None of this is AI-specific: it's what good search results have always looked like.
 
 ## 3. Add structured data
 
@@ -52,8 +58,11 @@ that. Add it for the kinds of pages that have a schema.org type:
 
 ## 4. Decide what crawlers may do
 
-AI crawlers follow `robots.txt` and have their own names in it, so you can treat training and search
-differently. For example, to keep your pages out of training but stay in AI search:
+The big AI companies each run several bots with different jobs: one collects pages for training, one builds the
+index their AI search answers from, and one fetches a page when a person asks about it. OpenAI's are GPTBot,
+OAI-SearchBot and ChatGPT-User; Anthropic's are ClaudeBot, Claude-SearchBot and Claude-User. They follow
+`robots.txt`, so you can treat them differently. For example, to keep your pages out of training but stay in AI
+search and in answers people ask for:
 
 ```text
 User-agent: GPTBot
@@ -64,10 +73,16 @@ Disallow: /
 
 User-agent: OAI-SearchBot
 Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
 ```
 
-Check each company's documentation for its current crawler names: they add and rename them. Blocking a crawler
-also keeps your pages out of whatever it feeds.
+Check each company's documentation for its current bot names: they add and rename them. Blocking a search bot
+keeps your pages out of that AI search; blocking a training bot doesn't.
+
+`robots.txt` isn't the only gate. CDNs and firewalls, Cloudflare among them, can block AI bots on their own, in
+some setups by default. If AI tools can't read your site, check there too.
 
 ## 5. Offer Markdown
 
@@ -98,7 +113,7 @@ browser builds a tool with typed parameters. Browsers that don't know them ignor
 | Content in the HTML | every crawler and assistant | none for server-rendered sites; real work for single-page apps |
 | Titles, headings, alt text, real elements | everyone, including search engines and screen readers | small, page by page |
 | Structured data | search engines, and the AI answers built on them | small per page type |
-| robots.txt rules for AI crawlers | the crawlers of the big AI companies | a few lines |
+| robots.txt rules for AI bots, and the CDN's bot settings | the bots of the big AI companies | a few lines |
 | Markdown on request | some assistants and agents; Cloudflare offers it | a middleware, or a page that compiles to it |
 | llms.txt | coding assistants and documentation tools | a generated file |
 | WebMCP | browsers testing it | two attributes per form |

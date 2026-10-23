@@ -65,6 +65,12 @@ have, whether EJS, Handlebars or plain strings. Its limits come from guessing st
 If your site is behind Cloudflare, its Markdown for Agents feature does the same conversion without code, with
 the same trade-offs.
 
+Two variations you'll see recommended. Some sites also serve Markdown at the page's URL plus `.md`
+(`/articles/sourdough.md`), for tools that don't send headers; that's a second route next to the first. Others
+send Markdown to known AI bots by their `User-Agent`. Be careful with that one: it needs `Vary: User-Agent`,
+which makes caching much less effective, and content that differs by user agent looks like cloaking to search
+engines. Keep the content the same in both formats.
+
 ## With Hypra
 
 [Hypra](https://hypralang.dev) pages are written once and compiled into HTML, Markdown and JSON together, so the
