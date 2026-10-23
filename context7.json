@@ -1,7 +1,7 @@
 {
   "$schema": "https://context7.com/schema/context7.json",
   "projectTitle": "Hypra",
-  "description": "Hypra is a strict markup language for web pages. Its compiler turns one .hypra file into accessible HTML for browsers, Markdown for AI agents, JSON, and WebMCP tool definitions, and refuses pages with mistakes such as missing alt text, unlabeled fields or skipped headings. Pages render with the hypra npm package in Node.js, Bun and Deno, or with hypra/laravel in Laravel.",
+  "description": "Hypra is a strict markup language for web pages. Its compiler turns one .hypra file into accessible HTML for browsers, Markdown for AI agents, JSON, and WebMCP tool definitions, and refuses pages with mistakes such as missing alt text, unlabeled fields or clickable divs. Pages render with the hypra npm package in Node.js, Bun and Deno, or with hypra/laravel in Laravel.",
   "folders": ["docs", "js", "php/laravel", "php/runtime", "editors/vscode", "starter"],
   "excludeFolders": ["node_modules", "vendor", "dist", "target", "test", "tests"],
   "excludeFiles": ["releasing.md", "CONTRIBUTING.md", "CHANGELOG.md", "ROADMAP.md"],
