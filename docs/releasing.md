@@ -14,8 +14,8 @@
    The `release` workflow checks that the versions match the tag, builds the compiler for Linux, macOS and
    Windows (x64 and ARM) and the VS Code extension, and publishes them as a GitHub release with `SHA256SUMS`.
    `php artisan hypra:install` downloads from there. Then the `registries` workflow publishes the compiler on
-   crates.io and the `hypra` package, with the compilers from the release in it, on npm, both through trusted
-   publishing, and the extension on Open VSX, with the `OVSX_PAT` secret.
+   crates.io, through trusted publishing, and the extension on Open VSX, with the `OVSX_PAT` secret, and the `npm`
+   workflow publishes the `hypra` package, with the compilers from the release in it, on npm.
 3. Publish the PHP packages. Packagist needs each in its own repository, so `php/runtime` and `php/laravel` are
    split into `hypralang/hypra-runtime` and `hypralang/hypra-laravel` and tagged with the same version:
 
@@ -35,6 +35,6 @@ every push to `main`.
 
 ## Trusted publishing on npm
 
-npm trusts the `release` workflow (`release.yml`) of `hypralang/hypra`, so no npm token is stored. npm checks the
-workflow a release starts from, not `registries.yml`, which it calls: running `registries.yml` by hand publishes to
-crates.io and Open VSX, but not to npm.
+npm trusts the `npm` workflow (`npm.yml`) of `hypralang/hypra`, so no npm token is stored. The release starts it
+with the release's tag; to publish a release on npm again, run it by hand with that tag. It's a workflow of its
+own, not a job the release calls, because npm refuses a publish from a workflow that another one calls.
