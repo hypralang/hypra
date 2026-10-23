@@ -23,6 +23,17 @@ The views in this project are Hypra (.hypra files), not HTML or Blade.
 
 For Claude Code, a `CLAUDE.md` with the line `@AGENTS.md` reads the same instructions, so they're kept in one place.
 
+## Or install the plugin
+
+For Cursor and Claude Code, [hypra-plugin](https://github.com/hypralang/hypra-plugin) bundles the same guidance:
+a skill the agent loads for `.hypra` files, Cursor rules, and the language server, so the agent sees the
+compiler's errors as it edits. In Claude Code:
+
+```console
+/plugin marketplace add hypralang/hypra-plugin
+/plugin install hypra@hypra
+```
+
 ## What the agent reads
 
 | URL | What it is |
