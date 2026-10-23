@@ -5,6 +5,8 @@ fixes and adds checks.
 
 ## Unreleased
 
+- A link or button that holds only an icon, like a decorative image, has no name for screen readers: A11Y-002
+  and A11Y-005 now report it. A link with an `aria-label` and no content no longer gets A11Y-002.
 - Link and alt text checks know French, Spanish, Portuguese, Italian and Dutch
 
 ## 0.1.1

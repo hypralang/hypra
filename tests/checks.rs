@@ -459,3 +459,21 @@ fn length_is_measured_by_width() {
     let src = format!("page(title: \"{title}\", description: \"{DESCRIPTION}\", lang: \"ja\") {{\n  h1 \"x\"\n}}\n");
     assert_eq!(codes(&compile(&src, &json!({}), "p")), ["SEO-002"]);
 }
+
+#[test]
+fn links_and_buttons_need_a_name_not_just_an_icon() {
+    // an icon alone names nothing
+    assert_eq!(codes(&run("  button(type: \"button\") { img(\"/x.svg\", decorative: true) }")), ["A11Y-005"]);
+    assert_eq!(codes(&run("  button(type: \"button\") { i(class: \"icon-close\") }")), ["A11Y-005"]);
+    assert_eq!(codes(&run("  a(\"/account\") { img(\"/user.svg\", decorative: true) }")), ["A11Y-002"]);
+    // a label, text inside, or an image with alt text does
+    for named in [
+        "a(\"/cart\", aria-label: \"Cart\")",
+        "a(\"/\") { img(\"/logo.svg\", alt: \"Shop home\") }",
+        "button(type: \"button\") { span(class: \"sr-only\") \"Close\" img(\"/x.svg\", decorative: true) }",
+        "button(type: \"button\", aria-label: \"Close\") { img(\"/x.svg\", decorative: true) }",
+        "button(type: \"button\") { svg(viewBox: \"0 0 10 10\") { title \"Close\" } }",
+    ] {
+        assert_eq!(codes(&run(&format!("  {named}"))), Vec::<&str>::new(), "{named}");
+    }
+}

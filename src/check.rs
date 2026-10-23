@@ -266,7 +266,10 @@ impl<'a> Checker<'a> {
                     self.report(Diagnostic::error("ATTR-006", format!("`{}` takes no text", e.name), v.pos, v.len));
                 }
             }
-            TextRule::Required(code, message, help) if e.value.is_none() && e.children.is_empty() => {
+            // a link's text can be its content, as long as something in it names the link
+            TextRule::Required(code, message, help)
+                if if e.name == "a" { !has_name(e) } else { e.value.is_none() && e.children.is_empty() } =>
+            {
                 self.report(Diagnostic::error(code, message, e.pos, len).help(help));
             }
             _ => {}
@@ -296,11 +299,7 @@ impl<'a> Checker<'a> {
                         .help("only use trusted HTML here; p \"{...}\" escapes it"),
                 );
             }
-            "button"
-                if e.value.is_none()
-                    && e.children.is_empty()
-                    && ["aria-label", "aria-labelledby", "title"].iter().all(|a| e.arg(a).is_none()) =>
-            {
+            "button" if !has_name(e) => {
                 self.report(
                     Diagnostic::error("A11Y-005", "button has no text", e.pos, len)
                         .help("button \"Send\", or aria-label: \"...\" for an icon button"),
@@ -1337,6 +1336,20 @@ fn contains_submit(items: &[Item], defs: &Defs, depth: usize) -> bool {
 
 fn contains_element(items: &[Item], name: &str) -> bool {
     any_element(items, &|e| e.name == name)
+}
+
+/// Whether a link or button has a name for screen readers: its text, a label, or content with text or a described
+/// image in it. An icon alone, like a decorative image, names nothing.
+fn has_name(e: &Element) -> bool {
+    e.value.is_some()
+        || ["aria-label", "aria-labelledby", "title"].iter().any(|a| e.arg(a).is_some())
+        || e.children.iter().any(|item| match item {
+            Item::Element(c) if c.name == "img" => c.arg("alt").is_some() && !c.flag("decorative"),
+            // a component or slot can bring text that isn't known here
+            Item::Element(c) if is_name(&c.name) || c.name == "slot" => true,
+            Item::Element(c) => has_name(c),
+            _ => true,
+        })
 }
 
 /// Elements that tell the links in them apart: a list item, a table row or cell, a description, or an article or
