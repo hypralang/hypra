@@ -22,6 +22,9 @@ Be realistic about what it does. As of late 2026, none of the large AI companies
 llms.txt in its crawlers or search, and Google has said it doesn't use it. Studies of crawler traffic find that
 most AI bots skip the file and read the HTML.
 
+Chrome's side of Google is more interested: Lighthouse 13.3, from May 2026, added an experimental "Agentic
+browsing" category that checks for an llms.txt, as one sign that agents can find their way around a site.
+
 Where it does help is with tools that fetch documentation on demand: coding assistants, agents and the
 documentation indexes behind them, which read a list of clean Markdown pages far more easily than a website. So
 llms.txt is worth having for documentation, APIs and developer tools, and cheap enough to add anywhere. It's not

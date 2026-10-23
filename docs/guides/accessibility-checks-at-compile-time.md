@@ -41,6 +41,20 @@ Keep this. It catches what only a browser can see. Its limits:
 - A problem in a component shows up on every page that uses it, but only on pages you test.
 - Failures arrive minutes later in CI, as a list of selectors, not as a line in your editor.
 
+Some template languages check part of this at compile time already:
+
+- **Svelte**'s compiler warns about accessibility problems in every component: images without `alt`, click
+  handlers on elements that a keyboard can't reach, labels without a control, invalid ARIA. They're warnings, so
+  the build goes on unless you make it fail on them.
+- **JSX, Vue and Angular** have linters that do the same from outside the compiler:
+  [eslint-plugin-jsx-a11y](https://github.com/jsx-eslint/eslint-plugin-jsx-a11y),
+  eslint-plugin-vuejs-accessibility and angular-eslint's template rules.
+- **Typed HTML libraries**, like TyXML for OCaml or Elm's accessible-html package, make some mistakes type
+  errors: an image without `alt` doesn't compile.
+
+If your project uses one of these, turn its checks on. They see the template, not the rendered page, like
+Hypra does.
+
 ## With Hypra
 
 [Hypra](https://hypralang.dev) is a markup language that compiles to HTML. The compiler knows what every element
@@ -129,7 +143,8 @@ What it checks, among others:
 | --- | --- |
 | images need alt text, or `decorative: true`; alt text like "image" or "photo" is a warning | `A11Y-001`, `A11Y-008` |
 | links and buttons need text; link text says where it goes, not "click here", and means one place | `A11Y-002`, `A11Y-005`, `A11Y-007`, `A11Y-013` |
-| form fields need a label, and a form needs a button | `FORM-002`, `FORM-003` |
+| form fields need a label, and a form needs a button; inputs written by hand need one too | `FORM-002`, `FORM-003`, `A11Y-015` |
+| something people click is a button or a link, not a `div` with `onclick` | `A11Y-014` |
 | headings go down one level at a time, and a page has one `h1` | `A11Y-006`, `SEO-003` |
 | videos need captions; autoplaying videos are muted | `A11Y-003`, `A11Y-011` |
 | iframes need a title; no positive `tabindex` | `A11Y-009`, `A11Y-010` |
@@ -137,6 +152,11 @@ What it checks, among others:
 The [error reference](https://hypralang.dev/docs/#errors) lists all of them. A few details that make this work
 on real sites:
 
+- **Errors where a mistake is certain, warnings where it's likely.** A missing `alt`, a field without a label or
+  a clickable `div` stops the build, unlike a linter's warnings, which scroll past. Vague link text and skipped
+  headings are warnings, because there are rare good reasons for them.
+- **Link and alt text are checked in the page's language**: English, German, French, Spanish, Portuguese,
+  Italian and Dutch.
 - **Components are checked once, everywhere.** A component without alt text on its image is an error where the
   component is written, not on each page that uses it.
 - **Heading levels are checked as the page renders**, so a component that starts with `h2` is fine after an
