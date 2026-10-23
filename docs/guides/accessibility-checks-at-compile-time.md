@@ -68,6 +68,7 @@ error[A11Y-001]: image has no alt text
 3 |   img("/img/trail.jpg")
   |       ^^^^^^^^^^^^^^^^
   = help: add alt: "..." or decorative: true
+  = docs: https://hypralang.dev/rules/a11y-001/
 
 warning[A11Y-006]: h3 follows h1, skipping a level
  --> signup.hypra:4:3
@@ -75,6 +76,7 @@ warning[A11Y-006]: h3 follows h1, skipping a level
 4 |   h3 "Why sign up?"
   |   ^^
   = help: use h2; screen readers navigate by heading levels
+  = docs: https://hypralang.dev/rules/a11y-006/
 
 warning[A11Y-007]: link text `click here` doesn't say where it goes
  --> signup.hypra:5:65
@@ -82,6 +84,7 @@ warning[A11Y-007]: link text `click here` doesn't say where it goes
 5 |   p { "Save routes and get new trails every week. " a("/about") "Click here" }
   |                                                                 ^^^^^^^^^^^^
   = help: describe the target, e.g. a("/guide") "Read the setup guide"
+  = docs: https://hypralang.dev/rules/a11y-007/
 
 error[FORM-002]: `field` needs `label`
  --> signup.hypra:7:5
@@ -89,6 +92,7 @@ error[FORM-002]: `field` needs `label`
 7 |     field("email", type: Email)
   |     ^^^^^
   = help: add label: "..."
+  = docs: https://hypralang.dev/rules/form-002/
 
 error[A11Y-005]: button has no text
  --> signup.hypra:8:5
@@ -96,6 +100,7 @@ error[A11Y-005]: button has no text
 8 |     button
   |     ^^^^^^
   = help: button "Send", or aria-label: "..." for an icon button
+  = docs: https://hypralang.dev/rules/a11y-005/
 
 3 errors, 2 warnings
 ```

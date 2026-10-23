@@ -4,9 +4,10 @@
 const SPEC: &str = include_str!("../docs/spec.md");
 const DOCS: &str = "https://hypralang.dev/docs/";
 
-/// Where the docs explain a rule code, like `A11Y-001`.
+/// The page that explains a rule code, like `A11Y-001`: why it's checked, and a page that breaks it and one that
+/// doesn't.
 pub fn rule_url(code: &str) -> String {
-    format!("{DOCS}#{}", code.to_ascii_lowercase())
+    format!("https://hypralang.dev/rules/{}/", code.to_ascii_lowercase())
 }
 
 /// Markdown about an element or statement, like `field` or `for`: what its section in the spec says about it, with

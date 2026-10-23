@@ -7,7 +7,6 @@ say so in an [issue](https://github.com/hypralang/hypra/issues): that moves it u
 
 - **JavaScript target.** `hypra build --target js` and an npm package, so pages render at request time in Node,
   Express, Hono, Next and others, the way the PHP target does in PHP and Laravel today.
-- **A page per rule** on hypralang.dev, with an example that fails and one that passes, linked from every error.
 
 ## Later
 

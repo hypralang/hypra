@@ -20,6 +20,7 @@ layout Site(lang: "en", title_suffix: " · Hypra", site_name: "Hypra", image: "h
       nav(aria-label: "Main", class: "flex items-center gap-5 text-[15px] whitespace-nowrap sm:gap-6 [&_a]:no-underline [&_a:hover]:underline") {
         a("/docs/") "Docs"
         a("/guides/") "Guides"
+        a("/rules/", class: "hidden sm:inline") "Rules"
         // on a phone the docs sidebar links to these
         a("/docs/laravel/", class: "hidden sm:inline") "Laravel"
         a("/docs/vscode/", class: "hidden sm:inline") "VS Code"
@@ -34,6 +35,7 @@ layout Site(lang: "en", title_suffix: " · Hypra", site_name: "Hypra", image: "h
     div(class: "mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-6 py-8 text-[14px] text-mute") {
       p "Hypra is free software, MIT or Apache-2.0. This site is written in Hypra."
       p(class: "flex gap-5") {
+        a("/rules/") "Rules"
         a("/llms.txt") "llms.txt"
         a("/docs/security/") "Security"
         a("https://github.com/hypralang/hypra") "Source"
