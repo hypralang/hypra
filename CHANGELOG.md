@@ -3,7 +3,7 @@
 Hypra is pre-1.0: a minor version (0.2, 0.3) may change the language or its output, a patch version (0.1.1) only
 fixes and adds checks.
 
-## Unreleased
+## 0.2.1
 
 - The VS Code extension finds the compiler a project installed, with `npm install hypra` or
   `php artisan hypra:install`, so it works without `hypra` on the `PATH`. In a folder VS Code doesn't trust, it
