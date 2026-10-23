@@ -32,12 +32,88 @@ const GERMAN: Words = Words {
     generic_alt: &["bild", "foto", "grafik", "abbildung", "img"],
 };
 
+const FRENCH: Words = Words {
+    vague_links: &[
+        "cliquez ici",
+        "cliquer ici",
+        "ici",
+        "plus",
+        "en savoir plus",
+        "lire la suite",
+        "lire plus",
+        "voir plus",
+        "suite",
+        "lien",
+        "ce lien",
+    ],
+    generic_alt: &["image", "photo", "img", "illustration", "graphique"],
+};
+
+const SPANISH: Words = Words {
+    vague_links: &[
+        "haz clic aquí",
+        "haga clic aquí",
+        "clic aquí",
+        "pulsa aquí",
+        "aquí",
+        "más",
+        "leer más",
+        "ver más",
+        "saber más",
+        "más información",
+        "enlace",
+        "este enlace",
+    ],
+    generic_alt: &["imagen", "foto", "fotografía", "img", "gráfico"],
+};
+
+const PORTUGUESE: Words = Words {
+    vague_links: &[
+        "clique aqui",
+        "aqui",
+        "mais",
+        "leia mais",
+        "ler mais",
+        "saiba mais",
+        "ver mais",
+        "link",
+        "este link",
+    ],
+    generic_alt: &["imagem", "foto", "fotografia", "img", "gráfico"],
+};
+
+const ITALIAN: Words = Words {
+    vague_links: &[
+        "clicca qui",
+        "clicca",
+        "qui",
+        "di più",
+        "leggi di più",
+        "leggi tutto",
+        "scopri di più",
+        "altro",
+        "link",
+        "questo link",
+    ],
+    generic_alt: &["immagine", "foto", "fotografia", "img", "grafica"],
+};
+
+const DUTCH: Words = Words {
+    vague_links: &["klik hier", "hier", "klik", "meer", "lees meer", "meer lezen", "meer info", "link", "deze link"],
+    generic_alt: &["afbeelding", "foto", "plaatje", "img", "beeld"],
+};
+
 /// The words for a language tag like `de` or `de-AT`, if they're known.
 pub fn for_language(lang: &str) -> Option<&'static Words> {
     let primary = lang.split(['-', '_']).next().unwrap_or_default().to_ascii_lowercase();
     match primary.as_str() {
         "en" => Some(&ENGLISH),
         "de" => Some(&GERMAN),
+        "fr" => Some(&FRENCH),
+        "es" => Some(&SPANISH),
+        "pt" => Some(&PORTUGUESE),
+        "it" => Some(&ITALIAN),
+        "nl" => Some(&DUTCH),
         _ => None,
     }
 }
