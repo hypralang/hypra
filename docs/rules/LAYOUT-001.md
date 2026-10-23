@@ -17,7 +17,6 @@ layout Shop(lang: "en", title_suffix: " | Shop") {
 ```hypra fails
 page(title: "Shoes", description: "All our running shoes, from light racers to trail shoes.", layout: Shop) {
   h1 "Shoes"
-
 }
 ```
 
@@ -28,6 +27,5 @@ use "layouts/shop.hypra"
 
 page(title: "Shoes", description: "All our running shoes, from light racers to trail shoes.", layout: Shop) {
   h1 "Shoes"
-
 }
 ```

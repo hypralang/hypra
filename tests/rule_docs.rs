@@ -69,6 +69,15 @@ fn check_every_page() {
         let mut data: Option<Json> = None;
         let (mut fails, mut passes) = (0, 0);
         for (info, example) in &blocks {
+            // examples are shown as `hypra fmt` writes them, except the syntax errors, which show the mistake as typed
+            if info.starts_with("hypra")
+                && !code.starts_with("PARSE-")
+                && !code.starts_with("LEX-")
+                && let Ok(formatted) = hypra::fmt::format(example)
+                && formatted != *example
+            {
+                wrong.push(format!("{code}: an example isn't formatted like `hypra fmt` writes it:\n{example}"));
+            }
             let words: Vec<&str> = info.split_whitespace().collect();
             match words.as_slice() {
                 ["json", "data"] => data = Some(serde_json::from_str(example).unwrap()),

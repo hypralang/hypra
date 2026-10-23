@@ -12,7 +12,6 @@ component Badge(text: "New") { span(class: "badge") "{text}" }
 
 page(title: "Shoes", description: "All our running shoes, from light racers to trail shoes.") {
   h1 "Shoes"
-
 }
 ```
 
