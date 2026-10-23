@@ -22,7 +22,7 @@
     },
     "require": {
         "php": ">=8.2",
-        "hypra/runtime": "^0.3",
+        "hypra/runtime": "^0.4",
         "guzzlehttp/guzzle": "^7.8 || ^8.0",
         "illuminate/console": "^11.0 || ^12.0 || ^13.0",
         "illuminate/http": "^11.0 || ^12.0 || ^13.0",
@@ -51,7 +51,7 @@
             "url": "../runtime",
             "options": {
                 "versions": {
-                    "hypra/runtime": "0.3.1"
+                    "hypra/runtime": "0.4.0"
                 }
             }
         }
