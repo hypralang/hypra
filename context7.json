@@ -1,10 +1,31 @@
 {
   "$schema": "https://context7.com/schema/context7.json",
+  "url": "https://context7.com/hypralang/hypra",
+  "public_key": "pk_UygHbY5Xi3YZORguSVCdT",
   "projectTitle": "Hypra",
   "description": "Hypra is a strict markup language for web pages. Its compiler turns one .hypra file into accessible HTML for browsers, Markdown for AI agents, JSON, and WebMCP tool definitions, and refuses pages with mistakes such as missing alt text, unlabeled fields or clickable divs. Pages render with the hypra npm package in Node.js, Bun and Deno, or with hypra/laravel in Laravel.",
-  "folders": ["docs", "js", "php/laravel", "php/runtime", "editors/vscode", "starter"],
-  "excludeFolders": ["node_modules", "vendor", "dist", "target", "test", "tests"],
-  "excludeFiles": ["releasing.md", "CONTRIBUTING.md", "CHANGELOG.md", "ROADMAP.md"],
+  "folders": [
+    "docs",
+    "js",
+    "php/laravel",
+    "php/runtime",
+    "editors/vscode",
+    "starter"
+  ],
+  "excludeFolders": [
+    "node_modules",
+    "vendor",
+    "dist",
+    "target",
+    "test",
+    "tests"
+  ],
+  "excludeFiles": [
+    "releasing.md",
+    "CONTRIBUTING.md",
+    "CHANGELOG.md",
+    "ROADMAP.md"
+  ],
   "rules": [
     "Read the language reference (docs/spec.md, or https://hypralang.dev/llms-full.txt) before writing a .hypra file.",
     "Design a Hypra page exactly like an HTML page, with the same layout, classes and CSS or Tailwind: Hypra writes no CSS of its own. The \"From HTML\" section of the reference shows how HTML is written in Hypra.",
