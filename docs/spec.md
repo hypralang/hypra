@@ -134,6 +134,46 @@ head {
 }
 ```
 
+### Styling
+
+Hypra writes no CSS of its own: without styles, a page looks like a plain HTML document. Style it the way any
+website is styled, with `class` and a stylesheet, a `style` block or a framework like Tailwind or Bootstrap. Put
+them in the layout, so every page shares them:
+
+```hypra
+layout Site(lang: "en", title_suffix: " | Trailhead") {
+  head {
+    script("https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.1.14")
+    style """
+      body { font-family: "Inter", system-ui, sans-serif; }
+      """
+  }
+  body(class: "bg-stone-50 text-stone-900 antialiased")
+  header(class: "border-b border-stone-200 bg-white") {
+    nav(class: "mx-auto flex max-w-5xl items-center gap-6 px-4 py-4", aria-label: "Main") {
+      a("/", class: "font-semibold") "Trailhead"
+      a("/shoes", class: "text-stone-600 hover:text-stone-900") "Shoes"
+    }
+  }
+  main(class: "mx-auto max-w-5xl px-4 py-12") { slot }
+}
+
+page(layout: Site, title: "Trail running shoes", description: "Light trail running shoes with grip for wet rock, mud and long mountain days.") {
+  section(class: "grid items-center gap-10 md:grid-cols-2") {
+    div {
+      h1(class: "text-4xl font-bold tracking-tight") "Shoes for the long way up"
+      p(class: "mt-4 text-lg text-stone-600") "Grip for wet rock, cushioning for the way down."
+      a("/shoes", class: "mt-8 inline-block rounded-lg bg-emerald-700 px-5 py-3 font-medium text-white hover:bg-emerald-800") "Browse trail shoes"
+    }
+    img("/hero.jpg", alt: "Runner on a rocky ridge at sunrise", width: 800, height: 600, class: "rounded-2xl shadow-lg")
+  }
+}
+```
+
+The Tailwind script builds the CSS in the browser, which is fine to start with. For a site that ships, build it
+ahead of time: Tailwind 4 finds the classes in `.hypra` files by itself, and Tailwind 3 needs them in `content`,
+e.g. `content: ["./views/**/*.hypra"]`. Styles never change the Markdown and JSON versions of a page.
+
 ## HTML elements and attributes
 
 Any HTML element works with its normal attributes: `div(class: "card", id: "main")`, `input(type: "search",
