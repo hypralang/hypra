@@ -3,7 +3,7 @@
 Hypra is pre-1.0: a minor version (0.2, 0.3) may change the language or its output, a patch version (0.1.1) only
 fixes and adds checks.
 
-## Unreleased
+## 0.2.0
 
 - JavaScript: `hypra build --target js` compiles a page to an ES module that renders at request time in Node, Bun
   and Deno, exactly like the static build. The `hypra` npm package has the runtime, with types, and the compiler
