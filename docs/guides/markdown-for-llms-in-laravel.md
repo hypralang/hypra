@@ -154,11 +154,11 @@ header, navigation and footer, the difference grows: the Markdown keeps only the
 
 ## Limits
 
-- Hypra is new (version 0.1), and the language may still change before 1.0.
+- Hypra is new and pre-1.0, so the language may still change.
 - Only pages written in Hypra get Markdown this way. Blade views keep working as before; you can convert one page
   at a time, and use the middleware above for the rest in the meantime.
-- Rendering on request is PHP only for now. Other backends can use the static build: `hypra build` writes the
-  HTML and Markdown files for given data.
+- For Node.js, Bun and Deno, see [Serve Markdown to AI agents from Node.js](https://hypralang.dev/guides/markdown-for-ai-agents-in-node/);
+  other backends can use the static build: `hypra build` writes the HTML and Markdown files for given data.
 
 ## Next steps
 

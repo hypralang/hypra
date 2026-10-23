@@ -155,7 +155,7 @@ on real sites:
   text is actually *good*. Keep running axe on rendered pages for those.
 - It checks pages written in Hypra. Existing HTML or Blade templates aren't checked; you can move one page at a
   time.
-- Hypra is new (version 0.1), and the language may still change before 1.0.
+- Hypra is new and pre-1.0, so the language may still change.
 
 ## Next steps
 

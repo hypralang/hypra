@@ -64,6 +64,20 @@ const docs = [
 const guides = [
   {
     section: "guides",
+    slug: "website-readable-for-ai-agents",
+    file: "docs/guides/website-readable-for-ai-agents.md",
+    nav: "Readable for AI agents",
+    description: "What AI crawlers, assistants and agents read on a website, and which changes help them today.",
+  },
+  {
+    section: "guides",
+    slug: "markdown-for-ai-agents-in-node",
+    file: "docs/guides/markdown-for-ai-agents-in-node.md",
+    nav: "Markdown for AI agents in Node.js",
+    description: "Answer AI agents in Markdown from the same URL as your HTML, in Express, Hono or Next.js.",
+  },
+  {
+    section: "guides",
     slug: "markdown-for-llms-in-laravel",
     file: "docs/guides/markdown-for-llms-in-laravel.md",
     nav: "Markdown for LLMs in Laravel",
@@ -82,6 +96,20 @@ const guides = [
     file: "docs/guides/webmcp-tools-for-your-website.md",
     nav: "WebMCP tools for your website",
     description: "Turn your forms and buttons into tools AI agents can call, with WebMCP attributes and JSON Schemas.",
+  },
+  {
+    section: "guides",
+    slug: "llms-txt-for-your-website",
+    file: "docs/guides/llms-txt-for-your-website.md",
+    nav: "llms.txt for your website",
+    description: "Add an llms.txt that lists your pages with their Markdown versions, generated so it never goes stale.",
+  },
+  {
+    section: "guides",
+    slug: "check-html-from-ai-coding-agents",
+    file: "docs/guides/check-html-from-ai-coding-agents.md",
+    nav: "Check what coding agents write",
+    description: "Catch the accessibility mistakes Claude Code, Cursor and Copilot make in HTML, with a check the agent runs itself.",
   },
 ];
 
