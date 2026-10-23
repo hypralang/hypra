@@ -332,7 +332,8 @@ Errors stop the build; warnings don't. The [spec](docs/spec.md#errors) lists eve
 
 ## Contributing
 
-Issues and pull requests are welcome. Before opening a pull request:
+Issues and pull requests are welcome. [ROADMAP.md](ROADMAP.md) lists what's planned and
+[CHANGELOG.md](CHANGELOG.md) what changed in each release. Before opening a pull request:
 
 ```console
 $ cargo fmt
