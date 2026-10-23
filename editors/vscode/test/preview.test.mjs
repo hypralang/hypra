@@ -6,7 +6,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import assert from "node:assert/strict";
 
-const { build, dataFile, dataNote, pageView, siteFiles, siteRoot, textView } = createRequire(import.meta.url)("../preview-core.js");
+const { build, dataFile, dataNote, hasPage, noPage, pageFor, pageView, siteFiles, siteRoot, textView } = createRequire(import.meta.url)("../preview-core.js");
 
 const site = mkdtempSync(join(tmpdir(), "hypra-site-"));
 for (const file of ["public/styles.css", "public/photos/a.jpg", "logo.svg", "pages/shop/cart.hypra", "pages/shop/cart.json"]) {
@@ -47,6 +47,30 @@ assert.match(text, /<p>With data from a\.json\.<\/p>/);
 assert.match(textView("error", { csp: "x", problem: true }), /<body class="problem">/);
 assert.equal(dataNote({}, "/x/home.hypra"), "Without data: add home.json next to the page to fill it in.");
 assert.equal(dataNote({ data: "/x/home.json" }, "/x/home.hypra"), "With data from home.json.");
+
+// a layout or component is shown in a page that uses it, directly or through another component
+const views = "/app/views";
+const files = [
+  [`${views}/layouts/game.hypra`, 'layout Game(lang: "en") {\n  main { slot }\n}\n'],
+  [`${views}/components/card.hypra`, 'use "../layouts/game.hypra"\ncomponent Card(t: Text) { p "{t}" }\n'],
+  [`${views}/components/unused.hypra`, "component Unused() { p \"x\" }\n"],
+  [`${views}/shop/list.hypra`, 'use "../components/card.hypra"\npage(title: "List") { h1 "List" }\n'],
+  [`${views}/home.hypra`, '// the home page\nuse "layouts/game.hypra"\n\npage(layout: Game, title: "Home") { h1 "Home" }\n'],
+];
+assert.equal(hasPage(files[4][1]), true);
+assert.equal(hasPage(files[0][1]), false);
+assert.equal(pageFor(`${views}/home.hypra`, files), `${views}/home.hypra`, "a page shows itself");
+assert.equal(pageFor(`${views}/layouts/game.hypra`, files), `${views}/home.hypra`, "the page closest to the top");
+const starter = [
+  ["/s/layouts/site.hypra", "layout Site() { slot }\n"],
+  ["/s/pages/coffee/show.hypra", 'use "../../layouts/site.hypra"\npage(title: "C") { h1 "C" }\n'],
+  ["/s/pages/about.hypra", 'use "../layouts/site.hypra"\npage(title: "A") { h1 "A" }\n'],
+  ["/s/pages/index.hypra", 'use "../layouts/site.hypra"\npage(title: "H") { h1 "H" }\n'],
+];
+assert.equal(pageFor("/s/layouts/site.hypra", starter), "/s/pages/index.hypra", "an index page before others");
+assert.equal(pageFor(`${views}/components/card.hypra`, files), `${views}/shop/list.hypra`);
+assert.equal(pageFor(`${views}/components/unused.hypra`, files), undefined);
+assert.match(noPage(`${views}/layouts/game.hypra`), /use "layouts\/game\.hypra"/);
 
 // a real build, when the compiler is built here, rendered with the runtime in js/
 const compiler = new URL("../../../target/debug/hypra", import.meta.url).pathname;

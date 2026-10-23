@@ -2,8 +2,56 @@
 const { execFile } = require("node:child_process");
 const { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } = require("node:fs");
 const { tmpdir } = require("node:os");
-const { basename, dirname, extname, join } = require("node:path");
+const { basename, dirname, extname, join, resolve } = require("node:path");
 const { pathToFileURL } = require("node:url");
+
+/** Whether a file has a page, rather than only layouts and components that pages bring in with `use`. */
+function hasPage(source) {
+  return /^\s*page\s*\(/m.test(source);
+}
+
+/** The files a file brings in with `use`, as full paths. */
+function uses(file, source) {
+  return [...source.matchAll(/^\s*use\s+"([^"]+)"/gm)].map((m) => resolve(dirname(file), m[1]));
+}
+
+/**
+ * The page that shows a file: the file itself if it has a page, else a page that uses it, directly or through
+ * other layouts and components. `files` are the project's .hypra files as [path, source] pairs.
+ * Undefined when no page uses it.
+ */
+function pageFor(file, files) {
+  // the page closest to the top of the project, an index page first, so a layout shows in the home page
+  const depth = (path) => path.split(/[\\/]/).length;
+  const order = ([a], [b]) =>
+    depth(a) - depth(b) || (basename(b, ".hypra") === "index") - (basename(a, ".hypra") === "index") || a.localeCompare(b);
+  const sources = new Map([...files].sort(order));
+  if (hasPage(sources.get(file) ?? readFileSync(file, "utf8"))) return file;
+  const seen = new Set([file]);
+  let found = [file];
+  while (found.length > 0) {
+    const next = [];
+    for (const [path, source] of sources) {
+      if (seen.has(path) || !uses(path, source).some((used) => found.includes(used))) continue;
+      if (hasPage(source)) return path;
+      seen.add(path);
+      next.push(path);
+    }
+    found = next;
+  }
+  return undefined;
+}
+
+/** What the preview says about a file that no page uses yet. */
+function noPage(file) {
+  const name = basename(file);
+  return (
+    `${name} has layouts and components, not a page. A page brings them in with use, with the path from the ` +
+    `page's folder; for a page next to the ${basename(dirname(file))} folder:\n\n` +
+    `  use "${basename(dirname(file))}/${name}"\n\n` +
+    `Once a page uses ${name}, this preview shows that page, with your changes to ${name} in it.`
+  );
+}
 
 /** The data a page is previewed with: `product.json` next to `product.hypra`, if there is one. */
 function dataFile(file) {
@@ -123,4 +171,4 @@ function dataNote(result, file) {
     : `Without data: add ${basename(file, extname(file))}.json next to the page to fill it in.`;
 }
 
-module.exports = { build, dataFile, dataNote, pageView, siteFiles, siteRoot, textView };
+module.exports = { build, dataFile, dataNote, hasPage, noPage, pageFor, pageView, siteFiles, siteRoot, textView, uses };

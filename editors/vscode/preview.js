@@ -2,7 +2,9 @@
 // JSON it compiles to. The buttons in the preview's title bar switch between them.
 const vscode = require("vscode");
 const { dirname, join } = require("node:path");
-const { build, dataNote, pageView, siteFiles, siteRoot, textView } = require("./preview-core");
+const { readFile } = require("node:fs/promises");
+const { basename } = require("node:path");
+const { build, dataNote, noPage, pageFor, pageView, siteFiles, siteRoot, textView } = require("./preview-core");
 
 const panels = new Map();
 let active;
@@ -41,19 +43,30 @@ function open(compiler) {
 }
 
 async function render(preview) {
-  preview.result = await build(preview.compiler(), preview.file, join(__dirname, "runtime.mjs"));
+  // a layout or component is shown in a page that uses it
+  const found = await vscode.workspace.findFiles("**/*.hypra", "**/{node_modules,vendor}/**");
+  const files = await Promise.all(found.map(async (uri) => [uri.fsPath, await readFile(uri.fsPath, "utf8")]));
+  const page = pageFor(preview.file, files);
+  const name = basename(preview.file);
+  preview.panel.title = page && page !== preview.file ? `Preview ${name} in ${basename(page)}` : `Preview ${name}`;
+  preview.page = page;
+  preview.result = page
+    ? await build(preview.compiler(), page, join(__dirname, "runtime.mjs"))
+    : { note: noPage(preview.file) };
   draw(preview);
 }
 
-function draw({ panel, file, root, result, show }) {
+function draw({ panel, page, root, result, show }) {
   const csp = panel.webview.cspSource;
-  if (result.problem) {
+  if (result.note) {
+    panel.webview.html = textView(result.note, { csp });
+  } else if (result.problem) {
     panel.webview.html = textView(result.problem, { csp, note: "The page doesn't build yet:", problem: true });
   } else if (show === "page") {
     const local = (path) => panel.webview.asWebviewUri(vscode.Uri.file(path)).toString();
     panel.webview.html = pageView(siteFiles(result.html, root, local), csp);
   } else {
-    panel.webview.html = textView(show === "markdown" ? result.markdown : result.json, { csp, note: dataNote(result, file) });
+    panel.webview.html = textView(show === "markdown" ? result.markdown : result.json, { csp, note: dataNote(result, page) });
   }
 }
 
