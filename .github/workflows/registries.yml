@@ -68,12 +68,9 @@ jobs:
           done
           # one for each system bin/hypra.js knows
           test "$(find js/bin -mindepth 1 -maxdepth 1 -type d | wc -l)" = 6 || { ls -R js/bin; exit 1; }
-      # trusted publishing needs npm 11.5.1 or later; the token is only for the very first release, see
-      # docs/releasing.md
+      # trusted publishing needs npm 11.5.1 or later
       - run: npx --yes npm@11.5.1 publish --access public
         working-directory: js
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
   open-vsx:
     runs-on: ubuntu-latest
