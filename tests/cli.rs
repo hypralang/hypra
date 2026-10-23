@@ -20,6 +20,8 @@ fn options_need_their_values() {
         (&["check", "examples", "--data", "examples/product.json"], "--data is the data of one page"),
         (&["check", "examples/product.hypra", "examples/broken.hypra", "--data", "x.json"], "data of one page"),
         (&["check", "src"], "src has no .hypra files"),
+        (&["fmt", "--check", "src"], "src has no .hypra files"),
+        (&["build", "examples/layouts", "--target", "js"], "no pages to build in examples/layouts"),
     ] {
         let (code, stderr) = hypra(args);
         assert_eq!(code, 2, "{args:?}");
@@ -76,6 +78,21 @@ fn building_a_folder_keeps_its_subfolders_and_skips_components() {
     let (_, stderr) = hypra(&["build", "examples", "--target", "php", "--out", out.to_str().unwrap()]);
     assert!(stderr.contains("2 files"), "{stderr}");
     assert!(out.join("product.php").exists() && !out.join("components").exists(), "{stderr}");
+}
+
+#[test]
+fn a_build_passes_over_folders_of_components() {
+    let out = std::path::PathBuf::from(env!("CARGO_TARGET_TMPDIR")).join("cli-components");
+    let args = ["build", "site/pages", "examples/layouts", "examples/components", "--target", "js", "--out"];
+    let (code, stderr) = hypra(&[&args[..], &[out.to_str().unwrap()]].concat());
+    assert_eq!(code, 0, "{stderr}");
+    assert!(out.join("index.mjs").exists(), "{stderr}");
+}
+
+#[test]
+fn fmt_takes_folders() {
+    let (code, stderr) = hypra(&["fmt", "--check", "examples", "site/pages"]);
+    assert_eq!(code, 0, "{stderr}");
 }
 
 #[test]

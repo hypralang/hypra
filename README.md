@@ -334,12 +334,14 @@ hypra build <path>... --target php [--out dir]
 hypra build <path>... --target js [--out dir]
 hypra check <path>... [--format json]
 hypra check <file.hypra> --data data.json
-hypra fmt [--check] <file.hypra>...
+hypra fmt [--check] <path>...
 hypra lsp
 ```
 
-A path can be a folder: `hypra check views` checks every `.hypra` file in it, and
-`hypra build views --target js --out dist` builds its pages into `dist`, in the same subfolders.
+A path can be a folder: `hypra check views` and `hypra fmt views` take every `.hypra` file in it, and
+`hypra build views --target js --out dist` builds its pages into `dist`, in the same subfolders as under
+`views`, so `views/shop/cart.hypra` becomes `dist/shop/cart.mjs`. Files with only components and layouts aren't
+built on their own; the pages that use them are.
 
 For VS Code and Cursor, [editors/vscode](editors/vscode) adds highlighting, errors as you type, Go to
 Definition, Find All References, Rename, hover help and Format Document. They come from `hypra lsp`, a language server, so other editors get
