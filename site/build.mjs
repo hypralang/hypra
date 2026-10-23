@@ -382,11 +382,16 @@ build(
   join(dist, "rules"),
 );
 
-// the compiler names its outputs after the page; these are their folders' index
+// the compiler names its outputs after the page; these are their folders' index, and the HTML's link to its
+// Markdown follows the rename
 for (const page of ["guides", "rules"]) {
   for (const ext of ["html", "md", "json", "webmcp.json"]) {
     renameSync(join(dist, page, `${page}.${ext}`), join(dist, page, `index.${ext}`));
   }
+  const html = join(dist, page, "index.html");
+  const alternate = `<link rel="alternate" type="text/markdown" href="${page}.md">`;
+  if (!readFileSync(html, "utf8").includes(alternate)) throw new Error(`${html} has no link to ${page}.md`);
+  writeFileSync(html, readFileSync(html, "utf8").replace(alternate, alternate.replace(`${page}.md`, "index.md")));
 }
 
 // --- llms.txt: where agents find the docs as Markdown, and llms-full.txt: all of them in one file
