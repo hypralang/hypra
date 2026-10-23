@@ -1,0 +1,16 @@
+{
+  "$schema": "https://context7.com/schema/context7.json",
+  "projectTitle": "Hypra",
+  "description": "Hypra is a strict markup language for web pages. Its compiler turns one .hypra file into accessible HTML for browsers, Markdown for AI agents, JSON, and WebMCP tool definitions, and refuses pages with mistakes such as missing alt text, unlabeled fields or skipped headings. Pages render with the hypra npm package in Node.js, Bun and Deno, or with hypra/laravel in Laravel.",
+  "folders": ["docs", "js", "php/laravel", "php/runtime", "editors/vscode", "starter"],
+  "excludeFolders": ["node_modules", "vendor", "dist", "target", "test", "tests"],
+  "excludeFiles": ["releasing.md", "CONTRIBUTING.md", "CHANGELOG.md", "ROADMAP.md"],
+  "rules": [
+    "Read the language reference (docs/spec.md, or https://hypralang.dev/llms-full.txt) before writing a .hypra file.",
+    "Design a Hypra page exactly like an HTML page, with the same layout, classes and CSS or Tailwind: Hypra writes no CSS of its own. The \"From HTML\" section of the reference shows how HTML is written in Hypra.",
+    "After changing .hypra files, run `hypra check` on them (folders work too) and fix every error and warning; each message says what to change.",
+    "Use field() inside form() for inputs, so every input gets a label; use button or a link for anything clickable, never a div with onclick.",
+    "Put the header, footer and stylesheet shared by every page in a layout, and pieces used more than once in a component, imported with use.",
+    "Don't silence a check with allow unless the page really needs it, and give the reason."
+  ]
+}
