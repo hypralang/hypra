@@ -8,6 +8,8 @@ fixes and adds checks.
 - [starter](starter): a small, styled site to start from, with pages, a layout, a component, dark mode and a
   Node server that answers in HTML, Markdown and JSON: `npx degit hypralang/hypra/starter my-site`. The
   instructions for agents point to it as an example to build from, not a site to copy.
+- "From HTML" in the reference shows how HTML is written in Hypra, and the instructions for agents say to design
+  pages as they would in HTML
 
 ## 0.3.1
 

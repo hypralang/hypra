@@ -15,9 +15,9 @@ others, `CLAUDE.md` for Claude Code. Add this to it:
 The views in this project are Hypra (.hypra files), not HTML or Blade.
 
 - The language: https://hypralang.dev/llms-full.txt. Read it before writing a .hypra file.
-- For a new site, read the starter first: https://github.com/hypralang/hypra/tree/main/starter. It shows how a finished Hypra site fits together: a layout, components, pages, a stylesheet and a server. Build the site that was asked for in the same way, with its own content, pages and design; copy the starter itself only when asked for a template.
-- Hypra writes no CSS, so an unstyled page looks like a bare HTML document. Style pages like any website: classes, and a stylesheet or Tailwind linked in the layout's `head`.
-- After changing a .hypra file, run `hypra check <file>` and fix every error and warning. Each one has a code, a line and a help line that says what to change.
+- Design pages exactly as you would in HTML, with the same layout, classes and CSS or Tailwind: Hypra changes how a page is written, not how it looks, and writes no CSS of its own. "From HTML" in the language reference shows how HTML is written in Hypra.
+- For how a whole project is laid out (pages, a layout, components, a stylesheet, a server), see the example at https://github.com/hypralang/hypra/tree/main/starter. Build the site that was asked for; don't copy the example.
+- After changing .hypra files, run `hypra check` on them (a folder works too) and fix every error and warning. Each one has a code, a line and a help line that says what to change.
 - Don't silence a check with `allow` unless the page really needs it; give the reason.
 ```
 
