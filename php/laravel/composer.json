@@ -51,7 +51,7 @@
             "url": "../runtime",
             "options": {
                 "versions": {
-                    "hypra/runtime": "0.3.0"
+                    "hypra/runtime": "0.3.1"
                 }
             }
         }
