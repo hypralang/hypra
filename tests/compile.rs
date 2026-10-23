@@ -56,10 +56,12 @@ fn broken_example_reports_every_problem_and_no_output() {
 #[test]
 fn any_html_element_and_attribute_passes_through() {
     let out = html(
-        "  div(class: \"card p-6 md:flex\", data-test: \"x\", \"x-on:click\": \"open = true\", hidden: true, inert: false) \"Hi\"\n  model-viewer(src: \"a.glb\", ar: true, camera-controls: true)",
+        "  div(class: \"card p-6 md:flex\", data-test: \"x\", \"x-on:mouseenter\": \"open = true\", hidden: true, inert: false) \"Hi\"\n  model-viewer(src: \"a.glb\", ar: true, camera-controls: true)",
         json!({}),
     );
-    assert!(out.contains("<div class=\"card p-6 md:flex\" data-test=\"x\" x-on:click=\"open = true\" hidden>Hi</div>"));
+    assert!(
+        out.contains("<div class=\"card p-6 md:flex\" data-test=\"x\" x-on:mouseenter=\"open = true\" hidden>Hi</div>")
+    );
     assert!(out.contains("<model-viewer src=\"a.glb\" ar camera-controls></model-viewer>"));
 }
 
@@ -140,11 +142,16 @@ fn conditions_support_else_and_not() {
 
 #[test]
 fn boolean_attributes_can_come_from_data() {
-    let body = "  props(user: User)\n  input(type: \"checkbox\", name: \"admin\", checked: user.admin)";
+    let body =
+        "  props(user: User)\n  input(type: \"checkbox\", name: \"admin\", aria-label: \"Admin\", checked: user.admin)";
     assert!(
-        html(body, json!({ "user": { "admin": true } })).contains("<input type=\"checkbox\" name=\"admin\" checked>")
+        html(body, json!({ "user": { "admin": true } }))
+            .contains("<input type=\"checkbox\" name=\"admin\" aria-label=\"Admin\" checked>")
     );
-    assert!(html(body, json!({ "user": { "admin": false } })).contains("<input type=\"checkbox\" name=\"admin\">"));
+    assert!(
+        html(body, json!({ "user": { "admin": false } }))
+            .contains("<input type=\"checkbox\" name=\"admin\" aria-label=\"Admin\">")
+    );
 }
 
 #[test]

@@ -363,6 +363,8 @@ stop the build, but fix it unless there's a reason (then use `allow`).
   French, Spanish, Portuguese, Italian and Dutch so far. A page in another language isn't checked for them, and
   neither is one whose `lang` comes from data.
 - An `iframe` has a `title`. A video that autoplays is `muted: true`. `tabindex` is `0` or `-1`, never positive.
+- Something people click is a `button` or a link, not a `div` or `span` with `onclick` or `"@click"`. Form
+  controls written by hand (`input`, `select`, `textarea`) have a label; `field` writes one for you.
 - An `id` is used once per page, so a component with a fixed `id` is used once.
 - `raw` with data writes it unescaped; only use it for trusted HTML. `javascript:` URLs are errors.
 
@@ -412,6 +414,8 @@ rule with a page that breaks it and the fixed page. Read the help line; it usual
 | [`A11Y-011`](rules/A11Y-011.md) | autoplaying video isn't muted (warning) |
 | [`A11Y-012`](rules/A11Y-012.md) | ARIA name or state on a div or span without a role (warning) |
 | [`A11Y-013`](rules/A11Y-013.md) | links with the same text go to different places (warning) |
+| [`A11Y-014`](rules/A11Y-014.md) | click handler on an element that isn't a control (warning) |
+| [`A11Y-015`](rules/A11Y-015.md) | form control has no label (warning) |
 | [`ALLOW-001`](rules/ALLOW-001.md) | allow has no reason |
 | [`ALLOW-002`](rules/ALLOW-002.md) | allow has no rule code |
 | [`ALLOW-003`](rules/ALLOW-003.md) | allow names an unknown rule (warning) |

@@ -36,6 +36,8 @@ pub fn check<'a>(items: &'a [Item], defs: &'a Defs<'a>, is_entry: bool, lang: Op
         loops: 0,
         links: vec![],
         link_context: 0,
+        in_label: 0,
+        label_targets: label_targets(items, defs),
         diags: vec![],
         allowed: vec![],
         in_template: false,
@@ -77,6 +79,10 @@ struct Checker<'a> {
     links: Vec<(String, String)>,
     /// How many elements around the current item tell its links apart, like a list item or a card with a heading.
     link_context: usize,
+    /// How many `label` elements the current item is in.
+    in_label: usize,
+    /// The ids that a `label(for: ...)` names, in this file and its components and layouts.
+    label_targets: Vec<String>,
     diags: Vec<Diagnostic>,
     /// Rule codes switched off by `allow` for the item currently being checked.
     allowed: Vec<String>,
@@ -307,8 +313,10 @@ impl<'a> Checker<'a> {
             }
             "form" => self.form(e),
             "field" => self.field_type(e),
+            "input" | "select" | "textarea" => self.control_label(e),
             _ => {}
         }
+        self.click_target(e);
 
         let was_control = std::mem::replace(&mut self.in_control, false);
         let was_form = if e.name == "form" { std::mem::replace(&mut self.form, InForm::Yes) } else { self.form };
@@ -317,12 +325,88 @@ impl<'a> Checker<'a> {
         self.in_html_template |= e.name == "template";
         let context = gives_link_context(e);
         self.link_context += usize::from(context);
+        self.in_label += usize::from(e.name == "label");
         self.items(&e.children, &e.name);
+        self.in_label -= usize::from(e.name == "label");
         self.link_context -= usize::from(context);
         self.in_control = was_control;
         self.form = was_form;
         self.in_foreign = was_foreign;
         self.in_html_template = was_html_template;
+    }
+
+    /// An `input`, `select` or `textarea` written by hand needs a label, as a `field` always has one: screen readers
+    /// announce it, and clicking it puts the cursor in the control. A placeholder isn't one: it's gone as soon as
+    /// someone types.
+    fn control_label(&mut self, e: &Element) {
+        let kind = e.arg("type").and_then(static_text).unwrap_or_default().to_ascii_lowercase();
+        // these name themselves with their value, or aren't seen
+        if e.name == "input" && matches!(kind.as_str(), "hidden" | "submit" | "button" | "reset" | "image") {
+            return;
+        }
+        let labelled = self.in_label > 0
+            || ["aria-label", "aria-labelledby", "title"].iter().any(|a| e.arg(a).is_some())
+            || match e.arg("id") {
+                // an id from data could be any label's
+                Some(id) => static_text(id).is_none_or(|id| self.label_targets.iter().any(|t| t == id)),
+                None => false,
+            };
+        if !labelled {
+            self.report(
+                Diagnostic::warning("A11Y-015", format!("`{}` has no label", e.name), e.pos, e.name.len()).help(
+                    "use field(\"email\", type: Email, label: \"Email\"), which writes the label; or add aria-label, \
+                     or a label(for: ...) with the control's id",
+                ),
+            );
+        }
+    }
+
+    /// A click handler on an element that isn't a control, like `div(onclick: ...)`: a mouse can click it, but a
+    /// keyboard can't reach it and a screen reader doesn't say it can be pressed.
+    fn click_target(&mut self, e: &Element) {
+        const CONTROLS: &[&str] =
+            &["a", "button", "input", "select", "textarea", "summary", "label", "option", "area", "details", "form"];
+        const ROLES: &[&str] = &[
+            "button",
+            "link",
+            "checkbox",
+            "menuitem",
+            "menuitemcheckbox",
+            "menuitemradio",
+            "option",
+            "radio",
+            "switch",
+            "tab",
+            "treeitem",
+        ];
+        if self.in_foreign || CONTROLS.contains(&e.name.as_str()) || e.name.contains('-') || is_name(&e.name) {
+            return;
+        }
+        let htmx_on_click = || match e.arg("hx-trigger").map(static_text) {
+            None => true,
+            Some(trigger) => trigger.is_some_and(|t| t.split([' ', ',']).any(|t| t == "click")),
+        };
+        let handler = e.args.iter().filter_map(|a| a.name()).find(|name| {
+            let (event, modifiers) = name.split_once('.').unwrap_or((name, ""));
+            // a click outside an element, like on the page around an open menu, isn't a click on it
+            let outside = modifiers.split('.').any(|m| matches!(m, "outside" | "away"));
+            (matches!(event, "onclick" | "@click" | "x-on:click") && !outside)
+                || (matches!(event, "hx-get" | "hx-post" | "hx-put" | "hx-patch" | "hx-delete") && htmx_on_click())
+        });
+        let Some(handler) = handler else { return };
+        let role = e.arg("role").and_then(static_text).is_some_and(|r| ROLES.contains(&r));
+        if role && e.arg("tabindex").is_some() {
+            return;
+        }
+        self.report(
+            Diagnostic::warning(
+                "A11Y-014",
+                format!("`{}` with `{handler}` isn't a button: a keyboard can't reach it", e.name),
+                e.pos,
+                e.name.len(),
+            )
+            .help("use button(type: \"button\") or a link; if it has to stay, add role: \"button\" and tabindex: 0, and handle Enter and Space"),
+        );
     }
 
     fn form(&mut self, e: &Element) {
@@ -1336,6 +1420,37 @@ fn contains_submit(items: &[Item], defs: &Defs, depth: usize) -> bool {
 
 fn contains_element(items: &[Item], name: &str) -> bool {
     any_element(items, &|e| e.name == name)
+}
+
+/// The ids that `label(for: ...)` elements name, in the file and in every component and layout.
+fn label_targets(items: &[Item], defs: &Defs) -> Vec<String> {
+    fn collect(items: &[Item], out: &mut Vec<String>) {
+        for item in items {
+            match item {
+                Item::Element(e) => {
+                    if e.name == "label"
+                        && let Some(id) = e.arg("for").and_then(static_text)
+                    {
+                        out.push(id.to_string());
+                    }
+                    collect(&e.children, out);
+                }
+                Item::For(f) => collect(&f.body, out),
+                Item::If(c) => {
+                    collect(&c.then, out);
+                    collect(&c.otherwise, out);
+                }
+                Item::Component(def) | Item::Layout(def) => collect(&def.body, out),
+                _ => {}
+            }
+        }
+    }
+    let mut out = vec![];
+    collect(items, &mut out);
+    for def in defs.components.values().chain(defs.layouts.values()) {
+        collect(&def.body, &mut out);
+    }
+    out
 }
 
 /// Whether a link or button has a name for screen readers: its text, a label, or content with text or a described

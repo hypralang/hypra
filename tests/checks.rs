@@ -477,3 +477,50 @@ fn links_and_buttons_need_a_name_not_just_an_icon() {
         assert_eq!(codes(&run(&format!("  {named}"))), Vec::<&str>::new(), "{named}");
     }
 }
+
+#[test]
+fn click_handlers_belong_on_controls() {
+    // a mouse can click these, a keyboard can't reach them
+    for fake in [
+        "div(class: \"btn\", onclick: \"buy()\") \"Buy\"",
+        "span(\"@click\": \"open = true\") \"Menu\"",
+        "li(\"x-on:click.prevent\": \"pick()\") \"Size 42\"",
+        "div(hx-post: \"/cart\") \"Add\"",
+    ] {
+        let result = run(&format!("  {fake}"));
+        assert!(codes(&result).contains(&"A11Y-014"), "{fake}: {:?}", codes(&result));
+    }
+    // controls, a role with a tabindex, a click outside, and htmx on another trigger are fine
+    for fine in [
+        "button(type: \"button\", \"@click\": \"open = true\") \"Menu\"",
+        "a(\"/cart\", \"@click\": \"track()\") \"Cart\"",
+        "div(role: \"button\", tabindex: 0, \"@click\": \"open = true\") \"Menu\"",
+        "div(\"@click.outside\": \"open = false\") { p \"Menu\" }",
+        "div(hx-get: \"/news\", hx-trigger: \"load\") { p \"Loading\" }",
+        "model-viewer(src: \"/a.glb\", alt: \"A shoe\", \"@click\": \"spin()\")",
+    ] {
+        assert_eq!(codes(&run(&format!("  {fine}"))), Vec::<&str>::new(), "{fine}");
+    }
+}
+
+#[test]
+fn form_controls_written_by_hand_need_a_label() {
+    for unlabelled in [
+        "input(name: \"email\", type: \"email\")",
+        "input(type: \"search\", placeholder: \"Search\")",
+        "textarea(name: \"note\")",
+        "select(name: \"size\") { option \"42\" }",
+    ] {
+        assert_eq!(codes(&run(&format!("  {unlabelled}"))), ["A11Y-015"], "{unlabelled}");
+    }
+    for labelled in [
+        "label(for: \"q\") \"Search\"\n  input(id: \"q\", type: \"search\")",
+        "input(id: \"q\", type: \"search\")\n  label(for: \"q\") \"Search\"",
+        "label { \"Note\" textarea(name: \"note\") }",
+        "input(type: \"search\", aria-label: \"Search shoes\")",
+        "input(type: \"hidden\", name: \"ref\", value: \"home\")",
+        "input(type: \"submit\", value: \"Send\")",
+    ] {
+        assert_eq!(codes(&run(&format!("  {labelled}"))), Vec::<&str>::new(), "{labelled}");
+    }
+}

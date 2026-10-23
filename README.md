@@ -323,7 +323,7 @@ Errors stop the build; warnings don't. The [spec](docs/spec.md#errors) lists eve
 | Codes | Rule |
 | --- | --- |
 | `SEO-001`…`006` | pages have a title, a description of 50 to 160 characters (wide characters count twice), one `h1` and an absolute canonical URL |
-| `A11Y-001`…`013` | alt text that describes images, captions, link and button text, links that say where they go, heading levels in order, iframe titles, no positive `tabindex`, muted autoplay, roles for named divs |
+| `A11Y-001`…`015` | alt text that describes images, captions, link and button text, links that say where they go, heading levels in order, iframe titles, no positive `tabindex`, muted autoplay, roles for named divs, click handlers only on controls, labels for form controls |
 | `FORM-001`…`006` | forms have a name, a button and a known method; fields have a type and a label |
 | `ATTR-001`…`008` | unknown, duplicate, misplaced, mistyped or malformed attributes, with "did you mean" hints |
 | `SEM-001`…`014` | unknown or misplaced elements, duplicate ids, language codes, action names |
