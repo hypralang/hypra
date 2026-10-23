@@ -1,0 +1,14 @@
+{
+  "name": "hypra-starter",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "hypra build pages --target js --out dist",
+    "check": "hypra check pages layouts components",
+    "fmt": "hypra fmt pages layouts components",
+    "start": "npm run build && node server.js"
+  },
+  "dependencies": {
+    "hypra": "^0.3.1"
+  }
+}

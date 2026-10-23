@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 480">
+  <circle cx="240" cy="240" r="220" fill="#e9d8c0"/>
+  <g transform="translate(70 70) rotate(-8 90 160)">
+    <path d="M38 40 L142 40 L150 290 Q90 300 30 290 Z" fill="#c9822b"/>
+    <path d="M42 22 L138 22 L142 40 L38 40 Z" fill="#c9822b"/>
+    <rect x="52" y="120" width="76" height="90" rx="4" fill="#f7f1e8"/>
+  </g>
+  <g transform="translate(250 90) rotate(7 90 160)">
+    <path d="M38 40 L142 40 L150 290 Q90 300 30 290 Z" fill="#4f6b3a"/>
+    <path d="M42 22 L138 22 L142 40 L38 40 Z" fill="#4f6b3a"/>
+    <rect x="52" y="120" width="76" height="90" rx="4" fill="#f7f1e8"/>
+  </g>
+  <g transform="translate(160 120)">
+    <path d="M38 40 L142 40 L150 290 Q90 300 30 290 Z" fill="#a33b2c"/>
+    <path d="M42 22 L138 22 L142 40 L38 40 Z" fill="#a33b2c"/>
+    <rect x="44" y="120" width="92" height="90" rx="4" fill="#f7f1e8"/>
+    <text x="90" y="170" text-anchor="middle" font-family="Georgia, serif" font-size="9" letter-spacing="1.5" fill="#2b1d14">NORTHBOUND</text>
+  </g>
+</svg>

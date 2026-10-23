@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 400" role="img">
+  <rect width="320" height="400" fill="#e2e8d6"/>
+  <ellipse cx="160" cy="372" rx="98" ry="10" fill="#000" opacity=".12"/>
+  <path d="M78 92 L242 92 L256 360 Q160 374 64 360 Z" fill="#4f6b3a"/>
+  <path d="M78 92 L242 92 L246 128 L74 128 Z" fill="#000" opacity=".18"/>
+  <path d="M84 64 L236 64 L242 92 L78 92 Z" fill="#4f6b3a"/>
+  <path d="M84 64 L236 64 L238 74 L82 74 Z" fill="#fff" opacity=".18"/>
+  <rect x="88" y="170" width="144" height="140" rx="6" fill="#f7f1e8"/>
+  <text x="160" y="214" text-anchor="middle" font-family="Georgia, serif" font-size="12" letter-spacing="2.5" fill="#2b1d14">NORTHBOUND</text>
+  <line x1="122" y1="228" x2="198" y2="228" stroke="#2b1d14" stroke-width="1"/>
+  <text x="160" y="256" text-anchor="middle" font-family="Georgia, serif" font-size="15" fill="#2b1d14">Huehuetenango</text>
+  <text x="160" y="284" text-anchor="middle" font-family="system-ui, sans-serif" font-size="9" letter-spacing="1.2" fill="#6b5a4d">250 G · WHOLE BEAN</text>
+</svg>

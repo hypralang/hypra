@@ -1,0 +1,28 @@
+// The frame around every page: header, footer, the stylesheet and site-wide settings.
+layout Site(lang: "en", title_suffix: " | Northbound Coffee", site_name: "Northbound Coffee") {
+  head {
+    link(rel: "stylesheet", href: "/styles.css")
+    link(rel: "icon", href: "/favicon.svg")
+    meta(name: "theme-color", content: "#2b1d14")
+  }
+
+  a("#main", class: "skip") "Skip to content"
+  header(class: "site-header") {
+    div(class: "wrap bar") {
+      a("/", class: "brand") { img("/favicon.svg", decorative: true, width: 28, height: 28) "Northbound" }
+      nav(aria-label: "Main") {
+        a("/") "Coffee"
+        a("/#subscribe") "Subscription"
+      }
+    }
+  }
+
+  main(id: "main") { slot }
+
+  footer(class: "site-footer") {
+    div(class: "wrap") {
+      p "Roasted every Tuesday in small batches. Shipped the same week."
+      p(class: "muted") "Northbound Coffee is a demo shop built with Hypra."
+    }
+  }
+}
