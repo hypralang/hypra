@@ -1,7 +1,8 @@
 # Accessibility checks at compile time
 
-By the end of this guide, missing alt text, unlabeled form fields, empty buttons and skipped heading levels stop
-your build with an error that says where the problem is and how to fix it, before a page reaches anyone.
+By the end of this guide, missing alt text, unlabeled form fields and empty buttons stop your build with an error
+that says where the problem is and how to fix it, and skipped heading levels get a warning, before a page reaches
+anyone.
 
 ## Why check before the page exists
 
