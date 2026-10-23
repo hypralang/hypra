@@ -97,7 +97,7 @@ fn scripts_take_text_not_children() {
 
 #[test]
 fn data_in_attributes_that_run_code_warns() {
-    let body = "  props(u: U)\n  button(onclick: \"go('{u.id}')\") \"Go\"\n  div(x-data: u.state) \"x\"\n  div(\"@click\": \"open('{u.id}')\") \"y\"\n  iframe(srcdoc: \"{u.html}\", title: \"Preview\")";
+    let body = "  props(u: U)\n  button(onclick: \"go('{u.id}')\") \"Go\"\n  div(x-data: u.state) \"x\"\n  button(\"@click\": \"open('{u.id}')\") \"y\"\n  iframe(srcdoc: \"{u.html}\", title: \"Preview\")";
     let result = run(body, json!({ "u": { "id": 1, "state": "{}", "html": "<b>" } }));
     assert_eq!(codes(&result), ["SEC-001", "SEC-004", "SEC-004", "SEC-004", "SEC-004"]);
 }
