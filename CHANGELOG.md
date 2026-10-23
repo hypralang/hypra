@@ -6,7 +6,8 @@ fixes and adds checks.
 ## Unreleased
 
 - [starter](starter): a small, styled site to start from, with pages, a layout, a component, dark mode and a
-  Node server that answers in HTML, Markdown and JSON: `npx degit hypralang/hypra/starter my-site`
+  Node server that answers in HTML, Markdown and JSON: `npx degit hypralang/hypra/starter my-site`. The
+  instructions for agents point to it as an example to build from, not a site to copy.
 
 ## 0.3.1
 
