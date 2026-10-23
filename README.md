@@ -15,6 +15,7 @@
   <a href="https://hypralang.dev">Website</a> ·
   <a href="https://hypralang.dev/docs/">Docs</a> ·
   <a href="https://hypralang.dev/guides/">Guides</a> ·
+  <a href="js">JavaScript</a> ·
   <a href="php/laravel">Laravel</a> ·
   <a href="editors/vscode">VS Code</a> ·
   <a href="https://github.com/hypralang/hypra/releases">Download</a>
@@ -43,13 +44,14 @@ page(title: "{product.name} – Running Shoes", description: "{product.name}: a 
 | Use it with | What you get |
 | --- | --- |
 | **Any site or language** | `hypra build` turns a page and its data (JSON) into HTML, Markdown, JSON and WebMCP files |
+| **Node, Bun, Deno** | pages compiled to JavaScript render at request time with the [`hypra`](js) npm package, which also brings the compiler |
 | **PHP 8.2+** | pages compiled to PHP render at request time with [`hypra/runtime`](php/runtime) |
 | **Laravel 11, 12, 13** | `.hypra` views, Markdown and JSON for agents on the same URL, CSRF, actions, `hypra:install`, `hypra:compile` |
 | **CSS and JavaScript** | anything: Tailwind, Alpine.js, htmx, web components, React or Vue islands |
 | **Editors** | VS Code and Cursor: highlighting, errors as you type, go to definition, references, rename, hover, formatting; other editors through `hypra lsp` |
-| **Compiler** | prebuilt for Linux, macOS and Windows on x64 and ARM, or `cargo install hypra` |
+| **Compiler** | prebuilt for Linux, macOS and Windows on x64 and ARM: `npm install hypra`, `cargo install hypra` or a download |
 
-Other server languages, like Node, Python, Go or Ruby, can use the static build or call `hypra build`.
+Other server languages, like Python, Go or Ruby, can use the static build or call `hypra build`.
 
 ## Why
 
@@ -247,8 +249,37 @@ Imports are relative to the importing file, and errors in imported files point a
 
 ## Rendering on a server
 
-For dynamic pages, Hypra compiles to code that receives its data at request time. The PHP target needs no
-Rust on the server; the generated file uses the small [`hypra/runtime`](php/runtime) package:
+For dynamic pages, Hypra compiles to code that receives its data at request time, in JavaScript or PHP. Both
+render exactly what the static build writes, and the tests compare them on thousands of generated pages.
+
+### JavaScript
+
+The [`hypra`](js) npm package brings the compiler and the runtime for Node, Bun and Deno:
+
+```console
+$ npm install hypra
+$ npx hypra build examples/product.hypra --target js
+✔ dist/product.mjs
+✔ dist/product.d.mts
+✔ dist/product.sources.json
+0 errors, 0 warnings
+```
+
+```js
+import product from "./dist/product.mjs";
+
+app.get("/shoes/:id", async (req, res) => {
+  const output = product.render({ product: await db.products.find(req.params.id) });
+  // HTML for browsers, Markdown for LLMs, JSON for apps: whatever the Accept header asks for
+  const { contentType, body } = output.negotiate(req.get("accept"));
+  res.vary("Accept").type(contentType).send(body);
+});
+```
+
+### PHP
+
+The PHP target needs no Rust on the server; the generated file uses the small [`hypra/runtime`](php/runtime)
+package:
 
 ```console
 $ hypra build examples/product.hypra --target php
@@ -267,8 +298,8 @@ $output->json;      // page metadata and actions
 $output->webmcp;    // tool definitions for AI agents
 ```
 
-The PHP output is tested to be identical to the static build. With `render($data, strict: true)`, data that
-doesn't match the page throws a `DataError` that points at the `.hypra` source.
+With `render($data, strict: true)`, data that doesn't match the page throws a `DataError` that points at the
+`.hypra` source; the JavaScript runtime has the same `strict` option.
 
 ### Laravel
 
@@ -284,8 +315,8 @@ No Rust needed: `php artisan hypra:install` downloads the compiler for your mach
 
 ## Getting started
 
-Download the `hypra` compiler for Linux, macOS or Windows from the
-[releases](https://github.com/hypralang/hypra/releases); each release lists the SHA-256 checksums in
+`npm install hypra` brings the compiler for Linux, macOS or Windows; run it with `npx hypra`. It's also in the
+[releases](https://github.com/hypralang/hypra/releases), where each release lists the SHA-256 checksums in
 `SHA256SUMS`. With Rust installed, `cargo install hypra` works too, or build it from source:
 
 ```console
@@ -298,6 +329,7 @@ $ ./target/release/hypra build examples/product.hypra --data examples/product.js
 ```text
 hypra build <file.hypra> [--data data.json] [--out dir]
 hypra build <file.hypra> --target php [--out dir]
+hypra build <file.hypra> --target js [--out dir]
 hypra check <file.hypra> [--data data.json] [--format json]
 hypra fmt [--check] <file.hypra>...
 hypra lsp

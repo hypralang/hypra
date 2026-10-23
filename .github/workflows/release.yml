@@ -1,5 +1,5 @@
 # Builds the compiler for every platform when a version is tagged, publishes it as a GitHub release with SHA-256
-# checksums, then on crates.io and Open VSX. `php artisan hypra:install` downloads from these releases.
+# checksums, then on crates.io, npm and Open VSX. `php artisan hypra:install` downloads from these releases.
 name: release
 
 on:
@@ -45,6 +45,8 @@ jobs:
           test "v$version" = "$GITHUB_REF_NAME" || { echo "tag $GITHUB_REF_NAME but Cargo.toml says $version"; exit 1; }
           extension=$(grep -m1 '"version"' editors/vscode/package.json | cut -d '"' -f4)
           test "$extension" = "$version" || { echo "the VS Code extension says $extension"; exit 1; }
+          npm=$(grep -m1 '"version"' js/package.json | cut -d '"' -f4)
+          test "$npm" = "$version" || { echo "the npm package says $npm"; exit 1; }
       - name: Build and package
         shell: bash
         run: |

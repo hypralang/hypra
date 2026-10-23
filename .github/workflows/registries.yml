@@ -1,5 +1,6 @@
-# Publishes a release to crates.io (`cargo install hypra`) and Open VSX (the extension for Cursor and other editors
-# built on VS Code). The release workflow runs it after each release; it can also be run by hand for a tag.
+# Publishes a release to crates.io (`cargo install hypra`), npm (`npm install hypra`: the compiler and the runtime
+# for JavaScript pages) and Open VSX (the extension for Cursor and other editors built on VS Code). The release
+# workflow runs it after each release; it can also be run by hand for a tag.
 name: registries
 
 on:
@@ -35,6 +36,44 @@ jobs:
       - run: cargo publish --locked
         env:
           CARGO_REGISTRY_TOKEN: ${{ steps.auth.outputs.token }}
+
+  npm:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    # trusted publishing: npm trusts this workflow, so no long-lived token is stored
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.tag }}
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          registry-url: https://registry.npmjs.org
+      - name: Put the release's compilers into the package
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tag="${{ inputs.tag }}"
+          gh release download "$tag" -R "$GITHUB_REPOSITORY" -p 'hypra-*.tar.gz' -D release
+          for archive in release/*.tar.gz; do
+            name=$(basename "$archive" .tar.gz)
+            target=${name#hypra-${tag#v}-}
+            exe=hypra; [[ "$target" == *windows* ]] && exe=hypra.exe
+            tar -xzf "$archive" -C release
+            mkdir -p "js/bin/$target"
+            cp "release/$name/$exe" "js/bin/$target/"
+          done
+          # one for each system bin/hypra.js knows
+          test "$(find js/bin -mindepth 1 -maxdepth 1 -type d | wc -l)" = 6 || { ls -R js/bin; exit 1; }
+      # trusted publishing needs npm 11.5.1 or later; the token is only for the very first release, see
+      # docs/releasing.md
+      - run: npx --yes npm@11.5.1 publish --access public
+        working-directory: js
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
   open-vsx:
     runs-on: ubuntu-latest

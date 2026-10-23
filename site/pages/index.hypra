@@ -14,9 +14,9 @@ page(layout: Site, title: "Pages that compile", canonical: "https://hypralang.de
         "url": "https://hypralang.dev/",
         "codeRepository": "https://github.com/hypralang/hypra",
         "programmingLanguage": "Rust",
-        "runtimePlatform": ["Linux", "macOS", "Windows", "PHP", "Laravel"],
+        "runtimePlatform": ["Linux", "macOS", "Windows", "Node.js", "Bun", "Deno", "PHP", "Laravel"],
         "license": ["https://opensource.org/license/mit", "https://www.apache.org/licenses/LICENSE-2.0"],
-        "keywords": "markup language, HTML compiler, accessibility, SEO, Laravel, Markdown for LLMs, WebMCP"
+        "keywords": "markup language, HTML compiler, accessibility, SEO, Node.js, Laravel, Markdown for LLMs, WebMCP"
       }
       """
   }
@@ -57,7 +57,7 @@ page(layout: Site, title: "Pages that compile", canonical: "https://hypralang.de
       Point(term: "SEO without plugins", text: "Title, description, canonical, Open Graph and Twitter tags come from the page's settings.")
       Point(term: "Safe with any data", text: "Data is always text: no cross-site scripting, no fake Markdown for agents, no CSRF token sent to another site.")
       Point(term: "Works with your stack", text: "Tailwind, Alpine.js, htmx and web components work as they are.")
-      Point(term: "Ready for Laravel", text: ".hypra files are views, and one URL answers in HTML, Markdown or JSON.")
+      Point(term: "Ready for Node and Laravel", text: "Pages render at request time, and one URL answers in HTML, Markdown or JSON.")
       Point(term: "One small binary", text: "Under a megabyte, written in Rust. Pages compile in milliseconds.")
     }
   }
@@ -78,8 +78,8 @@ page(layout: Site, title: "Pages that compile", canonical: "https://hypralang.de
   Section(number: "05", title: "Install") {
     div(id: "install", class: "mt-6 grid scroll-mt-24 gap-10 lg:grid-cols-3") {
       div {
-        h3 "Command line"
-        p(class: "mt-1 mb-3 text-ink-2") { "With Rust, or " a("https://github.com/hypralang/hypra/releases") "download a build" " for Linux, macOS or Windows." }
+        h3 "Compiler"
+        p(class: "mt-1 mb-3 text-ink-2") { "From npm with the runtime for Node, Bun and Deno, with Rust, or " a("https://github.com/hypralang/hypra/releases") "as a download" ". " a("/docs/js/") "JavaScript docs" }
         raw "{sample.install_cli}"
       }
       div {

@@ -5,12 +5,10 @@ say so in an [issue](https://github.com/hypralang/hypra/issues): that moves it u
 
 ## Next
 
-- **JavaScript target.** `hypra build --target js` and an npm package, so pages render at request time in Node,
-  Express, Hono, Next and others, the way the PHP target does in PHP and Laravel today.
+- **A Vite plugin.** `import page from "./product.hypra"` in Vite, Astro and SvelteKit, compiled on the fly
+  with errors in the browser's overlay.
 
 ## Later
-
-- A Vite plugin: `import page from "./product.hypra"` in Vite, Astro and SvelteKit
 
 - A playground on hypralang.dev: write Hypra in the browser and see every output
 - Link and alt text checks in more languages
