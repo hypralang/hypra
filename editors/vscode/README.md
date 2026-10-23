@@ -27,6 +27,9 @@ search for "Hypra" in the Extensions view. In VS Code, download `hypra-<version>
 
 ## The preview
 
+A layout or component has no page of its own, so its preview shows a page that uses it, the home page if it
+does, with your changes to the layout in it.
+
 The preview uses the data in a JSON file with the page's name next to it, e.g. `product.json` next to
 `product.hypra`. Without one, the page is shown with its data left empty. Paths like `/styles.css` are looked up
 in the nearest `public` folder above the page, else at the top of the project. Scripts the page loads, like
