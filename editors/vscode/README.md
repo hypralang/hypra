@@ -13,6 +13,10 @@ and to Markdown and JSON for AI agents. Works in VS Code, Cursor and other edito
 - **Hover** over a name to see where it's defined, or over an element or field type to see what it does, with an
   example.
 - **Format Document**, the same as `hypra fmt`.
+- **Preview** (Ctrl+K V, or the preview button in the editor's title bar): the page next to the editor, as a
+  browser shows it, with the project's stylesheets and images. The buttons in the preview's title bar switch to
+  the Markdown that AI agents get and to the JSON. It's rendered again whenever a `.hypra` file, a `.json` or a
+  `.css` file is saved.
 
 ## Install
 
@@ -20,6 +24,13 @@ In Cursor, VSCodium and other editors that install from [Open VSX](https://open-
 search for "Hypra" in the Extensions view. In VS Code, download `hypra-<version>.vsix` from the
 [latest release](https://github.com/hypralang/hypra/releases/latest), then in the Extensions view choose
 **…** → **Install from VSIX…**.
+
+## The preview
+
+The preview uses the data in a JSON file with the page's name next to it, e.g. `product.json` next to
+`product.hypra`. Without one, the page is shown with its data left empty. Paths like `/styles.css` are looked up
+in the nearest `public` folder above the page, else at the top of the project. Scripts the page loads, like
+Tailwind's, run in the preview.
 
 ## Settings
 
