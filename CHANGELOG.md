@@ -13,7 +13,7 @@ fixes and adds checks.
 - A link or button that holds only an icon, like a decorative image, has no name for screen readers: A11Y-002
   and A11Y-005 now report it. A link with an `aria-label` and no content no longer gets A11Y-002.
 - Link and alt text checks know French, Spanish, Portuguese, Italian and Dutch
-- New checks A11Y-014, a click handler on something that isn't a control, like `div(onclick: ...)`, and A11Y-015,
+- New errors A11Y-014, a click handler on something that isn't a control, like `div(onclick: ...)`, and A11Y-015,
   an `input`, `select` or `textarea` without a label
 
 ## 0.1.1

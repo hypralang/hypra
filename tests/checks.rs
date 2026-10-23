@@ -496,6 +496,7 @@ fn click_handlers_belong_on_controls() {
         "a(\"/cart\", \"@click\": \"track()\") \"Cart\"",
         "div(role: \"button\", tabindex: 0, \"@click\": \"open = true\") \"Menu\"",
         "div(\"@click.outside\": \"open = false\") { p \"Menu\" }",
+        "ul(\"@click\": \"pick($event.target)\") { li { button(type: \"button\") \"S\" } li { button(type: \"button\") \"M\" } }",
         "div(hx-get: \"/news\", hx-trigger: \"load\") { p \"Loading\" }",
         "model-viewer(src: \"/a.glb\", alt: \"A shoe\", \"@click\": \"spin()\")",
     ] {
