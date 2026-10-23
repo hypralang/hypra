@@ -2,8 +2,8 @@
 component Mark() {
   svg(viewBox: "0 0 32 32", aria-hidden: true) {
     rect(width: 32, height: 32, rx: 6, class: "fill-ink")
-    path(d: "M10 8v16M22 8v16M10 16h12", class: "stroke-paper", stroke-width: 3.4, stroke-linecap: "square", fill: "none")
-    rect(x: 19.5, y: 20.5, width: 5, height: 5, class: "fill-pass")
+    path(d: "M7 8v16M19 8v16M7 16h12", class: "stroke-paper", stroke-width: 3.4, stroke-linecap: "square", fill: "none")
+    rect(x: 22.6, y: 21.7, width: 4, height: 4, class: "fill-pass")
   }
 }
 
