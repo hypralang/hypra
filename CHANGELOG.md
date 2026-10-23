@@ -3,7 +3,7 @@
 Hypra is pre-1.0: a minor version (0.2, 0.3) may change the language or its output, a patch version (0.1.1) only
 fixes and adds checks.
 
-## Unreleased
+## 0.3.0
 
 - `hypra check` and `hypra build` take several files, and folders: `hypra check views` checks every `.hypra`
   file in it, and `hypra build views --target js --out dist` builds every page, in the same subfolders
