@@ -8,7 +8,7 @@
 <p align="center">
   <b>Pages that compile.</b><br>
   A markup language whose compiler turns one file into accessible HTML for browsers,<br>
-  Markdown for AI agents and typed tools, and refuses pages with mistakes.
+  Markdown for AI agents and typed tools. It refuses pages with mistakes, and warns about likely ones.
 </p>
 
 <p align="center">
@@ -318,7 +318,9 @@ It only changes whitespace, keeps comments and line breaks, and `--check` lists 
 
 ## Checks
 
-Errors stop the build; warnings don't. The [spec](docs/spec.md#errors) lists every code.
+Errors stop the build: a missing alt text, a field or input without a label, a click handler on a `div`.
+Warnings point at what's most likely a mistake but can be right, like skipping a heading level or "read more" as
+link text, and don't stop it. The [spec](docs/spec.md#errors) lists every code.
 
 | Codes | Rule |
 | --- | --- |

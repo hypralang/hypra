@@ -397,7 +397,8 @@ two spaces between items on one line stay as written. Run `hypra fmt --check` in
 ## Errors
 
 Every message has a code, a position, a fix (`help`) and a link to its rule's page (`docs`), which explains the
-rule with a page that breaks it and the fixed page. Read the help line; it usually says exactly what to write. Errors stop the build; warnings don't. `allow("CODE") "reason"` turns one off for the next element.
+rule with a page that breaks it and the fixed page. Read the help line; it usually says exactly what to write.
+Errors stop the build; warnings don't. `allow("CODE") "reason"` turns one off for the next element.
 
 | Code | Meaning |
 | --- | --- |
@@ -414,8 +415,8 @@ rule with a page that breaks it and the fixed page. Read the help line; it usual
 | [`A11Y-011`](rules/A11Y-011.md) | autoplaying video isn't muted (warning) |
 | [`A11Y-012`](rules/A11Y-012.md) | ARIA name or state on a div or span without a role (warning) |
 | [`A11Y-013`](rules/A11Y-013.md) | links with the same text go to different places (warning) |
-| [`A11Y-014`](rules/A11Y-014.md) | click handler on an element that isn't a control (warning) |
-| [`A11Y-015`](rules/A11Y-015.md) | form control has no label (warning) |
+| [`A11Y-014`](rules/A11Y-014.md) | click handler on an element that isn't a control |
+| [`A11Y-015`](rules/A11Y-015.md) | form control has no label |
 | [`ALLOW-001`](rules/ALLOW-001.md) | allow has no reason |
 | [`ALLOW-002`](rules/ALLOW-002.md) | allow has no rule code |
 | [`ALLOW-003`](rules/ALLOW-003.md) | allow names an unknown rule (warning) |

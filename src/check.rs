@@ -352,12 +352,10 @@ impl<'a> Checker<'a> {
                 None => false,
             };
         if !labelled {
-            self.report(
-                Diagnostic::warning("A11Y-015", format!("`{}` has no label", e.name), e.pos, e.name.len()).help(
-                    "use field(\"email\", type: Email, label: \"Email\"), which writes the label; or add aria-label, \
+            self.report(Diagnostic::error("A11Y-015", format!("`{}` has no label", e.name), e.pos, e.name.len()).help(
+                "use field(\"email\", type: Email, label: \"Email\"), which writes the label; or add aria-label, \
                      or a label(for: ...) with the control's id",
-                ),
-            );
+            ));
         }
     }
 
@@ -398,8 +396,12 @@ impl<'a> Checker<'a> {
         if role && e.arg("tabindex").is_some() {
             return;
         }
+        // a list that handles the clicks on the buttons or links in it, in one place, isn't clicked itself
+        if any_element(&e.children, &|c| CONTROLS.contains(&c.name.as_str()) || is_name(&c.name)) {
+            return;
+        }
         self.report(
-            Diagnostic::warning(
+            Diagnostic::error(
                 "A11Y-014",
                 format!("`{}` with `{handler}` isn't a button: a keyboard can't reach it", e.name),
                 e.pos,
