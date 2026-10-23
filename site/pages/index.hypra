@@ -89,7 +89,7 @@ page(layout: Site, title: "Pages that compile", canonical: "https://hypralang.de
       }
       div {
         h3 "VS Code and Cursor"
-        p(class: "mt-1 mb-3 text-ink-2") { "Errors as you type, go to definition, rename, hover help. " a("/docs/vscode/") "Extension docs" }
+        p(class: "mt-1 mb-3 text-ink-2") { "A preview next to the editor, errors as you type, go to definition, rename. " a("/docs/vscode/") "Extension docs" }
         raw "{sample.install_vscode}"
       }
     }

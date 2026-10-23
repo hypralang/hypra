@@ -40,6 +40,8 @@ example fails.
 | `js`, `php` | the runtimes for compiled pages, and the Laravel package |
 | `editors/vscode` | the extension for VS Code and Cursor |
 | `site` | hypralang.dev, written in Hypra |
+| `starter` | the example site people copy with `npx degit hypralang/hypra/starter` |
+| `examples` | the pages the README and the tests use |
 | `docs` | the spec, the rule pages and the guides |
 
 ## Security

@@ -207,19 +207,35 @@ fn hidden_form_fields_only_go_to_this_site() {
     let code = js_with("page.hypra", &|_| Ok(page.to_string())).code.unwrap();
     let dir = work_dir("forms");
     std::fs::write(dir.join("page.mjs"), code).unwrap();
-    let tokens = |target: &str| {
-        let script = format!(
-            r#"import page from "./page.mjs";
-const out = page.render({{ target: {target} }}, {{ formFields: () => ({{ _csrf: "t<" }}) }});
-console.log(out.html.split('name="_csrf"').length - 1);
+    // the same URLs as `only_same_site_urls_count_as_same_site` in tests/security.rs, all in one run of node
+    let same = ["/subscribe", "subscribe", "?page=2", "#top", "./a:b", "/a?next=https://x.example"];
+    let elsewhere = [
+        "https://evil.example/c",
+        "//evil.example/c",
+        "/\\evil.example/c",
+        "\\\\evil.example/c",
+        "/\t/evil.example/c",
+        "ht\ttps://evil.example/c",
+        "\u{1}//evil.example/c",
+        " //evil.example/c",
+        "mailto:a@b.example",
+        "HTTPS://evil.example",
+    ];
+    let targets: Vec<&str> = same.iter().chain(&elsewhere).copied().collect();
+    let script = format!(
+        r#"import page from "./page.mjs";
+for (const target of {targets}) {{
+  const out = page.render({{ target }}, {{ formFields: () => ({{ _csrf: "t<" }}) }});
+  console.log(out.html.split('name="_csrf"').length - 1);
+}}
 "#,
-            target = Json::String(target.to_string())
-        );
-        run_node("forms", &script).trim().parse::<usize>().unwrap()
-    };
-    assert_eq!(tokens("/also-local"), 2);
-    for elsewhere in ["https://other.example/x", "//other.example/x", " \\\\other.example/x", "java\tscript:x"] {
-        assert_eq!(tokens(elsewhere), 1, "{elsewhere}");
+        targets = Json::from(targets.clone())
+    );
+    let counts: Vec<usize> = run_node("forms", &script).lines().map(|l| l.parse().unwrap()).collect();
+    for (target, count) in targets.iter().zip(counts) {
+        // the local form always gets the token; the other one only when its target is this site
+        let expected = if same.contains(target) { 2 } else { 1 };
+        assert_eq!(count, expected, "{target:?}");
     }
 }
 
