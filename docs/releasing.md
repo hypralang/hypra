@@ -33,9 +33,8 @@
 The `site` workflow builds `site/` on every pull request and publishes it to hypralang.dev with GitHub Pages on
 every push to `main`.
 
-## The first npm release
+## Trusted publishing on npm
 
-npm trusts a workflow only for a package that exists. Before the first release that publishes to npm, create an
-access token with permission to publish on npmjs.com and save it as the `NPM_TOKEN` secret of the repository;
-the `npm` job uses it once. After that release, add `hypralang/hypra` with the workflow `registries.yml` as a
-trusted publisher in the package's settings on npmjs.com, and delete the token and the secret.
+npm trusts the `release` workflow (`release.yml`) of `hypralang/hypra`, so no npm token is stored. npm checks the
+workflow a release starts from, not `registries.yml`, which it calls: running `registries.yml` by hand publishes to
+crates.io and Open VSX, but not to npm.
