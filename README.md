@@ -80,7 +80,8 @@ Besides elements there are five statements: `use "file.hypra"`, `component Name(
 `for item in list { }` and `if [not] value { } else { }`.
 
 The complete reference is [`docs/spec.md`](docs/spec.md). It's short enough to give to a language model, and the
-[benchmark](bench) measures how well models write Hypra from it.
+[benchmark](bench) measures how well models write Hypra from it. [`docs/agents.md`](docs/agents.md) shows how to
+set up coding agents like Claude Code, Codex and Cursor to write it.
 
 ## One source, four outputs
 

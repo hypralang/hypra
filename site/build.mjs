@@ -41,6 +41,12 @@ const docs = [
     description: "Hypra in VS Code and Cursor: errors as you type, go to definition, references, rename, hover help and formatting.",
   },
   {
+    slug: "agents",
+    file: "docs/agents.md",
+    nav: "AI coding agents",
+    description: "Let Claude Code, Codex, Cursor and Copilot write Hypra: the instructions to give them and how they check their work.",
+  },
+  {
     slug: "security",
     file: "SECURITY.md",
     nav: "Security",
@@ -210,6 +216,14 @@ function linkOf(doc, href, absolute = false) {
   return `${url}${hash ? `#${hash}` : ""}`;
 }
 
+/** A doc's Markdown with every link absolute, except in code, which stays as written. */
+const absoluteLinks = (doc) =>
+  doc.markdown
+    .trim()
+    .split(/(^ *```[^]*?^ *```$)/m)
+    .map((part, i) => (i % 2 ? part : part.replace(/\]\(([^)\s]+)\)/g, (_, href) => `](${linkOf(doc, href, true)})`)))
+    .join("");
+
 /** Converts a doc to HTML: highlighted code, headings with ids, links to other docs within the site. */
 function render(doc, markdown) {
   const toc = [];
@@ -341,16 +355,24 @@ for (const page of ["guides", "rules"]) {
   }
 }
 
-// --- llms.txt: where agents find the docs as Markdown
+// --- llms.txt: where agents find the docs as Markdown, and llms-full.txt: all of them in one file
+const summary = "Hypra is a strict markup language that compiles to HTML for people and to Markdown, JSON and WebMCP tools for AI agents.";
 writeFileSync(
   join(dist, "llms.txt"),
-  `# Hypra\n\n> Hypra is a strict markup language that compiles to HTML for people and to Markdown, JSON and WebMCP tools for AI agents.\n\n## Docs\n\n` +
+  `# Hypra\n\n> ${summary}\n\nAll of these pages in one file: ${origin}/llms-full.txt\n\n## Docs\n\n` +
     loaded.map((d) => `- [${d.title}](${origin}${urlOf(d)}index.md): ${d.description}`).join("\n") +
     "\n\n## Guides\n\n" +
     loadedGuides.map((d) => `- [${d.title}](${origin}${urlOf(d)}index.md): ${d.description}`).join("\n") +
     "\n\n## Rules\n\nEvery message from the compiler has a code, and every code a page: why it's checked, a page that breaks it and the fix.\n\n" +
     loadedRules.map((d) => `- [${d.title}](${origin}${urlOf(d)}index.md)`).join("\n") +
     "\n",
+);
+writeFileSync(
+  join(dist, "llms-full.txt"),
+  `# Hypra\n\n> ${summary}\n\n` +
+    [...loaded, ...loadedGuides]
+      .map((d) => `<!-- ${origin}${urlOf(d)} -->\n\n${absoluteLinks(d)}\n`)
+      .join("\n"),
 );
 
 // --- for search engines: every page, and where the list is
