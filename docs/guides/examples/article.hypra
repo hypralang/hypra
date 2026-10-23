@@ -1,0 +1,12 @@
+page(title: "{article.title}", description: "{article.summary}") {
+  props(article: Article)
+  article {
+    h1 "{article.title}"
+    p { "By " b "{article.author}" ", " time(datetime: article.published) "{article.date}" }
+    for paragraph in article.body { p "{paragraph}" }
+  }
+  form("/newsletter", name: "newsletter", description: "Get new articles by email") {
+    field("email", type: Email, label: "Email")
+    button "Subscribe"
+  }
+}

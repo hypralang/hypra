@@ -1,0 +1,7 @@
+page(title: "Install Tidewater", description: "Install the Tidewater command-line tool on macOS, Linux or Windows, and check that it works.") {
+  h1 "Install Tidewater"
+  p "Tidewater runs on macOS, Linux and Windows."
+  pre { code "npm install --global tidewater" }
+  h2 "Check that it works"
+  pre { code "tidewater --version" }
+}

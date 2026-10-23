@@ -184,7 +184,7 @@ URL to clients that ask for it, and `action("cart.remove", ...)` posts to a rout
 - WebMCP itself is experimental and may change; Hypra will follow it.
 - The tools describe what a page offers. Your server still has to check every request, as with any form: an
   agent can send anything a browser can.
-- Hypra is new (version 0.1), and the language may still change before 1.0.
+- Hypra is new and pre-1.0, so the language may still change.
 
 ## Next steps
 

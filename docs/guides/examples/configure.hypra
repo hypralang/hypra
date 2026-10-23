@@ -1,0 +1,10 @@
+page(title: "Configure Tidewater", description: "The settings in tidewater.toml: where the tide data comes from, and which units Tidewater shows.") {
+  h1 "Configure Tidewater"
+  p { "Settings live in " code "tidewater.toml" " next to your project." }
+  dl {
+    dt { code "source" }
+    dd "Where the tide data comes from: noaa or a URL of your own."
+    dt { code "units" }
+    dd "metric or imperial."
+  }
+}
