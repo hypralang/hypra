@@ -21,6 +21,15 @@
   "engines": {
     "vscode": "^1.91.0"
   },
+  "capabilities": {
+    "untrustedWorkspaces": {
+      "supported": "limited",
+      "description": "Until the folder is trusted, .hypra files are highlighted but not checked: checking runs the hypra compiler, which can be one inside the project.",
+      "restrictedConfigurations": [
+        "hypra.path"
+      ]
+    }
+  },
   "categories": [
     "Programming Languages",
     "Formatters",
@@ -68,13 +77,13 @@
         "hypra.path": {
           "type": "string",
           "default": "hypra",
-          "description": "The hypra compiler: a command on your PATH or a full path to it."
+          "description": "The hypra compiler: a command on your PATH or a full path to it. By default, the one the project installed with npm or `php artisan hypra:install`, else `hypra` on your PATH."
         }
       }
     }
   },
   "scripts": {
-    "test": "node test/grammar.test.mjs",
+    "test": "node test/grammar.test.mjs && node test/compiler.test.mjs",
     "bundle": "esbuild extension.js --bundle --platform=node --external:vscode --minify --outfile=dist/extension.js",
     "package": "npm run bundle && cat ../../LICENSE-MIT ../../LICENSE-APACHE > LICENSE && vsce package"
   },

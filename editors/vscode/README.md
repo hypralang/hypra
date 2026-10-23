@@ -23,9 +23,13 @@ search for "Hypra" in the Extensions view. In VS Code, download `hypra-<version>
 
 ## Settings
 
-Everything except highlighting comes from `hypra lsp`, the language server in the `hypra` compiler. Put the
-compiler on your `PATH`, or set `hypra.path` to where it is.
+Everything except highlighting comes from `hypra lsp`, the language server in the `hypra` compiler. The extension
+uses the compiler the project installed, with `npm install hypra` or `php artisan hypra:install`, else `hypra` on
+your `PATH`. To use another one, set `hypra.path` to it.
+
+In a folder VS Code doesn't trust yet, `.hypra` files are highlighted but not checked, since checking runs the
+compiler, which can be one inside the project. Trusting the folder turns everything on.
 
 | Setting | Default | |
 | --- | --- | --- |
-| `hypra.path` | `hypra` | the compiler: a command on your `PATH` or a full path |
+| `hypra.path` | `hypra` | the compiler: a command on your `PATH` or a full path, used instead of the project's |

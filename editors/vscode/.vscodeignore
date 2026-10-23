@@ -4,3 +4,4 @@ package-lock.json
 .gitignore
 node_modules/**
 extension.js
+compiler.js
