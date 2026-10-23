@@ -17,6 +17,9 @@ fn options_need_their_values() {
         (&["build", "examples/product.hypra", "--target", "python"], "unknown target `python`"),
         (&["build", "examples/product.hypra", "--target", "js", "--data", "x.json"], "--data doesn't apply"),
         (&["build", "examples/product.hypra", "--out", "--data", "x.json"], "--out needs a value"),
+        (&["check", "examples", "--data", "examples/product.json"], "--data is the data of one page"),
+        (&["check", "examples/product.hypra", "examples/broken.hypra", "--data", "x.json"], "data of one page"),
+        (&["check", "src"], "src has no .hypra files"),
     ] {
         let (code, stderr) = hypra(args);
         assert_eq!(code, 2, "{args:?}");
@@ -52,6 +55,37 @@ fn the_js_target_writes_a_module_with_its_types() {
     let types = std::fs::read_to_string(out.join("product.d.mts")).unwrap();
     assert!(types.contains("declare const page: Page;"), "{types}");
     assert!(out.join("product.sources.json").exists());
+}
+
+#[test]
+fn a_folder_is_every_hypra_file_in_it() {
+    let (code, stderr) = hypra(&["check", "examples"]);
+    assert_eq!(code, 1, "broken.hypra has errors: {stderr}");
+    assert!(stderr.contains("4 files, 6 errors, 0 warnings"), "{stderr}");
+}
+
+#[test]
+fn building_a_folder_keeps_its_subfolders_and_skips_components() {
+    let out = std::path::PathBuf::from(env!("CARGO_TARGET_TMPDIR")).join("cli-folder");
+    let (code, stderr) = hypra(&["build", "site/pages", "--target", "js", "--out", out.to_str().unwrap()]);
+    assert_eq!(code, 0, "{stderr}");
+    assert!(out.join("index.mjs").exists() && out.join("docs/index.mjs").exists(), "{stderr}");
+
+    // the examples' layouts and components are built into the pages that import them
+    let out = std::path::PathBuf::from(env!("CARGO_TARGET_TMPDIR")).join("cli-folder-php");
+    let (_, stderr) = hypra(&["build", "examples", "--target", "php", "--out", out.to_str().unwrap()]);
+    assert!(stderr.contains("2 files"), "{stderr}");
+    assert!(out.join("product.php").exists() && !out.join("components").exists(), "{stderr}");
+}
+
+#[test]
+fn two_pages_with_one_name_dont_overwrite_each_other() {
+    let out = std::path::PathBuf::from(env!("CARGO_TARGET_TMPDIR")).join("cli-twice");
+    let args = ["build", "site/pages/index.hypra", "site/pages/docs/index.hypra", "--target", "js", "--out"];
+    let (code, stderr) = hypra(&[&args[..], &[out.to_str().unwrap()]].concat());
+    assert_eq!(code, 2, "{stderr}");
+    assert!(stderr.contains("two pages build to"), "{stderr}");
+    assert!(!out.exists(), "nothing is written");
 }
 
 #[test]

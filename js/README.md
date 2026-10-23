@@ -105,6 +105,20 @@ import type { Output } from "hypra/runtime";
 const output: Output = product.render({ product });
 ```
 
+## Building every page
+
+Give `build` and `check` a folder, and they take every `.hypra` file in it. Pages keep their subfolders under
+`--out`; files with only components and layouts are built into the pages that import them:
+
+```json
+{
+  "scripts": {
+    "build:views": "hypra build views --target js --out views/dist",
+    "check:views": "hypra check views"
+  }
+}
+```
+
 ## Rebuilding
 
 `product.sources.json` lists the `.hypra` files a page was built from, so a build script or a file watcher knows

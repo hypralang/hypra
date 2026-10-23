@@ -1,14 +1,14 @@
 use hypra::diag::Diagnostic;
-use hypra::{Generated, Source, check_file, compile_file, js_file, php_file};
+use hypra::{Generated, Source, check, check_file, compile_file, js_file, lexer, parser, php_file};
 use serde_json::{Value as Json, json};
 use std::{env, fs, path::Path, path::PathBuf, process::ExitCode};
 
 const USAGE: &str = "usage:
   hypra build <file.hypra> [--data data.json] [--out dir]   html, md, json and webmcp.json from data
-  hypra build <file.hypra> --target php [--out dir]         a PHP page for the hypra/runtime package
-  hypra build <file.hypra> --target js [--out dir]          a JavaScript module for the hypra npm package
-  hypra check <file.hypra> [--data data.json] [--format json]
-                                                            with data, also checks the data
+  hypra build <path>... --target php [--out dir]            PHP pages for the hypra/runtime package
+  hypra build <path>... --target js [--out dir]             JavaScript modules for the hypra npm package
+  hypra check <path>... [--format json]                     checks files, or every .hypra file in a folder
+  hypra check <file.hypra> --data data.json                 also checks the data
   hypra fmt [--check] <file.hypra>...                       formats files; --check lists those that need it
   hypra fmt -                                               formats stdin to stdout, for editors
   hypra lsp                                                 a language server for editors, over stdin and stdout
@@ -51,10 +51,32 @@ fn run() -> ExitCode {
         _ => {}
     }
 
-    let Options { file, data_path, out_dir, json_format, target } = match parse_options(cmd.as_str(), rest) {
+    let Options { paths, data_path, out_dir, json_format, target } = match parse_options(cmd.as_str(), rest) {
         Ok(options) => options,
         Err(code) => return code,
     };
+    let inputs = match inputs(&paths, cmd == "build") {
+        Ok(inputs) => inputs,
+        Err(message) => {
+            eprintln!("{message}");
+            return ExitCode::from(2);
+        }
+    };
+    // two pages with the same name from different folders would overwrite each other
+    let mut names = std::collections::HashSet::new();
+    if cmd == "build"
+        && let Some(twice) = inputs
+            .iter()
+            .map(|i| i.out.join(Path::new(&i.file).file_stem().unwrap_or_default()))
+            .find(|n| !names.insert(n.clone()))
+    {
+        eprintln!("two pages build to {}; build them into different --out folders", out_dir.join(twice).display());
+        return ExitCode::from(2);
+    }
+    if data_path.is_some() && (inputs.len() != 1 || Path::new(&paths[0]).is_dir()) {
+        eprintln!("--data is the data of one page, so give one file");
+        return ExitCode::from(2);
+    }
 
     let data: Json = match &data_path {
         Some(p) => match fs::read_to_string(p)
@@ -70,44 +92,111 @@ fn run() -> ExitCode {
         None => json!({}),
     };
 
-    let stem = Path::new(&file).file_stem().and_then(|s| s.to_str()).unwrap_or("page").to_string();
-    let (diagnostics, sources, files): Built = match target {
-        // without data there's nothing to render, so check everything else
-        Target::Static if cmd == "check" && data_path.is_none() => {
-            let result = check_file(&file);
-            (result.diagnostics, result.sources, None)
-        }
-        Target::Static => {
-            let result = compile_file(&file, &data);
-            let files = result.output.map(|out| static_files(&stem, &out));
-            (result.diagnostics, result.sources, files)
-        }
-        Target::Php => generated(php_file(&file), &stem, "php"),
-        Target::Js => {
-            // .mjs is a module in every project, with or without "type": "module"; .d.mts types it for TypeScript
-            let (diagnostics, sources, mut files) = generated(js_file(&file), &stem, "mjs");
-            let types =
-                "import type { Page } from \"hypra/runtime\";\n\ndeclare const page: Page;\nexport default page;\n";
-            files.iter_mut().for_each(|files| files.insert(1, (format!("{stem}.d.mts"), types.to_string())));
-            (diagnostics, sources, files)
-        }
-    };
+    let mut all: Vec<Json> = vec![];
+    let (mut errors, mut warnings) = (0, 0);
+    for Input { file, out } in &inputs {
+        let stem = Path::new(file).file_stem().and_then(|s| s.to_str()).unwrap_or("page").to_string();
+        let (diagnostics, sources, files): Built = match target {
+            // without data there's nothing to render, so check everything else
+            Target::Static if cmd == "check" && data_path.is_none() => {
+                let result = check_file(file);
+                (result.diagnostics, result.sources, None)
+            }
+            Target::Static => {
+                let result = compile_file(file, &data);
+                let files = result.output.map(|out| static_files(&stem, &out));
+                (result.diagnostics, result.sources, files)
+            }
+            Target::Php => generated(php_file(file), &stem, "php"),
+            Target::Js => {
+                // .mjs is a module in every project, with or without "type": "module"; .d.mts types it for TypeScript
+                let (diagnostics, sources, mut files) = generated(js_file(file), &stem, "mjs");
+                let types =
+                    "import type { Page } from \"hypra/runtime\";\n\ndeclare const page: Page;\nexport default page;\n";
+                files.iter_mut().for_each(|files| files.insert(1, (format!("{stem}.d.mts"), types.to_string())));
+                (diagnostics, sources, files)
+            }
+        };
 
-    report(&diagnostics, &sources, &file, json_format);
+        report(&diagnostics, &sources, file, json_format, &mut all);
+        let found = diagnostics.iter().filter(|d| d.is_error()).count();
+        errors += found;
+        warnings += diagnostics.len() - found;
 
-    if cmd == "build"
-        && let Some(files) = files
-        && let Err(e) = write_files(&out_dir, files)
-    {
-        eprintln!("can't write output: {e}");
-        return ExitCode::from(2);
+        if cmd == "build"
+            && let Some(files) = files
+        {
+            let dir = out_dir.join(out);
+            if let Err(e) = write_files(&dir, files) {
+                eprintln!("can't write output: {e}");
+                return ExitCode::from(2);
+            }
+        }
     }
 
-    let errors = diagnostics.iter().filter(|d| d.is_error()).count();
-    if !json_format {
-        eprintln!("{}, {}", plural(errors, "error"), plural(diagnostics.len() - errors, "warning"));
+    if json_format {
+        println!("{}", serde_json::to_string_pretty(&all).unwrap_or_default());
+    } else {
+        let files = if inputs.len() > 1 { format!("{}, ", plural(inputs.len(), "file")) } else { String::new() };
+        eprintln!("{files}{}, {}", plural(errors, "error"), plural(warnings, "warning"));
     }
     if errors > 0 { ExitCode::from(1) } else { ExitCode::SUCCESS }
+}
+
+/// A file to check or build, and the folder under `--out` its files go to.
+struct Input {
+    file: String,
+    out: PathBuf,
+}
+
+/// The files the paths name: a file as it is, a folder as every `.hypra` file in it and its subfolders, which
+/// keep their place under `--out`. A build leaves out a folder's files that hold only components and layouts,
+/// since the pages that import them build them.
+fn inputs(paths: &[String], build: bool) -> Result<Vec<Input>, String> {
+    let mut inputs = vec![];
+    for path in paths {
+        let root = Path::new(path);
+        if !root.is_dir() {
+            inputs.push(Input { file: path.clone(), out: PathBuf::new() });
+            continue;
+        }
+        let mut found = vec![];
+        hypra_files(root, &mut found).map_err(|e| format!("can't read {path}: {e}"))?;
+        found.sort();
+        let before = inputs.len();
+        for file in found {
+            if build && fs::read_to_string(&file).is_ok_and(|src| is_library(&src)) {
+                continue;
+            }
+            let out = file.parent().and_then(|p| p.strip_prefix(root).ok()).unwrap_or(Path::new("")).to_path_buf();
+            inputs.push(Input { file: file.to_string_lossy().into_owned(), out });
+        }
+        if inputs.len() == before {
+            return Err(format!("{path} has no .hypra {}", if build { "pages" } else { "files" }));
+        }
+    }
+    Ok(inputs)
+}
+
+/// Every `.hypra` file under `dir`, leaving out hidden folders and installed packages.
+fn hypra_files(dir: &Path, found: &mut Vec<PathBuf>) -> std::io::Result<()> {
+    for entry in fs::read_dir(dir)? {
+        let path = entry?.path();
+        let name = path.file_name().and_then(|n| n.to_str()).unwrap_or("");
+        if path.is_dir() {
+            if !name.starts_with('.') && !matches!(name, "node_modules" | "vendor") {
+                hypra_files(&path, found)?;
+            }
+        } else if path.extension().is_some_and(|e| e == "hypra") {
+            found.push(path);
+        }
+    }
+    Ok(())
+}
+
+/// Whether a file holds only components and layouts.
+fn is_library(src: &str) -> bool {
+    lexer::lex(src, 0).and_then(parser::parse).is_ok_and(|items| check::is_library(&items))
 }
 
 /// What a build found, the files it read, and the files to write as (name, contents) when it found no error.
@@ -124,7 +213,7 @@ fn generated(result: Generated, stem: &str, ext: &str) -> Built {
 
 /// What `build` and `check` were asked to do.
 struct Options {
-    file: String,
+    paths: Vec<String>,
     data_path: Option<String>,
     out_dir: PathBuf,
     json_format: bool,
@@ -133,7 +222,7 @@ struct Options {
 
 /// Reads the options of `build` and `check`; on a mistake, says what's wrong and gives the exit code.
 fn parse_options(cmd: &str, rest: &[String]) -> Result<Options, ExitCode> {
-    let mut file: Option<String> = None;
+    let mut paths: Vec<String> = vec![];
     let mut data_path: Option<String> = None;
     let mut out_dir = PathBuf::from("dist");
     let mut json_format = false;
@@ -161,22 +250,22 @@ fn parse_options(cmd: &str, rest: &[String]) -> Result<Options, ExitCode> {
                 ("--target", "js") => target = Target::Js,
                 _ => return Err(unknown("`static`, `php` or `js`")),
             }
-        } else if file.is_none() && !option.starts_with("--") {
-            file = Some(arg.clone());
+        } else if !option.starts_with("--") {
+            paths.push(arg.clone());
         } else {
             eprintln!("unknown argument `{option}`\n{USAGE}");
             return Err(ExitCode::from(2));
         }
     }
-    let (Some(file), true) = (file, matches!(cmd, "build" | "check")) else {
+    if paths.is_empty() || !matches!(cmd, "build" | "check") {
         eprintln!("{USAGE}");
         return Err(ExitCode::from(2));
-    };
+    }
     if target != Target::Static && data_path.is_some() {
         eprintln!("--data doesn't apply to --target php or js: the page receives its data when it renders");
         return Err(ExitCode::from(2));
     }
-    Ok(Options { file, data_path, out_dir, json_format, target })
+    Ok(Options { paths, data_path, out_dir, json_format, target })
 }
 
 /// Formats files in place, or with `--check` lists the ones that aren't formatted and changes nothing.
@@ -236,12 +325,12 @@ fn format_files(args: &[String]) -> ExitCode {
 }
 
 /// Prints diagnostics, each pointing into the file it came from (the page or one of its imports).
-fn report(diagnostics: &[Diagnostic], sources: &[Source], entry: &str, json_format: bool) {
+/// With `--format json`, adds them to `all`, which is printed at the end.
+fn report(diagnostics: &[Diagnostic], sources: &[Source], entry: &str, json_format: bool, all: &mut Vec<Json>) {
     let source_of =
         |d: &Diagnostic| sources.get(d.pos.file).map(|s| (s.path.as_str(), s.text.as_str())).unwrap_or((entry, ""));
     if json_format {
-        let list: Vec<Json> = diagnostics.iter().map(|d| d.to_json(source_of(d).0)).collect();
-        println!("{}", serde_json::to_string_pretty(&list).unwrap_or_default());
+        all.extend(diagnostics.iter().map(|d| d.to_json(source_of(d).0)));
     } else {
         for d in diagnostics {
             let (path, text) = source_of(d);

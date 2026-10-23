@@ -3,6 +3,13 @@
 Hypra is pre-1.0: a minor version (0.2, 0.3) may change the language or its output, a patch version (0.1.1) only
 fixes and adds checks.
 
+## Unreleased
+
+- `hypra check` and `hypra build` take several files, and folders: `hypra check views` checks every `.hypra`
+  file in it, and `hypra build views --target js --out dist` builds every page, in the same subfolders
+- The reference says how to style pages: Hypra writes no CSS, so a page needs a stylesheet or a framework like
+  Tailwind, best in its layout
+
 ## 0.2.1
 
 - The VS Code extension finds the compiler a project installed, with `npm install hypra` or
