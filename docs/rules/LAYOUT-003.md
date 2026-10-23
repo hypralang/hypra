@@ -20,7 +20,6 @@ layout Shop(lang: "en", title_suffix: " | Shop") {
 
 page(title: "Shoes", description: "All our running shoes, from light racers to trail shoes.", layout: Shop) {
   h1 "Shoes"
-
 }
 ```
 
@@ -34,6 +33,5 @@ layout Shop(lang: "en", title_suffix: " | Shop") {
 
 page(title: "Shoes", description: "All our running shoes, from light racers to trail shoes.", layout: Shop) {
   h1 "Shoes"
-
 }
 ```

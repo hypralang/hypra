@@ -21,7 +21,6 @@ use "components/reveiw-card.hypra"
 
 page(title: "Shoes", description: "All our running shoes, from light racers to trail shoes.") {
   h1 "Shoes"
-
 }
 ```
 
@@ -32,6 +31,5 @@ use "components/review-card.hypra"
 
 page(title: "Shoes", description: "All our running shoes, from light racers to trail shoes.") {
   h1 "Shoes"
-
 }
 ```

@@ -14,7 +14,6 @@ layout Shop(layout: Shop) {
 
 page(title: "Shoes", description: "All our running shoes, from light racers to trail shoes.", layout: Shop) {
   h1 "Shoes"
-
 }
 ```
 
@@ -32,6 +31,5 @@ layout Shop(layout: Base) {
 
 page(title: "Shoes", description: "All our running shoes, from light racers to trail shoes.", layout: Shop) {
   h1 "Shoes"
-
 }
 ```
