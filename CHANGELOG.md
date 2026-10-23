@@ -3,7 +3,7 @@
 Hypra is pre-1.0: a minor version (0.2, 0.3) may change the language or its output, a patch version (0.1.1) only
 fixes and adds checks.
 
-## Unreleased
+## 0.4.0
 
 - The VS Code extension previews a page next to the editor (Ctrl+K V): as a browser shows it, and the Markdown
   and JSON it compiles to. It's rendered again on every save, with the data from `product.json` next to

@@ -2,8 +2,9 @@
 
 1. Give the version its heading in `CHANGELOG.md`, in place of `Unreleased`. Set the version in `Cargo.toml`,
    `editors/vscode/package.json` and `js/package.json`, and in `php/laravel/composer.json` the `hypra/runtime`
-   version it requires and the version its path repository gives `php/runtime`. Run `cargo build` and
-   `npm install` in `editors/vscode` to update the lock files, and commit.
+   version it requires and the version its path repository gives `php/runtime`, and in `starter/package.json` the
+   `hypra` version it requires. Run `cargo build` and `npm install` in `editors/vscode` to update the lock files,
+   and commit.
 2. Tag it and push the tag:
 
    ```console
