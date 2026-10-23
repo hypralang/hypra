@@ -317,6 +317,14 @@ No Rust needed: `php artisan hypra:install` downloads the compiler for your mach
 
 ## Getting started
 
+To start a site, copy the [starter](starter), a small styled shop with pages, a layout, a component and a Node
+server:
+
+```console
+$ npx degit hypralang/hypra/starter my-site
+$ cd my-site && npm install && npm start
+```
+
 `npm install hypra` brings the compiler for Linux, macOS or Windows; run it with `npx hypra`. It's also in the
 [releases](https://github.com/hypralang/hypra/releases), where each release lists the SHA-256 checksums in
 `SHA256SUMS`. With Rust installed, `cargo install hypra` works too, or build it from source:

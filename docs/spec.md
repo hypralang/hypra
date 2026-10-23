@@ -170,6 +170,9 @@ page(layout: Site, title: "Trail running shoes", description: "Light trail runni
 }
 ```
 
+The [starter](../starter) is a whole site styled this way with a plain stylesheet, dark mode included:
+`npx degit hypralang/hypra/starter my-site`.
+
 The Tailwind script builds the CSS in the browser, which is fine to start with. For a site that ships, build it
 ahead of time: Tailwind 4 finds the classes in `.hypra` files by itself, and Tailwind 3 needs them in `content`,
 e.g. `content: ["./views/**/*.hypra"]`. Styles never change the Markdown and JSON versions of a page.

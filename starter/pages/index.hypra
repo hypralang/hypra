@@ -1,0 +1,37 @@
+use "../layouts/site.hypra"
+use "../components/coffee-card.hypra"
+
+page(layout: Site, title: "Small-batch coffee, roasted weekly", description: "Single-origin coffees from Ethiopia, Colombia and Guatemala, roasted in small batches every Tuesday and shipped the same week.") {
+  props(coffees: List)
+
+  section(class: "hero") {
+    div(class: "wrap hero-grid") {
+      div {
+        p(class: "eyebrow") "Roasted every Tuesday"
+        h1 "Coffee that tastes like where it grew"
+        p(class: "lede") "Three single-origin coffees, roasted light enough to taste the farm and shipped within days of roasting."
+        a("#coffees", class: "button") "See this week's coffees"
+      }
+      img("/photos/hero.jpg", alt: "Kettles and a glass pour-over brewer on a coffee bar", width: 1000, height: 750, class: "hero-art")
+    }
+  }
+
+  section(id: "coffees", class: "wrap section") {
+    h2 "This week's coffees"
+    div(class: "grid") {
+      for coffee in coffees { CoffeeCard(coffee: coffee) }
+    }
+  }
+
+  section(id: "subscribe", class: "wrap section subscribe") {
+    div {
+      h2 "A bag every two weeks"
+      p "Pick a coffee or let us choose. Pause or cancel whenever you like."
+    }
+    form("/subscribe", name: "subscribe", description: "Subscribe to a coffee delivery every two weeks", class: "stack") {
+      field("email", type: Email, label: "Email")
+      field("grind", type: Choice(whole: "Whole bean", filter: "Ground for filter", espresso: "Ground for espresso"), label: "Grind", default: "whole")
+      button(class: "button") "Subscribe"
+    }
+  }
+}

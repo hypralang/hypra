@@ -1,0 +1,427 @@
+/* Northbound Coffee: the starter's stylesheet. Hypra writes no CSS, so every page gets its look from here. */
+
+:root {
+  --bg: #fbf7f1;
+  --surface: #ffffff;
+  --text: #2b1d14;
+  --muted: #6b5a4d;
+  --line: #e7dccd;
+  --brand: #2b1d14;
+  --accent: #c9822b;
+  --button: #2b1d14;
+  --button-text: #fbf7f1;
+  --radius: 14px;
+  --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+  --sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #17110d;
+    --surface: #211912;
+    --text: #f3e9dc;
+    --muted: #b4a594;
+    --line: #3a2d23;
+    --brand: #f3e9dc;
+    --button: #e3a857;
+    --button-text: #17110d;
+    color-scheme: dark;
+  }
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: 17px/1.6 var(--sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+a {
+  color: inherit;
+  text-underline-offset: 3px;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--serif);
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+
+h1 {
+  font-size: clamp(2.2rem, 5vw, 3.6rem);
+}
+
+h2 {
+  font-size: clamp(1.6rem, 3vw, 2.2rem);
+  margin-bottom: 1.5rem;
+}
+
+h3 {
+  font-size: 1.3rem;
+}
+
+p {
+  margin: 0;
+}
+
+.wrap {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.section {
+  padding-top: 72px;
+  padding-bottom: 24px;
+}
+
+.stack > * + * {
+  margin-top: 1rem;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+.skip {
+  position: absolute;
+  left: -9999px;
+}
+
+.skip:focus {
+  left: 16px;
+  top: 16px;
+  z-index: 10;
+  background: var(--surface);
+  padding: 8px 14px;
+  border-radius: 8px;
+}
+
+:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 3px;
+}
+
+/* header and footer */
+
+.site-header {
+  border-bottom: 1px solid var(--line);
+  background: color-mix(in srgb, var(--bg) 85%, transparent);
+  backdrop-filter: blur(8px);
+  position: sticky;
+  top: 0;
+  z-index: 5;
+}
+
+.bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 68px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--serif);
+  font-size: 1.25rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.site-header nav {
+  display: flex;
+  gap: 28px;
+}
+
+.site-header nav a {
+  text-decoration: none;
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.site-header nav a:hover {
+  color: var(--text);
+}
+
+.site-footer {
+  margin-top: 96px;
+  padding: 40px 0 56px;
+  border-top: 1px solid var(--line);
+  font-size: 0.95rem;
+}
+
+.site-footer p + p {
+  margin-top: 6px;
+}
+
+/* buttons and text */
+
+.button {
+  display: inline-block;
+  border: 0;
+  border-radius: 999px;
+  background: var(--button);
+  color: var(--button-text);
+  font: 600 1rem var(--sans);
+  padding: 14px 26px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+.button:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.lede {
+  font-size: 1.2rem;
+  color: var(--muted);
+  max-width: 34em;
+}
+
+/* home */
+
+.hero {
+  padding: 64px 0 24px;
+}
+
+.hero-art {
+  border-radius: var(--radius);
+  box-shadow: 0 30px 60px -30px rgb(43 29 20 / 0.5);
+}
+
+.hero-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  gap: 48px;
+}
+
+.hero-grid h1 {
+  margin: 14px 0 20px;
+}
+
+.hero-grid .button {
+  margin-top: 32px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 28px;
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 16px 16px 22px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 14px 30px -18px rgb(43 29 20 / 0.45);
+}
+
+.card img {
+  border-radius: 10px;
+  margin-bottom: 16px;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+}
+
+.card-link {
+  text-decoration: none;
+}
+
+.card .origin {
+  color: var(--accent);
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-top: 4px;
+}
+
+.card .notes {
+  color: var(--muted);
+  margin-top: 8px;
+}
+
+.card .price {
+  margin-top: 14px;
+  font-weight: 600;
+}
+
+.subscribe {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 48px;
+  align-items: start;
+}
+
+.subscribe form {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 28px;
+}
+
+/* forms: field() writes a label and an input in a div */
+
+label {
+  display: block;
+  font-weight: 600;
+  font-size: 0.95rem;
+  margin-bottom: 6px;
+}
+
+input,
+select,
+textarea {
+  width: 100%;
+  font: inherit;
+  color: inherit;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 11px 14px;
+}
+
+/* coffee page */
+
+.product {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 56px;
+  align-items: start;
+  padding-top: 56px;
+}
+
+.product-art {
+  border-radius: var(--radius);
+  position: sticky;
+  top: 96px;
+}
+
+.facts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px 28px;
+  margin: 28px 0;
+  padding: 24px 0;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+
+.facts dt {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+}
+
+.facts dd {
+  margin: 4px 0 0;
+  font-weight: 500;
+}
+
+.buy {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.buy .price {
+  font-size: 1.6rem;
+  font-family: var(--serif);
+  font-weight: 600;
+}
+
+.buy .price span {
+  font: 400 1rem var(--sans);
+}
+
+.buy form {
+  margin: 0;
+}
+
+.steps {
+  counter-reset: step;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+}
+
+.steps li {
+  counter-increment: step;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 22px;
+}
+
+.steps li::before {
+  content: counter(step);
+  display: block;
+  font-family: var(--serif);
+  font-size: 1.6rem;
+  color: var(--accent);
+  margin-bottom: 6px;
+}
+
+@media (max-width: 800px) {
+  .hero-grid,
+  .subscribe,
+  .product {
+    grid-template-columns: 1fr;
+  }
+
+  .product-art {
+    position: static;
+  }
+
+  .site-header nav {
+    gap: 18px;
+  }
+}
+
+/* a coffee's own colour is dark; lighten it where it's text on a dark page */
+@media (prefers-color-scheme: dark) {
+  .eyebrow,
+  .card .origin {
+    color: color-mix(in srgb, var(--accent) 55%, white);
+  }
+}

@@ -3,6 +3,11 @@
 Hypra is pre-1.0: a minor version (0.2, 0.3) may change the language or its output, a patch version (0.1.1) only
 fixes and adds checks.
 
+## Unreleased
+
+- [starter](starter): a small, styled site to start from, with pages, a layout, a component, dark mode and a
+  Node server that answers in HTML, Markdown and JSON: `npx degit hypralang/hypra/starter my-site`
+
 ## 0.3.1
 
 - `hypra fmt` takes folders too, like `check` and `build`

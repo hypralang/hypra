@@ -1,0 +1,12 @@
+// A coffee in a grid of coffees: photo, name, origin, tasting notes and price.
+component CoffeeCard(coffee: Coffee) {
+  article(class: "card", style: "--accent: {coffee.color}") {
+    a("/coffee/{coffee.slug}", class: "card-link") {
+      img(coffee.photo, alt: coffee.photo_alt, width: 1000, height: 750)
+      h3 "{coffee.name}"
+    }
+    p(class: "origin") "{coffee.origin}"
+    p(class: "notes") "{coffee.notes}"
+    p(class: "price") "€{coffee.price}"
+  }
+}

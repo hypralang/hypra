@@ -90,6 +90,15 @@ fn a_build_passes_over_folders_of_components() {
 }
 
 #[test]
+fn the_starter_is_clean() {
+    let (code, stderr) = hypra(&["check", "starter/pages", "starter/layouts", "starter/components"]);
+    assert_eq!(code, 0, "{stderr}");
+    assert!(stderr.contains("0 errors, 0 warnings"), "{stderr}");
+    let (code, stderr) = hypra(&["fmt", "--check", "starter"]);
+    assert_eq!(code, 0, "{stderr}");
+}
+
+#[test]
 fn fmt_takes_folders() {
     let (code, stderr) = hypra(&["fmt", "--check", "examples", "site/pages"]);
     assert_eq!(code, 0, "{stderr}");

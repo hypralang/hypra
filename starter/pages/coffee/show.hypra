@@ -1,0 +1,31 @@
+use "../../layouts/site.hypra"
+
+page(layout: Site, title: "{coffee.name}, {coffee.origin}", description: "{coffee.name} from {coffee.origin}: {coffee.notes}. Roasted every Tuesday, €{coffee.price} for 250 g.") {
+  props(coffee: Coffee)
+
+  div(class: "wrap product", style: "--accent: {coffee.color}") {
+    img(coffee.photo, alt: coffee.photo_alt, width: 1000, height: 750, class: "product-art")
+    div(class: "stack") {
+      p(class: "eyebrow") "{coffee.origin}"
+      h1 "{coffee.name}"
+      p(class: "lede") "{coffee.story}"
+      dl(class: "facts") {
+        div { dt "Tastes like" dd "{coffee.notes}" }
+        div { dt "Process" dd "{coffee.process}" }
+        div { dt "Altitude" dd "{coffee.altitude}" }
+        div { dt "Roast" dd "{coffee.roast}" }
+      }
+      div(class: "buy") {
+        p(class: "price") { "€{coffee.price} " span(class: "muted") "for 250 g" }
+        action("cart.add", id: coffee.slug, class: "button") "Add to cart"
+      }
+    }
+  }
+
+  section(class: "wrap section") {
+    h2 "How we brew it"
+    ol(class: "steps") {
+      for step in coffee.brew { li "{step}" }
+    }
+  }
+}
