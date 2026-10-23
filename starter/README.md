@@ -16,6 +16,9 @@ http://localhost:3000
 $ curl -H "Accept: text/markdown" localhost:3000/coffee/huila
 ```
 
+Building a site with an AI agent? Point it here as an example of how a Hypra site fits together. It should build
+your site the same way, with your content and design, not copy the coffee shop.
+
 ## What's where
 
 | Path | What |
