@@ -330,12 +330,16 @@ $ ./target/release/hypra build examples/product.hypra --data examples/product.js
 
 ```text
 hypra build <file.hypra> [--data data.json] [--out dir]
-hypra build <file.hypra> --target php [--out dir]
-hypra build <file.hypra> --target js [--out dir]
-hypra check <file.hypra> [--data data.json] [--format json]
+hypra build <path>... --target php [--out dir]
+hypra build <path>... --target js [--out dir]
+hypra check <path>... [--format json]
+hypra check <file.hypra> --data data.json
 hypra fmt [--check] <file.hypra>...
 hypra lsp
 ```
+
+A path can be a folder: `hypra check views` checks every `.hypra` file in it, and
+`hypra build views --target js --out dist` builds its pages into `dist`, in the same subfolders.
 
 For VS Code and Cursor, [editors/vscode](editors/vscode) adds highlighting, errors as you type, Go to
 Definition, Find All References, Rename, hover help and Format Document. They come from `hypra lsp`, a language server, so other editors get
