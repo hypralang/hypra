@@ -29,6 +29,12 @@ const docs = [
     description: "Use .hypra files as Laravel views: install the compiler, render pages, answer agents in Markdown and JSON.",
   },
   {
+    slug: "js",
+    file: "js/README.md",
+    nav: "JavaScript",
+    description: "Render Hypra pages in Node, Bun and Deno: compile with npx hypra, serve HTML, Markdown and JSON from one URL.",
+  },
+  {
     slug: "php",
     file: "php/runtime/README.md",
     nav: "PHP runtime",
@@ -186,7 +192,7 @@ const landing = {
     markdown: highlight(read("product.md"), "markdown", true),
     tools: highlight(JSON.stringify(JSON.parse(read("product.webmcp.json")), null, 2), "json", true),
     errors: terminal(check.stderr.trim()),
-    install_cli: shell(["cargo install hypra"]),
+    install_cli: shell(["npm install hypra", "cargo install hypra"]),
     install_laravel: shell(["composer require hypra/laravel", "php artisan hypra:install"]),
     install_vscode: shell([
       "# Cursor, VSCodium and other editors that install from Open VSX",

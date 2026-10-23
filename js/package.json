@@ -1,0 +1,45 @@
+{
+  "name": "hypra",
+  "version": "0.1.1",
+  "description": "The Hypra compiler and the runtime for its JavaScript pages: accessible HTML for browsers, Markdown for LLMs and WebMCP tools for AI agents, from one file.",
+  "keywords": [
+    "hypra",
+    "templates",
+    "html",
+    "markdown",
+    "accessibility",
+    "seo",
+    "webmcp",
+    "llm"
+  ],
+  "homepage": "https://hypralang.dev/docs/js/",
+  "bugs": {
+    "url": "https://github.com/hypralang/hypra/issues"
+  },
+  "license": "(MIT OR Apache-2.0)",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hypralang/hypra.git",
+    "directory": "js"
+  },
+  "type": "module",
+  "bin": {
+    "hypra": "bin/hypra.js"
+  },
+  "exports": {
+    "./runtime": {
+      "types": "./runtime.d.ts",
+      "default": "./runtime.js"
+    }
+  },
+  "files": [
+    "bin/",
+    "runtime.js",
+    "runtime.d.ts",
+    "LICENSE-APACHE",
+    "LICENSE-MIT"
+  ],
+  "engines": {
+    "node": ">=18"
+  }
+}

@@ -5,6 +5,9 @@ fixes and adds checks.
 
 ## Unreleased
 
+- JavaScript: `hypra build --target js` compiles a page to an ES module that renders at request time in Node, Bun
+  and Deno, exactly like the static build. The `hypra` npm package has the runtime, with types, and the compiler
+  for every system: `npx hypra build`. `output.negotiate(accept)` serves HTML, Markdown or JSON from one URL.
 - [Hypra with AI coding agents](https://hypralang.dev/docs/agents/): what to tell Claude Code, Codex, Cursor and
   Copilot so they write Hypra, and [llms-full.txt](https://hypralang.dev/llms-full.txt) with all the docs in one file
 - Every rule has a page on [hypralang.dev/rules](https://hypralang.dev/rules/), with an example that breaks it and

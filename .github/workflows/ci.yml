@@ -19,6 +19,8 @@ jobs:
       - run: cargo fmt --check
       - run: cargo clippy --all-targets -- -D warnings
       - run: php --version
+      # the JavaScript runtime is tested with Node
+      - run: node --version
       # the W3C validator checks the HTML of the differential test's random pages; npm has pinned versions
       - run: npm install --no-save vnu-jar@26.10.12
       - run: cargo test

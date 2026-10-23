@@ -10,6 +10,7 @@ pub mod help;
 pub mod html;
 pub mod interp;
 pub mod ir;
+pub mod js;
 pub mod lexer;
 pub mod lower;
 pub mod lsp;
@@ -90,9 +91,28 @@ pub fn php_file(path: &str) -> Generated {
 
 /// Compiles the page at `entry` to PHP, loading it and its imports through `load`.
 pub fn php_with(entry: &str, load: &dyn Fn(&str) -> Result<String, String>) -> Generated {
+    generate(entry, load, php::emit)
+}
+
+/// Compiles a page from disk to a JavaScript module for the runtime in the `hypra` npm package.
+pub fn js_file(path: &str) -> Generated {
+    js_with(path, &read_disk)
+}
+
+/// Compiles the page at `entry` to JavaScript, loading it and its imports through `load`.
+pub fn js_with(entry: &str, load: &dyn Fn(&str) -> Result<String, String>) -> Generated {
+    generate(entry, load, js::emit)
+}
+
+/// Compiles the page at `entry` to code with `emit`, which gets the source paths for error locations.
+fn generate(
+    entry: &str,
+    load: &dyn Fn(&str) -> Result<String, String>,
+    emit: fn(&ir::Program, &[&str]) -> String,
+) -> Generated {
     let Frontend { program, diagnostics, sources } = frontend(entry, load, true);
     let paths: Vec<&str> = sources.iter().map(|s| s.path.as_str()).collect();
-    let code = program.map(|p| php::emit(&p, &paths));
+    let code = program.map(|p| emit(&p, &paths));
     Generated { code, diagnostics: in_order(diagnostics), sources }
 }
 

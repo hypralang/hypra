@@ -14,7 +14,8 @@ fn options_need_their_values() {
         (&["build", "examples/product.hypra", "--out"][..], "--out needs a value"),
         (&["check", "examples/product.hypra", "--data"], "--data needs a value"),
         (&["check", "examples/product.hypra", "--format", "xml"], "unknown format `xml`"),
-        (&["build", "examples/product.hypra", "--target", "js"], "unknown target `js`"),
+        (&["build", "examples/product.hypra", "--target", "python"], "unknown target `python`"),
+        (&["build", "examples/product.hypra", "--target", "js", "--data", "x.json"], "--data doesn't apply"),
         (&["build", "examples/product.hypra", "--out", "--data", "x.json"], "--out needs a value"),
     ] {
         let (code, stderr) = hypra(args);
@@ -39,6 +40,18 @@ fn the_php_target_lists_its_sources() {
     assert!(sources[0].ends_with("examples/product.hypra"), "{sources:?}");
     assert!(sources.len() > 1, "imports are listed too: {sources:?}");
     assert!(out.join("product.php").exists());
+}
+
+#[test]
+fn the_js_target_writes_a_module_with_its_types() {
+    let out = std::path::PathBuf::from(env!("CARGO_TARGET_TMPDIR")).join("cli-js");
+    let (code, stderr) = hypra(&["build", "examples/product.hypra", "--target", "js", "--out", out.to_str().unwrap()]);
+    assert_eq!(code, 0, "{stderr}");
+    let module = std::fs::read_to_string(out.join("product.mjs")).unwrap();
+    assert!(module.contains("import { Page } from \"hypra/runtime\";"), "{module}");
+    let types = std::fs::read_to_string(out.join("product.d.mts")).unwrap();
+    assert!(types.contains("declare const page: Page;"), "{types}");
+    assert!(out.join("product.sources.json").exists());
 }
 
 #[test]

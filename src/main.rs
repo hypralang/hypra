@@ -1,11 +1,12 @@
 use hypra::diag::Diagnostic;
-use hypra::{Source, check_file, compile_file, php_file};
+use hypra::{Generated, Source, check_file, compile_file, js_file, php_file};
 use serde_json::{Value as Json, json};
 use std::{env, fs, path::Path, path::PathBuf, process::ExitCode};
 
 const USAGE: &str = "usage:
   hypra build <file.hypra> [--data data.json] [--out dir]   html, md, json and webmcp.json from data
   hypra build <file.hypra> --target php [--out dir]         a PHP page for the hypra/runtime package
+  hypra build <file.hypra> --target js [--out dir]          a JavaScript module for the hypra npm package
   hypra check <file.hypra> [--data data.json] [--format json]
                                                             with data, also checks the data
   hypra fmt [--check] <file.hypra>...                       formats files; --check lists those that need it
@@ -17,6 +18,7 @@ const USAGE: &str = "usage:
 enum Target {
     Static,
     Php,
+    Js,
 }
 
 fn main() -> ExitCode {
@@ -69,7 +71,7 @@ fn run() -> ExitCode {
     };
 
     let stem = Path::new(&file).file_stem().and_then(|s| s.to_str()).unwrap_or("page").to_string();
-    let (diagnostics, sources, files) = match target {
+    let (diagnostics, sources, files): Built = match target {
         // without data there's nothing to render, so check everything else
         Target::Static if cmd == "check" && data_path.is_none() => {
             let result = check_file(&file);
@@ -80,14 +82,14 @@ fn run() -> ExitCode {
             let files = result.output.map(|out| static_files(&stem, &out));
             (result.diagnostics, result.sources, files)
         }
-        Target::Php => {
-            let result = php_file(&file);
-            // the files the page was built from, so a server knows when to rebuild it
-            let paths: Vec<&str> = result.sources.iter().map(|s| s.path.as_str()).collect();
-            let manifest = format!("{}\n", serde_json::to_string(&paths).expect("paths are strings"));
-            let files =
-                result.code.map(|code| vec![(format!("{stem}.php"), code), (format!("{stem}.sources.json"), manifest)]);
-            (result.diagnostics, result.sources, files)
+        Target::Php => generated(php_file(&file), &stem, "php"),
+        Target::Js => {
+            // .mjs is a module in every project, with or without "type": "module"; .d.mts types it for TypeScript
+            let (diagnostics, sources, mut files) = generated(js_file(&file), &stem, "mjs");
+            let types =
+                "import type { Page } from \"hypra/runtime\";\n\ndeclare const page: Page;\nexport default page;\n";
+            files.iter_mut().for_each(|files| files.insert(1, (format!("{stem}.d.mts"), types.to_string())));
+            (diagnostics, sources, files)
         }
     };
 
@@ -106,6 +108,18 @@ fn run() -> ExitCode {
         eprintln!("{}, {}", plural(errors, "error"), plural(diagnostics.len() - errors, "warning"));
     }
     if errors > 0 { ExitCode::from(1) } else { ExitCode::SUCCESS }
+}
+
+/// What a build found, the files it read, and the files to write as (name, contents) when it found no error.
+type Built = (Vec<Diagnostic>, Vec<Source>, Option<Vec<(String, String)>>);
+
+/// A page compiled to code: the code, and the files it was built from, so a server knows when to rebuild it.
+fn generated(result: Generated, stem: &str, ext: &str) -> Built {
+    let paths: Vec<&str> = result.sources.iter().map(|s| s.path.as_str()).collect();
+    let manifest = format!("{}\n", serde_json::to_string(&paths).expect("paths are strings"));
+    let files =
+        result.code.map(|code| vec![(format!("{stem}.{ext}"), code), (format!("{stem}.sources.json"), manifest)]);
+    (result.diagnostics, result.sources, files)
 }
 
 /// What `build` and `check` were asked to do.
@@ -144,7 +158,8 @@ fn parse_options(cmd: &str, rest: &[String]) -> Result<Options, ExitCode> {
                 ("--format", _) => return Err(unknown("`text` or `json`")),
                 ("--target", "static") => target = Target::Static,
                 ("--target", "php") => target = Target::Php,
-                _ => return Err(unknown("`static` or `php`")),
+                ("--target", "js") => target = Target::Js,
+                _ => return Err(unknown("`static`, `php` or `js`")),
             }
         } else if file.is_none() && !option.starts_with("--") {
             file = Some(arg.clone());
@@ -157,8 +172,8 @@ fn parse_options(cmd: &str, rest: &[String]) -> Result<Options, ExitCode> {
         eprintln!("{USAGE}");
         return Err(ExitCode::from(2));
     };
-    if target == Target::Php && data_path.is_some() {
-        eprintln!("--data doesn't apply to --target php: the PHP page receives its data when it renders");
+    if target != Target::Static && data_path.is_some() {
+        eprintln!("--data doesn't apply to --target php or js: the page receives its data when it renders");
         return Err(ExitCode::from(2));
     }
     Ok(Options { file, data_path, out_dir, json_format, target })

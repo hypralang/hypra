@@ -1,13 +1,13 @@
 //! Differential testing: random valid pages with random data must render exactly the same in the
-//! Rust interpreter and in the PHP runtime, and produce valid HTML.
+//! Rust interpreter, the PHP runtime and the JavaScript runtime, and produce valid HTML.
 //!
-//! The PHP comparison is skipped when `php` isn't installed. HTML validation runs when `VNU_JAR` points
+//! The PHP and JavaScript comparisons are skipped when `php` or `node` isn't installed. HTML validation runs when `VNU_JAR` points
 //! at the W3C Nu Html Checker (`vnu.jar`); CI downloads it.
 
 mod common;
 
 use common::{php_available, runtime_dir};
-use hypra::{compile_with, php_with};
+use hypra::{compile_with, js_with, php_with};
 use serde_json::{Value as Json, json};
 use std::path::PathBuf;
 use std::process::Command;
@@ -212,6 +212,7 @@ struct Case {
     data: Json,
     expected: hypra::interp::Output,
     php: String,
+    js: String,
 }
 
 /// Builds every case that compiles; a generated page with errors is a bug in the generator.
@@ -226,7 +227,8 @@ fn cases() -> Vec<Case> {
             let errors: Vec<_> = compiled.diagnostics.iter().filter(|d| d.is_error()).collect();
             assert!(errors.is_empty(), "seed {seed}: {errors:?}\n{source}");
             let php = php_with("page.hypra", &load).code.expect("compiles");
-            Case { seed, expected: compiled.output.expect("no errors"), source, data, php }
+            let js = js_with("page.hypra", &load).code.expect("compiles");
+            Case { seed, expected: compiled.output.expect("no errors"), source, data, php, js }
         })
         .collect()
 }
@@ -270,9 +272,51 @@ echo json_encode($results);
     let out = Command::new("php").arg(dir.join("harness.php")).output().unwrap();
     assert!(out.status.success(), "{}", String::from_utf8_lossy(&out.stderr));
     let results: Json = serde_json::from_slice(&out.stdout).unwrap();
+    assert_same(&cases, &results, "php");
+}
 
-    let mut failures = vec![];
+#[test]
+fn js_and_rust_render_random_pages_identically() {
+    if !Command::new("node").arg("--version").output().is_ok_and(|o| o.status.success()) {
+        eprintln!("node not installed, skipping");
+        return;
+    }
+    let cases = cases();
+    let dir = work_dir("differential-js");
+    // compiled pages import "hypra/runtime", which an app finds in node_modules
+    std::fs::create_dir_all(dir.join("node_modules")).unwrap();
+    let runtime = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("js");
+    #[cfg(unix)]
+    std::os::unix::fs::symlink(runtime, dir.join("node_modules/hypra")).unwrap();
+    #[cfg(windows)]
+    std::os::windows::fs::symlink_dir(runtime, dir.join("node_modules/hypra")).unwrap();
     for case in &cases {
+        std::fs::write(dir.join(format!("{}.mjs", case.seed)), &case.js).unwrap();
+        std::fs::write(dir.join(format!("{}.json", case.seed)), case.data.to_string()).unwrap();
+    }
+    // one Node process renders every case
+    let harness = r#"import { readdirSync, readFileSync } from "node:fs";
+const results = {};
+for (const file of readdirSync(import.meta.dirname).filter((f) => /^\d+\.mjs$/.test(f))) {
+  const seed = file.slice(0, -4);
+  const { default: page } = await import(`./${file}`);
+  const data = JSON.parse(readFileSync(`${import.meta.dirname}/${seed}.json`, "utf8"));
+  const out = page.render(data, { strict: true, alternateUrl: "page.md" });
+  results[seed] = { html: out.html, markdown: out.markdown, json: out.json, webmcp: out.webmcp };
+}
+process.stdout.write(JSON.stringify(results));
+"#;
+    std::fs::write(dir.join("harness.mjs"), harness).unwrap();
+    let out = Command::new("node").arg(dir.join("harness.mjs")).output().unwrap();
+    assert!(out.status.success(), "{}", String::from_utf8_lossy(&out.stderr));
+    let results: Json = serde_json::from_slice(&out.stdout).unwrap();
+    assert_same(&cases, &results, "js");
+}
+
+/// Every case renders in another runtime exactly as in Rust; the first that doesn't is shown with its source.
+fn assert_same(cases: &[Case], results: &Json, runtime: &str) {
+    let mut failures = vec![];
+    for case in cases {
         let actual = &results[case.seed.to_string()];
         let same = actual["html"] == case.expected.html
             && actual["markdown"] == case.expected.markdown
@@ -284,14 +328,14 @@ echo json_encode($results);
     }
     if let Some(case) = failures.first() {
         let actual = &results[case.seed.to_string()];
-        let diff = |rust: &str, php: &str| {
-            if rust == php {
+        let diff = |rust: &str, other: &str| {
+            if rust == other {
                 return "same".to_string();
             }
             rust.lines()
-                .zip(php.lines())
+                .zip(other.lines())
                 .find(|(a, b)| a != b)
-                .map_or("one is longer".to_string(), |(a, b)| format!("rust: {a}\n php: {b}"))
+                .map_or("one is longer".to_string(), |(a, b)| format!("rust: {a}\n {runtime}: {b}"))
         };
         panic!(
             "{} of {} cases differ. First: seed {}\n{}\nhtml: {}\nmarkdown: {}\ndata: {}",
