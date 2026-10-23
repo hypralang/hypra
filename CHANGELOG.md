@@ -3,7 +3,7 @@
 Hypra is pre-1.0: a minor version (0.2, 0.3) may change the language or its output, a patch version (0.1.1) only
 fixes and adds checks.
 
-## Unreleased
+## 0.4.1
 
 - The preview of a layout or component shows a page that uses it, instead of an error that it has no page
 
