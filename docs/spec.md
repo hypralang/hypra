@@ -28,6 +28,31 @@ page(layout: Shop, title: "{product.name} – Running Shoes", description: "{pro
 }
 ```
 
+## From HTML
+
+Hypra is HTML written another way. Every HTML element and attribute works, so a Hypra page is designed exactly
+like an HTML page: the same layout, the same `class` names, the same CSS or Tailwind. Plan a page as you would
+in HTML, then write it like this:
+
+- `<h1>Welcome</h1>` → `h1 "Welcome"`
+- `<div class="card" id="intro">…</div>` → `div(class: "card", id: "intro") { … }`
+- `<a href="/guide" class="button">Read the guide</a>` → `a("/guide", class: "button") "Read the guide"`
+- `<p>Open <b>every day</b> from 9.</p>` → `p { "Open " b "every day" " from 9." }`
+- `<img src="/team.jpg" alt="The team at the summer meetup">` → `img("/team.jpg", alt: "The team at the summer meetup")`
+- `<img src="/divider.svg" alt="">` → `img("/divider.svg", decorative: true)`
+- `<input type="checkbox" checked>` → `input(type: "checkbox", checked: true)`
+- `<button @click="open = !open" data-menu="main">` → `button("@click": "open = !open", data-menu: "main")`
+- `<html lang="de" class="dark">`, `<title>` → `page(lang: "de", class: "dark", title: "…", description: "…")`
+- `<body class="bg-stone-50">` → `body(class: "bg-stone-50")`, with no content, inside the page or layout
+- `<link rel="stylesheet" href="/app.css">` → `link(rel: "stylesheet", href: "/app.css")` inside `head { }`
+- `<style>…</style>`, `<script>…</script>` → `style """ … """`, `script """ … """`
+- `<!-- comment -->` → `// comment`
+
+What changes is what HTML leaves to you: lists come from data with `for` instead of being copied, a header and
+footer shared by every page go in a `layout`, a piece used more than once becomes a `component`, and forms use
+`field`, which writes the label and the input together. The compiler then checks what browsers forgive:
+missing `alt`, skipped headings, vague links, unlabeled inputs.
+
 ## Rules
 
 1. **Every element has one shape:** `name(attributes) "text" { children }`. Each part is optional, and they
