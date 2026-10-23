@@ -9,6 +9,6 @@
     "start": "npm run build && node server.js"
   },
   "dependencies": {
-    "hypra": "^0.4.0"
+    "hypra": "^0.4.1"
   }
 }
