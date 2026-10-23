@@ -6,15 +6,18 @@ server: as HTML for browsers, Markdown for LLMs, JSON for apps and WebMCP tools 
 
 ```console
 $ npm install hypra
-$ npx hypra build views/product.hypra --target js --out views/dist
+$ npx hypra build views --target js --out views/dist
+✔ views/dist/home.mjs
+✔ views/dist/home.d.mts
+✔ views/dist/home.sources.json
 ✔ views/dist/product.mjs
 ✔ views/dist/product.d.mts
 ✔ views/dist/product.sources.json
-0 errors, 0 warnings
+2 files, 0 errors, 0 warnings
 ```
 
 The package brings the compiler for Linux, macOS and Windows on x64 and ARM; nothing is downloaded when it's
-installed. `npx hypra check` and `npx hypra fmt` work the same way.
+installed. `npx hypra check views` and `npx hypra fmt views` work the same way.
 
 ## Rendering a page
 
@@ -107,14 +110,16 @@ const output: Output = product.render({ product });
 
 ## Building every page
 
-Give `build` and `check` a folder, and they take every `.hypra` file in it. Pages keep their subfolders under
-`--out`; files with only components and layouts are built into the pages that import them:
+Give `build`, `check` and `fmt` a folder, and they take every `.hypra` file in it. Pages keep their place
+relative to that folder: `views/shop/cart.hypra` becomes `views/dist/shop/cart.mjs`. Files with only components
+and layouts are built into the pages that import them:
 
 ```json
 {
   "scripts": {
     "build:views": "hypra build views --target js --out views/dist",
-    "check:views": "hypra check views"
+    "check:views": "hypra check views",
+    "fmt:views": "hypra fmt --check views"
   }
 }
 ```

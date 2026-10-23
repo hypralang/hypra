@@ -9,7 +9,7 @@ const USAGE: &str = "usage:
   hypra build <path>... --target js [--out dir]             JavaScript modules for the hypra npm package
   hypra check <path>... [--format json]                     checks files, or every .hypra file in a folder
   hypra check <file.hypra> --data data.json                 also checks the data
-  hypra fmt [--check] <file.hypra>...                       formats files; --check lists those that need it
+  hypra fmt [--check] <path>...                             formats files; --check lists those that need it
   hypra fmt -                                               formats stdin to stdout, for editors
   hypra lsp                                                 a language server for editors, over stdin and stdout
   hypra --version";
@@ -150,8 +150,8 @@ struct Input {
 }
 
 /// The files the paths name: a file as it is, a folder as every `.hypra` file in it and its subfolders, which
-/// keep their place under `--out`. A build leaves out a folder's files that hold only components and layouts,
-/// since the pages that import them build them.
+/// keep their place under `--out`. A build leaves out files that hold only components and layouts, since the
+/// pages that import them build them, so a folder of them builds nothing.
 fn inputs(paths: &[String], build: bool) -> Result<Vec<Input>, String> {
     let mut inputs = vec![];
     for path in paths {
@@ -160,22 +160,32 @@ fn inputs(paths: &[String], build: bool) -> Result<Vec<Input>, String> {
             inputs.push(Input { file: path.clone(), out: PathBuf::new() });
             continue;
         }
-        let mut found = vec![];
-        hypra_files(root, &mut found).map_err(|e| format!("can't read {path}: {e}"))?;
-        found.sort();
-        let before = inputs.len();
-        for file in found {
+        for file in folder(path)? {
             if build && fs::read_to_string(&file).is_ok_and(|src| is_library(&src)) {
                 continue;
             }
             let out = file.parent().and_then(|p| p.strip_prefix(root).ok()).unwrap_or(Path::new("")).to_path_buf();
             inputs.push(Input { file: file.to_string_lossy().into_owned(), out });
         }
-        if inputs.len() == before {
-            return Err(format!("{path} has no .hypra {}", if build { "pages" } else { "files" }));
-        }
+    }
+    if inputs.is_empty() {
+        return Err(format!(
+            "no pages to build in {}: files with only components and layouts are built by the pages that use them",
+            paths.join(", ")
+        ));
     }
     Ok(inputs)
+}
+
+/// The `.hypra` files in a folder and its subfolders, in order; a folder without any is a mistake.
+fn folder(path: &str) -> Result<Vec<PathBuf>, String> {
+    let mut found = vec![];
+    hypra_files(Path::new(path), &mut found).map_err(|e| format!("can't read {path}: {e}"))?;
+    if found.is_empty() {
+        return Err(format!("{path} has no .hypra files"));
+    }
+    found.sort();
+    Ok(found)
 }
 
 /// Every `.hypra` file under `dir`, leaving out hidden folders and installed packages.
@@ -288,13 +298,27 @@ fn format_files(args: &[String]) -> ExitCode {
         };
     }
     let check = args.iter().any(|a| a == "--check");
-    let files: Vec<&String> = args.iter().filter(|a| *a != "--check").collect();
-    if files.is_empty() || files.iter().any(|f| f.starts_with("--")) {
+    let paths: Vec<&String> = args.iter().filter(|a| *a != "--check").collect();
+    if paths.is_empty() || paths.iter().any(|f| f.starts_with("--")) {
         eprintln!("{USAGE}");
         return ExitCode::from(2);
     }
+    let mut files = vec![];
+    for path in paths {
+        if !Path::new(path).is_dir() {
+            files.push(path.clone());
+            continue;
+        }
+        match folder(path) {
+            Ok(found) => files.extend(found.iter().map(|f| f.to_string_lossy().into_owned())),
+            Err(message) => {
+                eprintln!("{message}");
+                return ExitCode::from(2);
+            }
+        }
+    }
     let mut failed = false;
-    for file in files {
+    for file in &files {
         let src = match fs::read_to_string(file) {
             Ok(src) => src,
             Err(e) => {
