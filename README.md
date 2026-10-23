@@ -18,6 +18,8 @@
   <a href="js">JavaScript</a> ·
   <a href="php/laravel">Laravel</a> ·
   <a href="editors/vscode">VS Code</a> ·
+  <a href="ROADMAP.md">Roadmap</a> ·
+  <a href="CHANGELOG.md">Changelog</a> ·
   <a href="https://github.com/hypralang/hypra/releases">Download</a>
 </p>
 
@@ -370,14 +372,8 @@ link text, and don't stop it. The [spec](docs/spec.md#errors) lists every code.
 
 ## Contributing
 
-Issues and pull requests are welcome. [ROADMAP.md](ROADMAP.md) lists what's planned and
-[CHANGELOG.md](CHANGELOG.md) what changed in each release. Before opening a pull request:
-
-```console
-$ cargo fmt
-$ cargo clippy --all-targets -- -D warnings
-$ cargo test
-```
+Issues and pull requests are welcome; [CONTRIBUTING.md](CONTRIBUTING.md) says how. [ROADMAP.md](ROADMAP.md) lists
+what's planned and [CHANGELOG.md](CHANGELOG.md) what changed in each release.
 
 ## License
 
