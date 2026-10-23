@@ -36,8 +36,8 @@ impl Rng {
         (self.next() % n as u64) as usize
     }
 
-    fn pick<'a, T>(&mut self, items: &'a [T]) -> &'a T {
-        &items[self.below(items.len())]
+    fn pick<T: Copy>(&mut self, items: &[T]) -> T {
+        items[self.below(items.len())]
     }
 
     fn chance(&mut self, percent: u64) -> bool {
@@ -82,7 +82,7 @@ const NUMBERS: &[f64] = &[0.0, -1.0, 42.0, 3.5, 1e20, 1.5e-7, -0.25];
 fn data(rng: &mut Rng) -> Json {
     let text = |rng: &mut Rng| json!(rng.pick(STRINGS));
     let number = |rng: &mut Rng| {
-        let n = *rng.pick(NUMBERS);
+        let n = rng.pick(NUMBERS);
         if n.fract() == 0.0 && n.abs() < 1e15 { json!(n as i64) } else { json!(n) }
     };
     let items: Vec<Json> = (0..rng.below(4))

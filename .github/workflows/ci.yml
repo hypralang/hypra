@@ -27,6 +27,18 @@ jobs:
       - run: cargo run -q -- build examples/product.hypra --data examples/product.json
       - run: cargo run -q -- fmt --check $(git ls-files '*.hypra' ':!bench/runs')
 
+  msrv:
+    # the oldest Rust that `rust-version` in Cargo.toml promises; newer Rust accepts code that it doesn't
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - id: version
+        run: echo "rust=$(grep -m1 '^rust-version' Cargo.toml | cut -d '"' -f2)" >> "$GITHUB_OUTPUT"
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: ${{ steps.version.outputs.rust }}
+      - run: cargo test
+
   laravel:
     runs-on: ubuntu-latest
     steps:
