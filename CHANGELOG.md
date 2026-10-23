@@ -5,6 +5,9 @@ fixes and adds checks.
 
 ## Unreleased
 
+- The VS Code extension previews a page next to the editor (Ctrl+K V): as a browser shows it, and the Markdown
+  and JSON it compiles to. It's rendered again on every save, with the data from `product.json` next to
+  `product.hypra` if there is one
 - [starter](starter): a small, styled site to start from, with pages, a layout, a component, dark mode and a
   Node server that answers in HTML, Markdown and JSON: `npx degit hypralang/hypra/starter my-site`. The
   instructions for agents point to it as an example to build from, not a site to copy.

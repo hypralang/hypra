@@ -1,7 +1,7 @@
 {
   "name": "hypra",
   "displayName": "Hypra",
-  "description": "Highlighting, errors as you type, Go to Definition, references, rename, hover help and formatting for Hypra, the markup language for people and AI agents.",
+  "description": "Highlighting, a preview, errors as you type, Go to Definition, references, rename, hover help and formatting for Hypra, the markup language for people and AI agents.",
   "version": "0.3.1",
   "publisher": "hypralang",
   "homepage": "https://hypralang.dev/docs/vscode/",
@@ -80,11 +80,87 @@
           "description": "The hypra compiler: a command on your PATH or a full path to it. By default, the one the project installed with npm or `php artisan hypra:install`, else `hypra` on your PATH."
         }
       }
-    }
+    },
+    "commands": [
+      {
+        "command": "hypra.preview",
+        "title": "Open Preview to the Side",
+        "category": "Hypra",
+        "icon": "$(open-preview)"
+      },
+      {
+        "command": "hypra.preview.page",
+        "title": "Show the Page",
+        "category": "Hypra Preview",
+        "icon": "$(browser)"
+      },
+      {
+        "command": "hypra.preview.markdown",
+        "title": "Show the Markdown for AI Agents",
+        "category": "Hypra Preview",
+        "icon": "$(markdown)"
+      },
+      {
+        "command": "hypra.preview.json",
+        "title": "Show the JSON",
+        "category": "Hypra Preview",
+        "icon": "$(json)"
+      }
+    ],
+    "menus": {
+      "editor/title": [
+        {
+          "command": "hypra.preview",
+          "when": "editorLangId == hypra && isWorkspaceTrusted",
+          "group": "navigation"
+        },
+        {
+          "command": "hypra.preview.page",
+          "when": "activeWebviewPanelId == 'hypra.preview'",
+          "group": "navigation@1"
+        },
+        {
+          "command": "hypra.preview.markdown",
+          "when": "activeWebviewPanelId == 'hypra.preview'",
+          "group": "navigation@2"
+        },
+        {
+          "command": "hypra.preview.json",
+          "when": "activeWebviewPanelId == 'hypra.preview'",
+          "group": "navigation@3"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "hypra.preview",
+          "when": "editorLangId == hypra"
+        },
+        {
+          "command": "hypra.preview.page",
+          "when": "activeWebviewPanelId == 'hypra.preview'"
+        },
+        {
+          "command": "hypra.preview.markdown",
+          "when": "activeWebviewPanelId == 'hypra.preview'"
+        },
+        {
+          "command": "hypra.preview.json",
+          "when": "activeWebviewPanelId == 'hypra.preview'"
+        }
+      ]
+    },
+    "keybindings": [
+      {
+        "command": "hypra.preview",
+        "key": "ctrl+k v",
+        "mac": "cmd+k v",
+        "when": "editorLangId == hypra"
+      }
+    ]
   },
   "scripts": {
-    "test": "node test/grammar.test.mjs && node test/compiler.test.mjs",
-    "bundle": "esbuild extension.js --bundle --platform=node --external:vscode --minify --outfile=dist/extension.js",
+    "test": "node test/grammar.test.mjs && node test/compiler.test.mjs && node test/preview.test.mjs",
+    "bundle": "esbuild extension.js --bundle --platform=node --external:vscode --minify --outfile=dist/extension.js && cp ../../js/runtime.js dist/runtime.mjs",
     "package": "npm run bundle && cat ../../LICENSE-MIT ../../LICENSE-APACHE > LICENSE && vsce package"
   },
   "dependencies": {

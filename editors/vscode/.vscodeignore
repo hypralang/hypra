@@ -5,3 +5,5 @@ package-lock.json
 node_modules/**
 extension.js
 compiler.js
+preview.js
+preview-core.js
