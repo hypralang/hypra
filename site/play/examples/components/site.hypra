@@ -1,0 +1,12 @@
+// The frame around every page: the language, the header and the footer.
+layout Site(lang: "en", title_suffix: " · Harbour Library") {
+  header {
+    a("/") "Harbour Library"
+    nav(aria-label: "Main") {
+      a("/events") "Events"
+      a("/visit") "Opening hours and directions"
+    }
+  }
+  main { slot }
+  footer { p "Harbour Library, 2 Quay Street" }
+}

@@ -15,6 +15,7 @@
   <a href="https://hypralang.dev">Website</a> ·
   <a href="https://hypralang.dev/docs/">Docs</a> ·
   <a href="https://hypralang.dev/guides/">Guides</a> ·
+  <a href="https://hypralang.dev/play/">Playground</a> ·
   <a href="js">JavaScript</a> ·
   <a href="php/laravel">Laravel</a> ·
   <a href="editors/vscode">VS Code</a> ·
@@ -316,6 +317,9 @@ Route::hypra('cart.add', [CartController::class, 'add']);   // action("cart.add"
 No Rust needed: `php artisan hypra:install` downloads the compiler for your machine.
 
 ## Getting started
+
+To try it without installing anything, open the [playground](https://hypralang.dev/play/): it compiles as you
+type, in the browser.
 
 To start a site, copy the [starter](starter), a small styled shop with pages, a layout, a component and a Node
 server:

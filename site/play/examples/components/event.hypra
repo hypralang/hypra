@@ -1,0 +1,8 @@
+// One event: a component is checked once, wherever it's used.
+component Event(title: Text, day: Text, time: Text, room: Text, full: Bool = false) {
+  article {
+    h2 "{title}"
+    p "{day}, {time} · {room}"
+    if full { p { b "Full:" " there's a waiting list at the desk." } }
+  }
+}

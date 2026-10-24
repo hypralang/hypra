@@ -28,6 +28,7 @@ page(layout: Site, title: "Pages that compile", canonical: "https://hypralang.de
       p(class: "mt-6 max-w-xl text-[1.2rem] text-ink-2") "Hypra is a markup language with a compiler. One file becomes accessible HTML for browsers, Markdown for AI agents and typed tools for anything that acts on your site. A page with a mistake doesn't build, so nobody sees it."
       div(class: "mt-8 flex flex-wrap items-center gap-3 text-[15px]") {
         a("#install", class: "rounded-md bg-ink px-5 py-2.5 font-bold text-paper no-underline hover:bg-ink-2") "Install"
+        a("/play/", class: "rounded-md border border-ink px-5 py-2.5 font-bold no-underline hover:bg-ink hover:text-paper") "Try it in the browser"
         a("/docs/", class: "rounded-md border border-ink px-5 py-2.5 font-bold no-underline hover:bg-ink hover:text-paper") "Read the reference"
       }
       p(class: "mt-6 font-mono text-[14px] text-mute") "v{version} · Rust · MIT or Apache-2.0"

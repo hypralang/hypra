@@ -1,0 +1,17 @@
+// A page with data: change the article in data.json, or the page here, and watch every output follow.
+page(title: "{article.title}", description: "{article.summary}") {
+  props(article: Article)
+  article {
+    h1 "{article.title}"
+    p { "By " b "{article.author}" ", " time(datetime: article.published) "{article.date}" }
+    for paragraph in article.body { p "{paragraph}" }
+    h2 "What to change"
+    ul {
+      for tip in article.tips { li "{tip}" }
+    }
+  }
+  form("/newsletter", name: "newsletter", description: "Get new articles by email") {
+    field("email", type: Email, label: "Email")
+    button "Subscribe"
+  }
+}

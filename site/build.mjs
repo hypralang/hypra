@@ -3,8 +3,10 @@
 import { execFileSync, spawnSync } from "node:child_process";
 import { cpSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, renameSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { dirname, join, relative, resolve } from "node:path";
+import { basename, dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { deflateRawSync } from "node:zlib";
+import { build as bundle } from "esbuild";
 import { Marked } from "marked";
 import { createHighlighter } from "shiki";
 
@@ -141,6 +143,22 @@ execFileSync("cargo", ["build", "--release", "--quiet"], { cwd: repo, stdio: "in
 const hypra = join(repo, "target/release/hypra");
 const version = execFileSync(hypra, ["--version"], { encoding: "utf8" }).trim().replace("hypra ", "");
 
+// the playground's compiler: the same one, as WebAssembly (site/wasm); the build uses it too, for the examples
+execFileSync("cargo", ["build", "--release", "--quiet", "--target", "wasm32-unknown-unknown"], { cwd: join(site, "wasm"), stdio: "inherit" });
+const wasmFile = join(site, "wasm/target/wasm32-unknown-unknown/release/hypra_playground.wasm");
+const wasm = (await WebAssembly.instantiate(readFileSync(wasmFile))).instance.exports;
+/** Compiles files and data in the playground's compiler, the way the page does. */
+function playground(files, data) {
+  const bytes = new TextEncoder().encode(JSON.stringify({ files: Object.fromEntries(files), data: JSON.parse(data) }));
+  const ptr = wasm.input(bytes.length);
+  new Uint8Array(wasm.memory.buffer, ptr, bytes.length).set(bytes);
+  const len = wasm.compile();
+  return JSON.parse(new TextDecoder().decode(new Uint8Array(wasm.memory.buffer, wasm.output(), len)));
+}
+/** A link that opens files and data in the playground; the page reads them back from the address. */
+const playLink = (files, data = "{}\n") =>
+  `/play/#code=${deflateRawSync(JSON.stringify({ files, data })).toString("base64url")}`;
+
 const highlighter = await createHighlighter({
   themes: ["github-light", "github-dark"],
   langs: [
@@ -149,16 +167,17 @@ const highlighter = await createHighlighter({
   ],
 });
 const aliases = { console: "shellscript", sh: "shellscript", bash: "shellscript", text: "text", "": "text" };
-/** Highlighted code in a block that gets a copy button; `wrap` breaks long lines instead of scrolling, and `label`
- * names the block, e.g. "Output" for what the compiler wrote. */
-const highlight = (code, lang, wrap = false, label = "") => {
+/** Highlighted code in a block that gets a copy button; `wrap` breaks long lines instead of scrolling, `label`
+ * names the block, e.g. "Output" for what the compiler wrote, and `play` is a link to try it in the playground. */
+const highlight = (code, lang, wrap = false, label = "", play = "") => {
   const name = aliases[lang] ?? lang;
   const html = highlighter.codeToHtml(code.replace(/\n$/, ""), {
     lang: highlighter.getLoadedLanguages().includes(name) ? name : "text",
     themes: { light: "github-light", dark: "github-dark" },
     defaultColor: "light",
   });
-  return `<div class="codeblock${wrap ? " wrap" : ""}"${label ? ` data-label="${label}"` : ""}>${html}</div>`;
+  const tryIt = play ? `<a class="try" href="${play}">Try it</a>` : "";
+  return `<div class="codeblock${wrap ? " wrap" : ""}"${label ? ` data-label="${label}"` : ""}>${html}${tryIt}</div>`;
 };
 const escape = (text) => text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 /** The compiler's report, colored the way a terminal shows it. Its lines don't wrap, so the `^^^` under a line keep
@@ -215,7 +234,7 @@ const shell = (lines) => highlight(lines.join("\n"), "shellscript", true);
 const landing = {
   version,
   sample: {
-    source: highlight(sample.source, "hypra", true),
+    source: highlight(sample.source, "hypra", true, "", playLink([["product.hypra", sample.source]], `${JSON.stringify(sample.data, null, 2)}\n`)),
     html: highlight(body, "html", true),
     markdown: highlight(read("product.md"), "markdown", true),
     tools: highlight(JSON.stringify(JSON.parse(read("product.webmcp.json")), null, 2), "json", true),
@@ -262,6 +281,7 @@ const absoluteLinks = (doc) =>
 function render(doc, markdown) {
   const toc = [];
   const failures = doc.code ? ruleChecks(doc) : [];
+  const tries = tryLinks(doc);
   const marked = new Marked({
     renderer: {
       code({ text, lang }) {
@@ -269,10 +289,10 @@ function render(doc, markdown) {
         const [language, kind, ...rest] = (lang ?? "").split(/\s+/);
         if (language === "console" && kind === "output") return terminal(text, "Output");
         // a rule's examples: what `hypra check` says follows each one that fails
-        if (kind === "fails") return highlight(text, language, true) + terminal(failures.shift(), "hypra check");
+        if (kind === "fails") return highlight(text, language, true, "", tries.get(text)) + terminal(failures.shift(), "hypra check");
         if (kind === "file") return highlight(text, language, true, rest.join(" "));
         if (kind === "data") return highlight(text, language, true, "Data");
-        return highlight(text, language, true, kind === "output" ? "Output" : "");
+        return highlight(text, language, true, kind === "output" ? "Output" : "", tries.get(text));
       },
       heading({ tokens, depth, text }) {
         const id = slug(text);
@@ -289,6 +309,40 @@ function render(doc, markdown) {
     .parse(markdown)
     .replace(/<tr>\n<td>(?:<a [^>]+>)?<code>([A-Z0-9]+-\d{3})<\/code>/g, (row, code) => row.replace("<tr>", `<tr id="${code.toLowerCase()}">`));
   return { html, toc };
+}
+
+// the guides' example pages and their data, so a guide's page can open in the playground with its data
+const guideExamples = new Map(
+  readdirSync(join(repo, "docs/guides/examples"))
+    .filter((name) => name.endsWith(".hypra"))
+    .map((name) => {
+      const file = join(repo, "docs/guides/examples", name);
+      const data = file.replace(/\.hypra$/, ".json");
+      return [readFileSync(file, "utf8").trim(), readdirSync(dirname(file)).includes(basename(data)) ? readFileSync(data, "utf8") : "{}\n"];
+    }),
+);
+
+/** A "Try it" link for each example page in a doc, by its code: with the rule's other files and the data before it,
+ * or a guide example's data. Only pages the playground can compile as they are get one: a page whose data isn't in
+ * the doc would only say that its data is missing. */
+function tryLinks(doc) {
+  const links = new Map();
+  const blocks = new Marked().lexer(doc.markdown).filter((token) => token.type === "code");
+  const files = blocks.filter((b) => b.lang?.split(/\s+/)[1] === "file").map((b) => [b.lang.split(/\s+/)[2], `${b.text}\n`]);
+  let data = "{}\n";
+  for (const { lang = "", text } of blocks) {
+    const [language, kind] = lang.split(/\s+/);
+    if (language === "json" && kind === "data") data = `${text}\n`;
+    if (language !== "hypra" || ![undefined, "fails", "passes"].includes(kind) || !/^page\(/m.test(text)) continue;
+    const page = [["page.hypra", `${text}\n`], ...files];
+    const pageData = guideExamples.get(text.trim()) ?? data;
+    const result = playground(page, pageData);
+    // TYPE-001's own example is about the missing data
+    const missing = result.diagnostics.some((d) => (d.code === "TYPE-001" && doc.code !== "TYPE-001") || d.code.startsWith("IMPORT-"));
+    if (missing) continue;
+    links.set(text, playLink(page, pageData));
+  }
+  return links;
 }
 
 /** What `hypra check` says about each failing example of a rule, in order. The examples import the rule's other
@@ -363,6 +417,43 @@ for (const doc of [...loaded, ...loadedGuides, ...loadedRules]) {
   writeFileSync(join(out, "index.md"), doc.markdown);
 }
 
+// --- the playground: its examples are checked here, in the same compiler, so each one does what it says
+const exampleList = [
+  { name: "article", title: "A page with data" },
+  { name: "mistakes", title: "Mistakes the compiler catches" },
+  { name: "form", title: "A form for people and agents" },
+  { name: "components", title: "A layout and a component" },
+];
+const examples = {};
+for (const { name, title } of exampleList) {
+  const dir = join(site, "play/examples", name);
+  const names = readdirSync(dir).filter((f) => f.endsWith(".hypra")).sort((a, b) => (a === "page.hypra" ? -1 : b === "page.hypra" ? 1 : a.localeCompare(b)));
+  const files = names.map((f) => [f, readFileSync(join(dir, f), "utf8")]);
+  const data = readdirSync(dir).includes("data.json") ? readFileSync(join(dir, "data.json"), "utf8") : "{}\n";
+  const result = playground(files, data);
+  const clean = result.ok && !result.diagnostics.length;
+  if (name === "mistakes" ? result.ok : !clean) {
+    throw new Error(`the playground's ${name} example doesn't compile as it should:\n${result.diagnostics.map((d) => d.text).join("")}`);
+  }
+  examples[name] = { title, files, data };
+}
+mkdirSync(join(dist, "play"), { recursive: true });
+cpSync(wasmFile, join(dist, "play/hypra.wasm"));
+await bundle({
+  entryPoints: [join(site, "play/play.js")],
+  outdir: join(dist, "play"),
+  // the highlighting for HTML and Markdown output loads when its tab is first opened
+  splitting: true,
+  chunkNames: "chunks/[name]-[hash]",
+  bundle: true,
+  minify: true,
+  format: "esm",
+  target: "es2022",
+  define: { EXAMPLES: JSON.stringify(examples) },
+  logLevel: "warning",
+});
+build(join(site, "pages/play.hypra"), {}, join(dist, "play"));
+
 // --- the list of guides
 build(
   join(site, "pages/guides.hypra"),
@@ -384,7 +475,7 @@ build(
 
 // the compiler names its outputs after the page; these are their folders' index, and the HTML's link to its
 // Markdown follows the rename
-for (const page of ["guides", "rules"]) {
+for (const page of ["guides", "rules", "play"]) {
   for (const ext of ["html", "md", "json", "webmcp.json"]) {
     renameSync(join(dist, page, `${page}.${ext}`), join(dist, page, `index.${ext}`));
   }
@@ -398,7 +489,7 @@ for (const page of ["guides", "rules"]) {
 const summary = "Hypra is a strict markup language that compiles to HTML for people and to Markdown, JSON and WebMCP tools for AI agents.";
 writeFileSync(
   join(dist, "llms.txt"),
-  `# Hypra\n\n> ${summary}\n\nAll of these pages in one file: ${origin}/llms-full.txt\n\n## Docs\n\n` +
+  `# Hypra\n\n> ${summary}\n\nAll of these pages in one file: ${origin}/llms-full.txt\n\nTry it in the browser, without installing anything: ${origin}/play/\n\n## Docs\n\n` +
     loaded.map((d) => `- [${d.title}](${origin}${urlOf(d)}index.md): ${d.description}`).join("\n") +
     "\n\n## Guides\n\n" +
     loadedGuides.map((d) => `- [${d.title}](${origin}${urlOf(d)}index.md): ${d.description}`).join("\n") +
@@ -418,6 +509,7 @@ writeFileSync(
 const pages = [
   `${origin}/`,
   ...loaded.map((d) => `${origin}${urlOf(d)}`),
+  `${origin}/play/`,
   `${origin}/guides/`,
   ...loadedGuides.map((d) => `${origin}${urlOf(d)}`),
   `${origin}/rules/`,

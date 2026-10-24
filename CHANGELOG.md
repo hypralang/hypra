@@ -3,6 +3,12 @@
 Hypra is pre-1.0: a minor version (0.2, 0.3) may change the language or its output, a patch version (0.1.1) only
 fixes and adds checks.
 
+## Unreleased
+
+- [The playground](https://hypralang.dev/play/): write Hypra in the browser and see the page, its HTML, Markdown,
+  JSON and tools, and every message, as you type. It runs the compiler as WebAssembly, opens with examples, and
+  "Copy link" shares what you wrote. The examples on the website have a "Try it" link that opens them there
+
 ## 0.4.1
 
 - The preview of a layout or component shows a page that uses it, instead of an error that it has no page

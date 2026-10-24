@@ -39,7 +39,7 @@ example fails.
 | `src` | the compiler: lexer, parser, checks, IR and the HTML, PHP and JavaScript outputs |
 | `js`, `php` | the runtimes for compiled pages, and the Laravel package |
 | `editors/vscode` | the extension for VS Code and Cursor |
-| `site` | hypralang.dev, written in Hypra |
+| `site` | hypralang.dev, written in Hypra; `site/play` is the playground, which runs the compiler built from `site/wasm` |
 | `starter` | the example site people copy with `npx degit hypralang/hypra/starter` |
 | `examples` | the pages the README and the tests use |
 | `docs` | the spec, the rule pages and the guides |

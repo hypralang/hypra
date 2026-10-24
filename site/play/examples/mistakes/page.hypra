@@ -1,0 +1,9 @@
+// Five mistakes HTML lets through. Each message below says where and how to fix it; fix them all to see the page.
+page(title: "Menu", description: "Today's bread and pastries at Crumb & Co, baked this morning, with prices and allergens.") {
+  h1 "Today's menu"
+  img("/img/loaves.jpg")
+  h3 "Bread"
+  div(class: "item", onclick: "order('rye')") "Rye loaf, €4.50"
+  input(type: "email", placeholder: "Your email")
+  a("/allergens") "Click here"
+}

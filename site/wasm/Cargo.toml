@@ -1,0 +1,21 @@
+# The compiler as WebAssembly, for the playground on hypralang.dev. It isn't published; the site builds it.
+[package]
+name = "hypra-playground"
+version = "0.0.0"
+edition = "2024"
+publish = false
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+hypra = { path = "../.." }
+serde_json = { version = "1.0.154", features = ["preserve_order"] }
+
+# a small download for the page
+[profile.release]
+lto = true
+codegen-units = 1
+opt-level = "s"
+strip = true
+panic = "abort"
