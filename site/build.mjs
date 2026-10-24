@@ -251,6 +251,23 @@ const landing = {
   },
 };
 
+// cards that fill the last row of a grid of guides, so it has no gap: as many as the row needs, in this order
+const fillers = [
+  {
+    url: "/play/",
+    title: "Try it in the playground",
+    description: "Write a page in the browser and see its HTML, Markdown and tools, and every error, as you type.",
+    extra: true,
+  },
+  {
+    url: `${github}/issues/new?title=Guide%3A%20`,
+    title: "Missing a guide?",
+    description: "Say in an issue what you'd like to do with Hypra, and it may become the next guide.",
+    extra: true,
+  },
+];
+const filled = (list) => [...list.map((g) => ({ ...g, extra: false })), ...fillers.slice(0, (3 - (list.length % 3)) % 3)];
+
 // --- the docs: Markdown from the repository
 
 const slug = (text) => text.toLowerCase().replace(/<[^>]+>|`/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
@@ -380,7 +397,7 @@ rmSync(dist, { recursive: true, force: true });
 cpSync(join(site, "public"), dist, { recursive: true });
 build(
   join(site, "pages/index.hypra"),
-  { ...landing, guides: guides.map((g) => ({ url: urlOf(g), title: g.nav, description: g.description })) },
+  { ...landing, guides: filled(guides.map((g) => ({ url: urlOf(g), title: g.nav, description: g.description }))) },
   dist,
 );
 
@@ -457,7 +474,7 @@ build(join(site, "pages/play.hypra"), {}, join(dist, "play"));
 // --- the list of guides
 build(
   join(site, "pages/guides.hypra"),
-  { guides: loadedGuides.map((g) => ({ url: urlOf(g), title: g.title, description: g.description })) },
+  { guides: filled(loadedGuides.map((g) => ({ url: urlOf(g), title: g.title, description: g.description }))) },
   join(dist, "guides"),
 );
 

@@ -1,6 +1,6 @@
 use "layout.hypra"
 
-page(layout: Site, title: "Guides", canonical: "https://hypralang.dev/guides/", description: "Step-by-step guides: Markdown for LLMs in Laravel, accessibility checks at compile time and WebMCP tools.") {
+page(layout: Site, title: "Guides", canonical: "https://hypralang.dev/guides/", description: "Step-by-step guides: Markdown for AI agents in Node.js and Laravel, llms.txt, WebMCP tools and accessibility checks.") {
   props(guides: List)
 
   div(class: "mx-auto max-w-6xl px-6 pt-14") {
@@ -10,7 +10,10 @@ page(layout: Site, title: "Guides", canonical: "https://hypralang.dev/guides/", 
       for guide in guides {
         li(class: "bg-paper") {
           a(guide.url, class: "block h-full p-6 no-underline hover:bg-code") {
-            h2(class: "text-xl leading-snug font-bold") "{guide.title}"
+            h2(class: "text-xl leading-snug font-bold") {
+              if guide.extra { span(class: "text-pass", aria-hidden: true) "→ " }
+              "{guide.title}"
+            }
             p(class: "mt-2 text-ink-2") "{guide.description}"
           }
         }
