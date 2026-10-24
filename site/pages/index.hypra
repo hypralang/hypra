@@ -64,12 +64,13 @@ page(layout: Site, title: "Pages that compile", canonical: "https://hypralang.de
   }
 
   Section(number: "04", title: "Guides") {
-    ul(class: "mt-6 grid gap-px border-y border-rule bg-rule sm:grid-cols-3") {
+    // a list rather than a grid, so it reads the same for any number of guides
+    ul(class: "mt-6 border-t border-rule") {
       for guide in guides {
-        li(class: "bg-paper sm:px-5 sm:first:pl-0") {
-          a(guide.url, class: "block h-full py-5 pr-6 no-underline hover:underline sm:pr-0") {
-            h3(class: "text-lg leading-snug font-bold") "{guide.title}"
-            p(class: "mt-1.5 text-ink-2") "{guide.description}"
+        li(class: "border-b border-rule") {
+          a(guide.url, class: "group grid gap-1 py-5 no-underline sm:grid-cols-[minmax(0,1fr)_minmax(0,2fr)] sm:items-baseline sm:gap-10") {
+            h3(class: "text-lg leading-snug font-bold group-hover:underline") "{guide.title}"
+            p(class: "text-ink-2") "{guide.description}"
           }
         }
       }
