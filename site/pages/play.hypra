@@ -1,0 +1,65 @@
+use "layout.hypra"
+
+// The playground: the compiler runs in the browser, as WebAssembly. play.js fills in the editor, the outputs and
+// the messages; without JavaScript the page says what it would do.
+page(layout: Site, title: "Playground", canonical: "https://hypralang.dev/play/", description: "Write a Hypra page in the browser and see its HTML, Markdown, JSON and WebMCP tools, and every error, as you type.") {
+  head {
+    script("/play/play.js", type: "module")
+  }
+
+  section(class: "mx-auto max-w-[96rem] px-6 pt-10") {
+    div(class: "flex flex-wrap items-end justify-between gap-x-10 gap-y-4") {
+      div {
+        h1(class: "text-[2.4rem] leading-tight font-extrabold tracking-[-0.03em]") "Playground"
+        p(class: "mt-2 max-w-2xl text-ink-2") "Write a page and see what the compiler makes of it as you type: the page, its HTML, the Markdown for AI agents, its data as JSON and the tools its forms become. Everything runs in your browser."
+      }
+      div(class: "flex flex-wrap items-center gap-3 text-[15px]") {
+        label(for: "example", class: "text-ink-2") "Example"
+        select(id: "example", class: "rounded-md border border-rule bg-paper px-3 py-2") {
+          option(value: "") "Choose…"
+        }
+        button(type: "button", id: "format", class: "rounded-md border border-ink px-4 py-2 font-bold hover:bg-ink hover:text-paper") "Format"
+        button(type: "button", id: "share", class: "rounded-md bg-ink px-4 py-2 font-bold text-paper hover:bg-ink-2") "Copy link"
+      }
+    }
+
+    noscript {
+      p(class: "mt-8 rounded-md border border-rule bg-code p-4") "The playground needs JavaScript: it runs the compiler in your browser as WebAssembly."
+    }
+
+    div(class: "playground mt-6 grid gap-4 lg:grid-cols-2") {
+      div(class: "pane") {
+        div(id: "files", class: "tabs", role: "tablist", aria-label: "Files")
+        div(id: "editor", class: "editor")
+      }
+      div(class: "pane") {
+        div(id: "outputs", class: "tabs", role: "tablist", aria-label: "Output") {
+          button(type: "button", role: "tab", data-output: "preview", aria-selected: "true") "Preview"
+          button(type: "button", role: "tab", data-output: "html", aria-selected: "false") "HTML"
+          button(type: "button", role: "tab", data-output: "markdown", aria-selected: "false") "Markdown"
+          button(type: "button", role: "tab", data-output: "json", aria-selected: "false") "JSON"
+          button(type: "button", role: "tab", data-output: "tools", aria-selected: "false") "Tools"
+        }
+        div(id: "output", class: "editor", role: "tabpanel", aria-label: "Output") {
+          iframe(id: "preview", title: "Preview of the page", sandbox: "")
+        }
+      }
+    }
+
+    div(class: "mt-4") {
+      div(class: "flex items-baseline justify-between gap-4 text-[14px]") {
+        h2(class: "text-[15px] font-bold") "Messages"
+        span(id: "status", class: "font-mono text-mute", aria-live: "polite") "Loading the compiler…"
+      }
+      div(id: "problems", class: "codeblock terminal mt-2")
+    }
+
+    p(class: "mt-6 text-[15px] text-ink-2") {
+      "The preview uses a plain stylesheet and doesn't run scripts. To use Hypra in a project, "
+      a("/#install") "install the compiler"
+      "; the "
+      a("/docs/") "language reference"
+      " has everything a page can contain."
+    }
+  }
+}

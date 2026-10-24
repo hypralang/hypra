@@ -1,0 +1,12 @@
+// A form for people and for AI agents: open Tools to see the tool an agent gets, with a JSON Schema for each field.
+page(title: "Book a guided walk", description: "Book a guided walk along the cliffs: pick a date, a route and how many people are coming.") {
+  h1 "Book a guided walk"
+  p "Walks start at 9:00 at the harbour and take about three hours."
+  form("/bookings", name: "book_walk", description: "Book a guided walk for a date and a group") {
+    field("date", type: Date(min: "2026-11-01"), label: "Date")
+    field("route", type: Choice(cliffs: "Cliff path, 9 km", bay: "Bay loop, 6 km"), label: "Route")
+    field("people", type: Int(1..12), label: "People", default: 2)
+    field("notes", type: Text(max: 500), label: "Anything we should know?", optional: true)
+    button "Book the walk"
+  }
+}

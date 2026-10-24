@@ -1,0 +1,7 @@
+{
+  "events": [
+    { "title": "Mending clothes by hand", "day": "Tuesday", "time": "18:00", "room": "Workshop", "full": true },
+    { "title": "The history of the harbour", "day": "Thursday", "time": "19:00", "room": "Reading room", "full": false },
+    { "title": "Birds of the estuary, a walk", "day": "Saturday", "time": "8:30", "room": "Meet at the entrance", "full": false }
+  ]
+}

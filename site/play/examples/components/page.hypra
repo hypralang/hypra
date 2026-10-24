@@ -1,0 +1,11 @@
+// A page with a layout and a component from other files: open them in the tabs above.
+use "site.hypra"
+use "event.hypra"
+
+page(layout: Site, title: "Events this week", description: "Talks, workshops and walks at the Harbour Library this week, all free, most without booking.") {
+  props(events: List)
+  h1 "Events this week"
+  for event in events {
+    Event(title: event.title, day: event.day, time: event.time, room: event.room, full: event.full)
+  }
+}

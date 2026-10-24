@@ -5,8 +5,6 @@ say so in an [issue](https://github.com/hypralang/hypra/issues): that moves it u
 
 ## Next
 
-- **A playground on hypralang.dev.** Write Hypra in the browser and see the page, its Markdown, its JSON and the
-  compiler's messages as you type, without installing anything.
 - **A Vite plugin.** `import page from "./product.hypra"` in Vite, Astro and SvelteKit, compiled on the fly
   with errors in the browser's overlay.
 
