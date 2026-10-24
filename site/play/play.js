@@ -124,7 +124,11 @@ function tabs() {
     tab.addEventListener("click", () => show(i));
     const errors = last.diagnostics?.filter((d) => d.file === doc.name && d.severity === "error").length;
     if (errors) tab.dataset.errors = errors;
-    bar.append(tab);
+    // the tab and its remove button look like one tab
+    const file = document.createElement("span");
+    file.className = "file";
+    file.append(tab);
+    bar.append(file);
     if (i > 0 && doc.name !== "data.json") {
       const remove = document.createElement("button");
       remove.type = "button";
@@ -141,7 +145,7 @@ function tabs() {
         tabs();
         compile();
       });
-      bar.append(remove);
+      file.append(remove);
     }
   });
   const add = document.createElement("button");

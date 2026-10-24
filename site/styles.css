@@ -115,7 +115,12 @@
 .playground .tabs button { @apply px-3.5 py-2 font-mono text-ink-2 hover:text-ink; }
 .playground .tabs [role="tab"][aria-selected="true"] { @apply bg-code font-semibold text-ink shadow-[inset_0_-2px_0_var(--color-ink)]; }
 .playground .tabs [data-errors]::after { content: " " attr(data-errors); @apply font-bold text-fail; }
-.playground .tabs .remove { @apply -ml-2 px-1.5 text-mute hover:text-fail; }
+/* a file's tab is the tab and its remove button together */
+.playground .tabs .file { @apply flex items-stretch; }
+.playground .tabs .file:has([aria-selected="true"]) { @apply bg-code shadow-[inset_0_-2px_0_var(--color-ink)]; }
+.playground .tabs .file [role="tab"] { @apply bg-transparent shadow-none; }
+.playground .tabs .file:has(.remove) [role="tab"] { @apply pr-1.5; }
+.playground .tabs .remove { @apply pr-3 pl-1 text-mute hover:text-fail; }
 .playground .tabs .add { @apply ml-auto font-sans text-mute; }
 .playground .editor { @apply relative h-[26rem] lg:h-[36rem]; }
 .playground .editor .cm-editor { @apply h-full; }
