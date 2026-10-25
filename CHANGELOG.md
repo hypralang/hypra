@@ -3,7 +3,7 @@
 Hypra is pre-1.0: a minor version (0.2, 0.3) may change the language or its output, a patch version (0.1.1) only
 fixes and adds checks.
 
-## Unreleased
+## 0.5.0
 
 - `field(..., description: "...")` describes a field to AI agents when its label alone doesn't say enough. It
   writes WebMCP's `toolparamdescription`, and every field's schema in the page's tools now has a `description`:

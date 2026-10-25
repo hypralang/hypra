@@ -1,6 +1,6 @@
 {
   "name": "hypra",
-  "version": "0.4.1",
+  "version": "0.5.0",
   "description": "The Hypra compiler and the runtime for its JavaScript pages: accessible HTML for browsers, Markdown for LLMs and WebMCP tools for AI agents, from one file.",
   "keywords": [
     "hypra",
