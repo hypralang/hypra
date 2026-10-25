@@ -5,6 +5,12 @@ fixes and adds checks.
 
 ## Unreleased
 
+- `field(..., description: "...")` describes a field to AI agents when its label alone doesn't say enough. It
+  writes WebMCP's `toolparamdescription`, and every field's schema in the page's tools now has a `description`:
+  its own, or else its label, as browsers do
+- `form(..., autosubmit: true)` writes WebMCP's `toolautosubmit`, so an agent's call sends the form instead of
+  only filling it in. A form with `autosubmit` but no name gets FORM-004
+
 - [The playground](https://hypralang.dev/play/): write Hypra in the browser and see the page, its HTML, Markdown,
   JSON and tools, and every message, as you type. It runs the compiler as WebAssembly, opens with examples, and
   "Copy link" shares what you wrote. The examples on the website have a "Try it" link that opens them there

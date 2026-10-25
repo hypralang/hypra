@@ -263,11 +263,16 @@ form("/signup", name: "signup", description: "Create an account") {
 - `form(url, name: "...")`: the `name` makes the form a tool agents can call, so a form with fields should have
   one. Also: `description`, and `method`: `"post"` by default; `"get"`, `"put"`, `"patch"` and `"delete"` also
   work, and `"dialog"` closes the surrounding `dialog` without sending anything, so it's never a tool.
+  `autosubmit: true` lets an agent's call send the form (WebMCP's `toolautosubmit`); without it, the agent fills
+  the form in and the visitor sends it. Use it for forms that are safe to send without asking, like a search,
+  never for one that pays, orders or deletes.
 - A form needs a `button` to submit it.
 - `field("name", type: ..., label: "...")` goes anywhere inside the form, also inside `fieldset` or a `div`, but
   not inside `for` or `if`: fields are the form's fixed inputs. `type` and `label` are required. Fields are
-  required to fill in unless they have `optional: true`. Also: `default: "..."`, and any input attribute such as
-  `placeholder: "..."`. Plain `input`, `select` and `textarea` work too, but agents only see fields.
+  required to fill in unless they have `optional: true`. Also: `default: "..."`, `description: "..."` for agents
+  when the label alone doesn't say enough (WebMCP's `toolparamdescription`; otherwise agents get the label), and
+  any input attribute such as `placeholder: "..."`. Plain `input`, `select` and `textarea` work too, but agents
+  only see fields.
 - Forms can't be nested, and an `action` is a form of its own, so it can't be inside a form or a line of text.
 
 | Field type | Input |

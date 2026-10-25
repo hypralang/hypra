@@ -3,7 +3,8 @@
 **Warning**: the page still builds, but this is most likely a mistake.
 
 A form's name is the name AI agents call it by: it becomes the form's WebMCP tool, and the action listed in
-the page's Markdown and JSON.
+the page's Markdown and JSON. A form with `autosubmit: true` but no name gets this warning too: without a name
+it isn't a tool, so there's nothing for an agent to send.
 
 ## Fails
 

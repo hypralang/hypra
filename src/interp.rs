@@ -190,7 +190,14 @@ impl Interp<'_> {
                     let value = self.eval(expr);
                     json!({ "type": json_type(&value), "const": value })
                 }
-                None => p.schema.clone(),
+                None => {
+                    let mut schema = p.schema.clone();
+                    let description = p.description.as_ref().map(|d| display(&self.eval(d))).unwrap_or_default();
+                    if !description.is_empty() {
+                        schema["description"] = json!(description);
+                    }
+                    schema
+                }
             };
             params.insert(p.name.clone(), schema);
             if p.required {
