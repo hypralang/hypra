@@ -270,6 +270,6 @@ console.log(Object.keys(out.json.actions[0].params).join(","), JSON.stringify(ou
     );
     assert_eq!(
         out,
-        "<p>{&quot;name&quot;:&quot;root&quot;,&quot;children&quot;:[{&quot;name&quot;:&quot;child&quot;,&quot;parent&quot;:null}]}</p>\n__proto__ {\"__proto__\":{\"type\":\"string\"}}\n"
+        "<p>{&quot;name&quot;:&quot;root&quot;,&quot;children&quot;:[{&quot;name&quot;:&quot;child&quot;,&quot;parent&quot;:null}]}</p>\n__proto__ {\"__proto__\":{\"type\":\"string\",\"description\":\"Odd name\"}}\n"
     );
 }

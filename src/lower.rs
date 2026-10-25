@@ -991,7 +991,14 @@ impl<'a> Lowerer<'a> {
             let value = self.expr(&a.value);
             let input = format!("<input type=\"hidden\" name=\"{}\" value=\"", esc(&key.name));
             self.html_line(depth + 1, vec![fixed(&input), escaped(&value), fixed("\">")]);
-            params.push(ParamDef { name: key.name.clone(), schema: Json::Null, value: Some(value), required: true });
+            let param = ParamDef {
+                name: key.name.clone(),
+                schema: Json::Null,
+                value: Some(value),
+                description: None,
+                required: true,
+            };
+            params.push(param);
         }
         let sent: Vec<&str> = el.args.iter().filter_map(|a| a.name()).filter(|n| !styling.contains(n)).collect();
         let mut button = vec![fixed("<button type=\"submit\"")];
@@ -1011,7 +1018,7 @@ impl<'a> Lowerer<'a> {
 
     fn form(&mut self, el: &'a Element, depth: usize) {
         let method = el.arg("method").and_then(Value::as_str).unwrap_or("post").to_ascii_lowercase();
-        let skip = ["action", "name", "description", "method"];
+        let skip = ["action", "name", "description", "method", "autosubmit"];
         if method == "dialog" {
             // closes the dialog it's in; nothing is sent, so it's plain HTML
             let mut open = vec![fixed("<form method=\"dialog\"")];
@@ -1044,6 +1051,10 @@ impl<'a> Lowerer<'a> {
                 escaped(description),
                 fixed("\""),
             ]);
+            // an agent's call sends the form, instead of filling it in for the visitor to send
+            if el.flag("autosubmit") {
+                open.push(fixed(" toolautosubmit"));
+            }
         }
         open.extend(self.attributes(el, &skip));
         open.push(fixed(">"));
@@ -1091,7 +1102,12 @@ impl<'a> Lowerer<'a> {
         let required = !el.flag("optional") || kind.input == "checkbox";
         let req = if required { " required" } else { "" };
         let name = esc(&key);
-        let extra = self.attributes(el, &["name", "type", "label", "optional", "default"]);
+        let description = el.arg("description").map(|v| self.expr(v));
+        let mut extra = self.attributes(el, &["name", "type", "label", "optional", "default", "description"]);
+        // browsers describe the field to agents by its label, unless it has a description of its own
+        if let Some(d) = &description {
+            extra.extend([fixed(" toolparamdescription=\""), escaped(d), fixed("\"")]);
+        }
 
         let mut schema = json!({ "type": kind.schema.0 });
         if let Some(format) = kind.schema.1 {
@@ -1174,7 +1190,7 @@ impl<'a> Lowerer<'a> {
         }
         line.push(fixed("</label>"));
         self.html_line(depth, line);
-        Some(ParamDef { name: key, schema, value: None, required })
+        Some(ParamDef { name: key, schema, value: None, description: Some(description.unwrap_or(label)), required })
     }
 
     fn call(&mut self, el: &'a Element, depth: usize) {

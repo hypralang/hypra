@@ -428,11 +428,17 @@ impl<'a> Checker<'a> {
                     .help("add button \"Send\""),
             );
         }
-        if e.arg("name").is_none() && method.as_deref() != Some("dialog") && contains_element(&e.children, "field") {
-            self.report(
-                Diagnostic::warning("FORM-004", "form has fields but no name, so agents can't call it", e.pos, len)
-                    .help("add name: \"signup\""),
-            );
+        if e.arg("name").is_none() && method.as_deref() != Some("dialog") {
+            let message = if e.flag("autosubmit") {
+                Some("form has `autosubmit` but no name, so it isn't a tool agents can call")
+            } else if contains_element(&e.children, "field") {
+                Some("form has fields but no name, so agents can't call it")
+            } else {
+                None
+            };
+            if let Some(message) = message {
+                self.report(Diagnostic::warning("FORM-004", message, e.pos, len).help("add name: \"signup\""));
+            }
         }
     }
 

@@ -507,9 +507,38 @@ fn field_types_take_bounds_options_and_files() {
         assert!(out.html.contains(part), "{part}\n{}", out.html);
     }
     let params = &out.json["actions"][0]["params"];
-    assert_eq!(params["age"], json!({ "type": "integer", "minimum": 18 }));
-    assert_eq!(params["price"], json!({ "type": "number", "minimum": 0, "maximum": 9.99 }));
-    assert_eq!(params["country"], json!({ "type": "string", "enum": ["de", "at"] }));
+    assert_eq!(params["age"], json!({ "type": "integer", "minimum": 18, "description": "Age" }));
+    assert_eq!(params["price"], json!({ "type": "number", "minimum": 0, "maximum": 9.99, "description": "Price" }));
+    assert_eq!(params["country"], json!({ "type": "string", "enum": ["de", "at"], "description": "Country" }));
+}
+
+#[test]
+fn fields_describe_themselves_to_agents_and_forms_can_send_themselves() {
+    let result = compile(
+        &page(
+            "  props(u: U)\n  form(\"/search\", name: \"search\", description: \"Find a trail\", autosubmit: true) {\n    field(\"q\", type: String, label: \"Search\", description: \"Words from the trail's name or {u.region}\")\n    field(\"km\", type: Int, label: \"Longest distance in km\", optional: true)\n    button \"Search\"\n  }",
+        ),
+        &json!({ "u": { "region": "the Alps" } }),
+        "p",
+    );
+    assert!(result.diagnostics.is_empty(), "{:?}", result.diagnostics);
+    let out = result.output.unwrap();
+    assert!(out.html.contains("toolname=\"search\" tooldescription=\"Find a trail\" toolautosubmit>"), "{}", out.html);
+    assert!(
+        out.html.contains(
+            "<input type=\"text\" name=\"q\" toolparamdescription=\"Words from the trail's name or the Alps\" required>"
+        ),
+        "{}",
+        out.html
+    );
+    // without a description of its own, a field is described by its label, as browsers do
+    assert!(out.html.contains("<input type=\"number\" name=\"km\">"), "{}", out.html);
+    let params = &out.webmcp[0]["inputSchema"]["properties"];
+    assert_eq!(params["q"]["description"], "Words from the trail's name or the Alps");
+    assert_eq!(params["km"]["description"], "Longest distance in km");
+
+    let unnamed = compile(&page("  form(\"/s\", autosubmit: true) {\n    button \"Go\"\n  }"), &json!({}), "p");
+    assert_eq!(codes(&unnamed.diagnostics), ["FORM-004"]);
 }
 
 #[test]

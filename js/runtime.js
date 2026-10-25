@@ -226,9 +226,7 @@ class Context {
 
   action(name, description, method, endpoint, params) {
     // fromEntries makes every name an own key, even `__proto__`
-    const schemas = Object.fromEntries(
-      params.map((param) => [param.name, "value" in param ? { type: type(param.value), const: param.value } : param.schema]),
-    );
+    const schemas = Object.fromEntries(params.map((param) => [param.name, schemaOf(param)]));
     const required = params.filter((param) => param.required).map((param) => param.name);
     const existing = this.actions.find((a) => a.name === name);
     if (existing) {
@@ -254,6 +252,13 @@ class Context {
   #fail(at, message) {
     if (this.#strict) throw new DataError(`${at}: ${message}`);
   }
+}
+
+/** A parameter's JSON Schema: a fixed value, or a field's schema with what it's for. */
+function schemaOf(param) {
+  if ("value" in param) return { type: type(param.value), const: param.value };
+  const description = param.description == null ? "" : display(param.description);
+  return description ? { ...param.schema, description } : param.schema;
 }
 
 /**

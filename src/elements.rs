@@ -78,7 +78,12 @@ const IMG: &[Attr] = &[attr("alt", Kind::Text), attr("decorative", Kind::Bool), 
 
 const VIDEO: &[Attr] = &[attr("captions", Kind::Text)];
 
-const FORM: &[Attr] = &[attr("name", Kind::Static), attr("description", Kind::Text), attr("method", Kind::Static)];
+const FORM: &[Attr] = &[
+    attr("name", Kind::Static),
+    attr("description", Kind::Text),
+    attr("method", Kind::Static),
+    attr("autosubmit", Kind::Bool),
+];
 
 const ACTION: &[Attr] = &[attr("confirm", Kind::Text)];
 
@@ -87,6 +92,7 @@ const FIELD: &[Attr] = &[
     req("label", Kind::Text, "FORM-002", "add label: \"...\""),
     attr("optional", Kind::Bool),
     attr("default", Kind::Text),
+    attr("description", Kind::Text),
 ];
 
 /// A field type: the control it becomes and how agents see it.

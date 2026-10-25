@@ -12,9 +12,20 @@ the idea of tools from the Model Context Protocol (MCP), which AI assistants alr
 
 WebMCP has two parts:
 
-- a **declarative** one: attributes on an ordinary HTML form, `toolname` and `tooldescription`, from which the
-  browser builds the tool and its parameters;
+- a **declarative** one: attributes on an ordinary HTML form, from which the browser builds the tool and its
+  parameters;
 - an **imperative** one: a JavaScript API for tools that aren't forms.
+
+The declarative attributes, as [Chrome documents them](https://developer.chrome.com/docs/ai/webmcp/declarative-api):
+
+| Attribute | On | What it does |
+| --- | --- | --- |
+| `toolname` | `form` | the tool's name; required |
+| `tooldescription` | `form` | what the tool does; required |
+| `toolparamdescription` | a field | describes the parameter; without it, the browser uses the field's label |
+| `toolautosubmit` | `form` | the agent's call sends the form; without it, the agent only fills it in and the visitor sends it |
+
+The parameters come from the fields: their `name`, `type`, `required` and the options of a `select`.
 
 It's experimental. Chrome is testing it, the details are still changing, and other browsers haven't committed to
 it. The declarative form is the safe start: browsers that don't know the attributes ignore them, so the forms work
@@ -34,14 +45,21 @@ You can add the attributes by hand to any form:
     </select>
   </label>
   <label>Email for the receipt <input type="email" name="email" required></label>
+  <label>Note for the courier
+    <textarea name="note" maxlength="200" toolparamdescription="Where to leave the parcel, or a door code"></textarea>
+  </label>
   <button type="submit">Pay now</button>
 </form>
 ```
 
+A form that's safe to send without asking, like a search, can add `toolautosubmit`. Don't add it to a form
+that pays, orders or deletes something: there, the visitor should see what the agent filled in and send it
+themselves.
+
 That's a good start. What it leaves to you:
 
-- The tool's parameters are only as good as the form's markup: a field without `name`, `type` or `required`
-  becomes a vague parameter, and nothing tells you.
+- The tool's parameters are only as good as the form's markup: a field without `name`, `type`, `required` or a
+  label becomes a vague parameter, and nothing tells you.
 - Buttons that do one thing, like "remove from cart", need to be wrapped in forms to become tools at all, and a
   list of ten of them becomes ten tools with the same name.
 - Agents that don't run a browser, like a crawler or an assistant reading your page as text, don't see the
@@ -66,7 +84,7 @@ page(title: "Your cart", description: "The shoes in your cart, ready to check ou
   form("/checkout", name: "checkout", description: "Pay for the cart and choose how it's delivered") {
     field("delivery", type: Choice(standard: "Standard, 3–5 days", express: "Express, next day"), label: "Delivery")
     field("email", type: Email, label: "Email for the receipt")
-    field("note", type: Text(max: 200), label: "Note for the courier", optional: true)
+    field("note", type: Text(max: 200), label: "Note for the courier", optional: true, description: "Where to leave the parcel, or a door code")
     button "Pay now"
   }
 }
@@ -87,14 +105,14 @@ with this data:
 
 ### For browsers: WebMCP attributes
 
-The checkout form becomes a normal HTML form with the WebMCP attributes, labels on every field and the
-constraints from the field types:
+The checkout form becomes a normal HTML form with the WebMCP attributes, labels on every field, the
+constraints from the field types, and `toolparamdescription` where a field has a `description`:
 
 ```html output
 <form method="post" action="/checkout" toolname="checkout" tooldescription="Pay for the cart and choose how it's delivered">
   <label>Delivery <select name="delivery" required><option value="">Delivery</option><option value="standard">Standard, 3–5 days</option><option value="express">Express, next day</option></select></label>
   <label>Email for the receipt <input type="email" name="email" required></label>
-  <label>Note for the courier <textarea name="note" maxlength="200"></textarea></label>
+  <label>Note for the courier <textarea name="note" maxlength="200" toolparamdescription="Where to leave the parcel, or a door code"></textarea></label>
   <button>Pay now</button>
 </form>
 ```
@@ -140,15 +158,18 @@ without a browser.
           "enum": [
             "standard",
             "express"
-          ]
+          ],
+          "description": "Delivery"
         },
         "email": {
           "type": "string",
-          "format": "email"
+          "format": "email",
+          "description": "Email for the receipt"
         },
         "note": {
           "type": "string",
-          "maxLength": 200
+          "maxLength": 200,
+          "description": "Where to leave the parcel, or a door code"
         }
       },
       "required": [
@@ -162,7 +183,17 @@ without a browser.
 
 The two **Remove from cart** buttons became *one* tool, `cart.remove`, whose `id` must be one of the items in the
 cart. A field with `optional: true` isn't required; a `Choice` becomes an `enum`; `Text(max: 200)` becomes
-`maxLength`.
+`maxLength`. Each field is described the way the browser describes it: by its `description`, or else its label.
+
+A search is safe for an agent to send by itself, so its form can say so with `autosubmit: true`, which writes
+`toolautosubmit`:
+
+```hypra
+form("/search", method: "get", name: "search", description: "Find shoes by name or brand", autosubmit: true) {
+  field("q", type: String(1..80), label: "Search")
+  button "Search"
+}
+```
 
 ### For LLMs: the actions in Markdown
 

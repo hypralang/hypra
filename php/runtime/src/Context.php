@@ -169,16 +169,24 @@ final class Context
     }
 
     /**
-     * @param list<array{name: string, required: bool, schema?: mixed, value?: mixed}> $params
+     * @param list<array{name: string, required: bool, schema?: mixed, value?: mixed, description?: mixed}> $params
      */
     public function action(string $name, mixed $description, string $method, mixed $endpoint, array $params): void
     {
         $schemas = [];
         $required = [];
         foreach ($params as $param) {
-            $schemas[$param['name']] = array_key_exists('value', $param)
-                ? ['type' => Value::type($param['value']), 'const' => $param['value']]
-                : $param['schema'];
+            if (array_key_exists('value', $param)) {
+                $schemas[$param['name']] = ['type' => Value::type($param['value']), 'const' => $param['value']];
+            } else {
+                // a field's schema, with what it's for
+                $schema = $param['schema'];
+                $about = Value::display($param['description'] ?? '');
+                if ($about !== '') {
+                    $schema['description'] = $about;
+                }
+                $schemas[$param['name']] = $schema;
+            }
             if ($param['required']) {
                 $required[] = $param['name'];
             }

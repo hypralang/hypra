@@ -154,6 +154,8 @@ pub struct ParamDef {
     pub schema: Json,
     /// A fixed value, e.g. `id: product.id`; its schema is `{ "type": ..., "const": value }`.
     pub value: Option<Expr>,
+    /// What the field is for, for agents: its `description`, or else its label. Goes into the schema.
+    pub description: Option<Expr>,
     pub required: bool,
 }
 

@@ -143,7 +143,10 @@ impl Writer<'_> {
         for p in &def.params {
             let source = match &p.value {
                 Some(value) => format!("'value' => {}", self.expr(value)),
-                None => format!("'schema' => {}", literal(&p.schema)),
+                None => match &p.description {
+                    Some(d) => format!("'schema' => {}, 'description' => {}", literal(&p.schema), self.expr(d)),
+                    None => format!("'schema' => {}", literal(&p.schema)),
+                },
             };
             self.line(&format!("['name' => {}, {source}, 'required' => {}],", quote(&p.name), p.required));
         }
