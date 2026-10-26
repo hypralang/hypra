@@ -16,7 +16,26 @@ is a registered media type (RFC 7763), and a page can also point to its Markdown
 
 ## Without Hypra
 
-You can add this to any Laravel app today. A middleware converts the HTML of each response with
+You can add this to any Laravel app today. On PHP 8.4 or later, Spatie's
+[laravel-markdown-response](https://spatie.be/docs/laravel-markdown-response/v1) does it with one middleware:
+
+```console
+$ composer require spatie/laravel-markdown-response
+```
+
+```php
+use Spatie\MarkdownResponse\Middleware\ProvideMarkdownResponse;
+
+Route::middleware(ProvideMarkdownResponse::class)->group(function () {
+    Route::get('/posts/{post}', [PostController::class, 'show']);
+});
+```
+
+It converts the HTML your views render for requests with `Accept: text/markdown`, for URLs ending in `.md`, and
+for known AI crawlers, sets `Vary: Accept`, and caches the result. If your app runs on Laravel Cloud, the
+platform has a Markdown for Agents setting that does the same without a package.
+
+On PHP 8.2 or 8.3, a middleware of your own does the same with
 [league/html-to-markdown](https://github.com/thephpleague/html-to-markdown):
 
 ```console
@@ -62,7 +81,7 @@ Register it for the `web` group in `bootstrap/app.php`:
 })
 ```
 
-This works with the Blade views you have. Its limits come from guessing structure after the fact:
+Both work with the Blade views you have. Their limits come from guessing structure after the fact:
 
 - The converter only sees HTML. A `div` styled as a heading stays text, a button styled as a link becomes a
   link, and anything your layout adds around the content has to be removed by name.

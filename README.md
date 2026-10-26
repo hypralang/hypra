@@ -16,6 +16,7 @@
   <a href="https://hypralang.dev/docs/">Docs</a> ·
   <a href="https://hypralang.dev/guides/">Guides</a> ·
   <a href="https://hypralang.dev/play/">Playground</a> ·
+  <a href="https://hypralang.dev/docs/when-to-use/">When to use it</a> ·
   <a href="js">JavaScript</a> ·
   <a href="php/laravel">Laravel</a> ·
   <a href="editors/vscode">VS Code</a> ·

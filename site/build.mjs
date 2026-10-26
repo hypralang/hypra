@@ -25,6 +25,12 @@ const docs = [
     description: "The complete Hypra reference: elements, data, components, layouts, forms, actions and every check.",
   },
   {
+    slug: "when-to-use",
+    file: "docs/when-to-use.md",
+    nav: "When to use Hypra",
+    description: "When Hypra is worth it, and what to use instead: Markdown middleware, accessibility linters, axe, MJML, React.",
+  },
+  {
     slug: "laravel",
     file: "php/laravel/README.md",
     nav: "Laravel",
