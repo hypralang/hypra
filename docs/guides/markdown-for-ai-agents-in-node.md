@@ -18,49 +18,43 @@ so caches keep the formats apart.
 
 ## Without Hypra
 
-Any Express app can convert the HTML it sends with [Turndown](https://github.com/mixmark-io/turndown):
+The quickest way is a ready-made middleware that converts the HTML a route sends.
+[markdown-for-agents](https://github.com/KKonstantinov/markdown-for-agents) has one for Express, Hono, Fastify,
+Next.js and any server built on the web's `Request` and `Response`:
 
 ```console
-$ npm install turndown
-```
-
-```js
-// middleware/markdown.js
-import TurndownService from "turndown";
-
-const turndown = new TurndownService({ headingStyle: "atx", codeBlockStyle: "fenced" });
-turndown.remove(["head", "title", "script", "style", "nav", "footer"]);
-
-// Answers in Markdown when the client prefers it, by converting the HTML a route sends
-export function markdown(req, res, next) {
-  const send = res.send.bind(res);
-  res.send = (body) => {
-    // the same URL answers in two formats, so caches must keep them apart
-    res.vary("Accept");
-    const html = typeof body === "string" && /html/.test(res.get("Content-Type") ?? "text/html");
-    if (!html || req.accepts(["text/html", "text/markdown"]) !== "text/markdown") return send(body);
-    res.type("text/markdown");
-    return send(turndown.turndown(body));
-  };
-  next();
-}
+$ npm install @markdown-for-agents/express markdown-for-agents
 ```
 
 ```js
 import express from "express";
-import { markdown } from "./middleware/markdown.js";
+import { markdown } from "@markdown-for-agents/express";
 
 const app = express();
-app.use(markdown);
+// strips navigation, footers and banners from the Markdown, and sets Vary: Accept
+app.use(markdown({ extract: true }));
+
+app.get("/articles/:slug", async (req, res) => {
+  const article = await db.articles.find(req.params.slug);
+  // the middleware only converts a response that is already marked as HTML
+  res.type("html").send(renderArticle(article));
+});
 ```
 
-Browsers keep getting HTML; `curl -H "Accept: text/markdown"` gets Markdown. This works with the templates you
-have, whether EJS, Handlebars or plain strings. Its limits come from guessing structure after the fact:
+Browsers keep getting HTML; `curl -H "Accept: text/markdown"` gets Markdown. One thing to know: the middleware
+converts a response only if its `Content-Type` is HTML *before* `res.send` runs, and Express sets the type
+inside `res.send`. So mark the response as HTML first, as above; a plain `res.send(html)` or `res.render(...)`
+is sent as HTML even to clients that ask for Markdown (version 1.3.5, Express 5).
 
-- The converter only sees HTML. A `div` styled as a heading stays text, and everything your layout adds around
-  the content has to be removed by name, like `nav` and `footer` above.
-- Forms and buttons, the things an agent could *do* on the page, are dropped or become loose text.
-- Nothing checks the result. A new banner or cookie notice quietly ends up in every Markdown page.
+To do it yourself instead, [Turndown](https://github.com/mixmark-io/turndown) converts HTML to Markdown in a few
+lines of middleware. Either way, this works with the templates you have, whether EJS, Handlebars or plain
+strings. Its limits come from guessing structure after the fact:
+
+- The converter only sees HTML. A `div` styled as a heading stays text, and what counts as navigation or a
+  banner is guessed, so it can keep too much or drop too much.
+- Forms and buttons, the things an agent could *do* on the page, are dropped or become loose text: in a test, a
+  newsletter form disappeared from the Markdown entirely.
+- Nothing checks the result. A new banner or cookie notice can quietly end up in every Markdown page.
 
 If your site is behind Cloudflare, its Markdown for Agents feature does the same conversion without code, with
 the same trade-offs.
