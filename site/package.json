@@ -19,7 +19,7 @@
     "@tailwindcss/cli": "4.3.3",
     "codemirror": "6.0.2",
     "esbuild": "0.28.2",
-    "marked": "18.1.1",
+    "marked": "18.1.2",
     "shiki": "4.5.0"
   }
 }
